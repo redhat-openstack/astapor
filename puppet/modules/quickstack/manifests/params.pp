@@ -13,6 +13,8 @@ class quickstack::params {
   $keystone_admin_token       = 'CHANGEME'
   $keystone_db_password       = 'CHANGEME'
   $mysql_root_password        = 'CHANGEME'
+  $neutron_db_password        = 'CHANGEME'
+  $neutron_user_password      = 'CHANGEME'
   $nova_db_password           = 'CHANGEME'
   $nova_user_password         = 'CHANGEME'
 
