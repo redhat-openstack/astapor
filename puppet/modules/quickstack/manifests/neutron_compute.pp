@@ -1,5 +1,5 @@
 # Common quickstack configurations
-class quickstack::compute (
+class quickstack::compute::neutron (
   $fixed_network_range        = $quickstack::params::fixed_network_range,
   $floating_network_range       = $quickstack::params::floating_network_range,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
