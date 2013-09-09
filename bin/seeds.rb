@@ -242,6 +242,8 @@ params = {
   "mysql_root_password"        => SecureRandom.hex,
   "nova_db_password"           => SecureRandom.hex,
   "nova_user_password"         => SecureRandom.hex,
+  "neutron_db_password"        => SecureRandom.hex,
+  "neutron_user_password"      => SecureRandom.hex,
   "private_interface"          => private_int,
   "public_interface"           => public_int,
   "fixed_network_range"        => 'PRIV_RANGE',
@@ -251,8 +253,21 @@ params = {
   "admin_email"                => "admin@#{Facter.domain}"
 }
 
-['quickstack::compute','quickstack::controller'].each do |pc|
-pclass = Puppetclass.find_by_name pc
+hostgroups = [
+    {:name=>"OpenStack Controller",
+     :class=>"quickstack::controller::nova"},
+    {:name=>"OpenStack Nova Compute",
+     :class=>"quickstack::compute::nova"},
+    {:name=>"OpenStack Neutron Controller",
+     :class=>"quickstack::controller::neutron"},
+    {:name=>"OpenStack Neutron Compute",
+     :class=>"quickstack::compute::neutron"},
+    {:name=>"OpenStack Neutron Networker",
+     :class=>"quickstack::networker"}
+]
+
+hostgroups.each do |hg|
+pclass = Puppetclass.find_by_name hg[:class]
   params.each do |k,v|
     p = pclass.class_params.find_by_key(k)
     unless p.nil?
@@ -264,19 +279,15 @@ pclass = Puppetclass.find_by_name pc
 end
 
 # Hostgroups
-h_controller=Hostgroup.find_or_create_by_name "OpenStack Controller"
-h_controller.environment = Environment.find_by_name('production')
-h_controller.puppetclasses = [ Puppetclass.find_by_name('quickstack::controller') ]
-h_controller.save!
-
-h_compute=Hostgroup.find_or_create_by_name "OpenStack Nova Compute"
-h_compute.environment = Environment.find_by_name('production')
-h_compute.puppetclasses = [ Puppetclass.find_by_name('quickstack::compute') ]
-h_compute.save!
+hostgroups.each do |hg|
+  h=Hostgroup.find_or_create_by_name hg[:name]
+  h.environment = Environment.find_by_name('production')
+  h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+end
 
 if ENV["FOREMAN_PROVISIONING"] == "true" then
-  ['OpenStack Controller','OpenStack Nova Compute'].each do |name|
-    h=Hostgroup.find_by_name name
+  hostgroups.each do |hg|
+    h=Hostgroup.find_by_name hg[:name]
     h.puppet_proxy    = Feature.find_by_name("Puppet").smart_proxies.first
     h.puppet_ca_proxy = Feature.find_by_name("Puppet CA").smart_proxies.first
     h.os = os
