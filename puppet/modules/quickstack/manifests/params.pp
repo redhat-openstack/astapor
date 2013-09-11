@@ -5,6 +5,8 @@ class quickstack::params {
   # during the setup process. This will move to the Foreman API v2
   # at some point.
   $admin_password             = 'CHANGEME'
+  $ceilometer_metering_secret = 'CHANGEME'
+  $ceilometer_user_password   = 'CHANGEME'
   $cinder_db_password         = 'CHANGEME'
   $cinder_user_password       = 'CHANGEME'
   $glance_db_password         = 'CHANGEME'

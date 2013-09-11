@@ -232,6 +232,8 @@ end
 params = {
   "verbose"                    => "true",
   "admin_password"             => SecureRandom.hex,
+  "ceilometer_metering_secret" => SecureRandom.hex,
+  "ceilometer_user_password"   => SecureRandom.hex,
   "cinder_db_password"         => SecureRandom.hex,
   "cinder_user_password"       => SecureRandom.hex,
   "glance_db_password"         => SecureRandom.hex,

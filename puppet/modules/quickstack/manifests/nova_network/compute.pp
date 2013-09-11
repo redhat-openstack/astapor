@@ -1,5 +1,7 @@
 # Common quickstack configurations
 class quickstack::nova_network::compute (
+  $ceilometer_metering_secret = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password   = $quickstack::params::ceilometer_user_password,
   $fixed_network_range        = $quickstack::params::fixed_network_range,
   $floating_network_range     = $quickstack::params::floating_network_range,
   $nova_db_password           = $quickstack::params::nova_db_password,
@@ -76,4 +78,16 @@ class quickstack::nova_network::compute (
         action   => 'accept',
     }
 
+    class { 'ceilometer':
+        metering_secret => $ceilometer_metering_secret,
+        qpid_hostname   => $pacemaker_priv_floating_ip,
+        rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
+        verbose         => $verbose,
+        debug           => true,
+    }
+
+    class { 'ceilometer::agent::compute':
+        auth_url      => "http://${pacemaker_priv_floating_ip}:35357/v2.0",
+        auth_password => $ceilometer_user_password,
+    }
 }
