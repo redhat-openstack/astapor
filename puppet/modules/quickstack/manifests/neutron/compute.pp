@@ -1,17 +1,18 @@
 # Common quickstack configurations
 class quickstack::neutron::compute (
-  $admin_password               = $quickstack::params::admin_password,
-  $fixed_network_range          = $quickstack::params::fixed_network_range,
-  $floating_network_range       = $quickstack::params::floating_network_range,
-  $neutron_db_password          = $quickstack::params::neutron_db_password,
-  $neutron_user_password        = $quickstack::params::neutron_user_password,
-  $nova_db_password             = $quickstack::params::nova_db_password,
-  $nova_user_password           = $quickstack::params::nova_user_password,
-  $pacemaker_priv_floating_ip   = $quickstack::params::pacemaker_priv_floating_ip,
-  $pacemaker_pub_floating_ip    = $quickstack::params::pacemaker_pub_floating_ip,
-  $private_interface            = $quickstack::params::private_interface,
-  $public_interface             = $quickstack::params::public_interface,
-  $verbose                      = $quickstack::params::verbose,
+  $admin_password             = $quickstack::params::admin_password,
+  $fixed_network_range        = $quickstack::params::fixed_network_range,
+  $floating_network_range     = $quickstack::params::floating_network_range,
+  $neutron_db_password        = $quickstack::params::neutron_db_password,
+  $neutron_user_password      = $quickstack::params::neutron_user_password,
+  $nova_db_password           = $quickstack::params::nova_db_password,
+  $nova_user_password         = $quickstack::params::nova_user_password,
+  $private_ip                 = $quickstack::params::private_ip,
+  $pacemaker_priv_floating_ip = $quickstack::params::pacemaker_priv_floating_ip,
+  $pacemaker_pub_floating_ip  = $quickstack::params::pacemaker_pub_floating_ip,
+  $private_interface          = $quickstack::params::private_interface,
+  $public_interface           = $quickstack::params::public_interface,
+  $verbose                    = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   # Configure Nova
@@ -110,7 +111,7 @@ class quickstack::neutron::compute (
 
   # Agent
   class { '::neutron::agents::ovs':
-      local_ip         => $::ipaddress,
+      local_ip         => $private_ip,
       enable_tunneling => true,
   }
 

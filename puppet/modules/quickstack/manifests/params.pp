@@ -23,6 +23,7 @@ class quickstack::params {
   # Networking
   $private_interface          = 'PRIV_INTERFACE'
   $public_interface           = 'PUB_INTERFACE'
+  $private_ip                 = $ipaddress_<PRIV_INTERFACE>
   $fixed_network_range        = 'PRIV_RANGE'
   $floating_network_range     = 'PUB_RANGE'
   $pacemaker_priv_floating_ip = 'PRIV_IP'
