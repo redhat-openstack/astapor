@@ -21,13 +21,13 @@ class quickstack::params {
   $nova_user_password         = 'CHANGEME'
 
   # Networking
-  $private_interface          = 'PRIV_INTERFACE'
-  $public_interface           = 'PUB_INTERFACE'
-  $private_ip                 = $ipaddress_<PRIV_INTERFACE>
-  $fixed_network_range        = 'PRIV_RANGE'
-  $floating_network_range     = 'PUB_RANGE'
-  $pacemaker_priv_floating_ip = 'PRIV_IP'
-  $pacemaker_pub_floating_ip  = 'PUB_IP'
+  $private_interface             = 'PRIV_INTERFACE'
+  $public_interface              = 'PUB_INTERFACE'
+  $fixed_network_range           = 'PRIV_RANGE'
+  $floating_network_range        = 'PUB_RANGE'
+  $controller_priv_floating_ip   = 'PRIV_IP'
+  $controller_pub_floating_ip    = 'PUB_IP'
+  $metadata_proxy_shared_secret  = 'CHANGEME'
 
   # Logs
   $admin_email                = "admin@${::domain}"

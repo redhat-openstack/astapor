@@ -1,47 +1,23 @@
-# TODO
-# refine iptable rules, their probably giving access to the public
-#
-
 class quickstack::neutron::controller (
-  $admin_email                = $quickstack::params::admin_email,
-  $admin_password             = $quickstack::params::admin_password,
-  $cinder_db_password         = $quickstack::params::cinder_db_password,
-  $cinder_user_password       = $quickstack::params::cinder_user_password,
-  $glance_db_password         = $quickstack::params::glance_db_password,
-  $glance_user_password       = $quickstack::params::glance_user_password,
-  $horizon_secret_key         = $quickstack::params::horizon_secret_key,
-  $keystone_admin_token       = $quickstack::params::keystone_admin_token,
-  $keystone_db_password       = $quickstack::params::keystone_db_password,
-  $mysql_root_password        = $quickstack::params::mysql_root_password,
-  $neutron_db_password        = $quickstack::params::neutron_db_password,
-  $neutron_user_password      = $quickstack::params::neutron_user_password,
-  $nova_db_password           = $quickstack::params::nova_db_password,
-  $nova_user_password         = $quickstack::params::nova_user_password,
-  $pacemaker_priv_floating_ip = $quickstack::params::pacemaker_priv_floating_ip,
-  $pacemaker_pub_floating_ip  = $quickstack::params::pacemaker_pub_floating_ip,
-  $verbose                    = $quickstack::params::verbose
+  $admin_email                  = $quickstack::params::admin_email,
+  $admin_password               = $quickstack::params::admin_password,
+  $cinder_db_password           = $quickstack::params::cinder_db_password,
+  $cinder_user_password         = $quickstack::params::cinder_user_password,
+  $glance_db_password           = $quickstack::params::glance_db_password,
+  $glance_user_password         = $quickstack::params::glance_user_password,
+  $horizon_secret_key           = $quickstack::params::horizon_secret_key,
+  $keystone_admin_token         = $quickstack::params::keystone_admin_token,
+  $keystone_db_password         = $quickstack::params::keystone_db_password,
+  $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
+  $mysql_root_password          = $quickstack::params::mysql_root_password,
+  $neutron_db_password          = $quickstack::params::neutron_db_password,
+  $neutron_user_password        = $quickstack::params::neutron_user_password,
+  $nova_db_password             = $quickstack::params::nova_db_password,
+  $nova_user_password           = $quickstack::params::nova_user_password,
+  $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
+  $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
+  $verbose                      = $quickstack::params::verbose
 ) inherits quickstack::params {
-
-    #pacemaker::corosync { 'quickstack': }
-
-    #pacemaker::corosync::node { '10.100.0.2': }
-    #pacemaker::corosync::node { '10.100.0.3': }
-
-    #pacemaker::resources::ip { '8.21.28.222':
-    #    address => '8.21.28.222',
-    #}
-    #pacemaker::resources::ip { '10.100.0.222':
-    #    address => '10.100.0.222',
-    #}
-
-    #pacemaker::resources::lsb { 'qpidd': }
-
-    #pacemaker::stonith::ipmilan { $ipmi_address:
-    #    address  => $ipmi_address,
-    #    user     => $ipmi_user,
-    #    password => $ipmi_pass,
-    #    hostlist => $ipmi_host_list,
-    #}
 
     class {'openstack::db::mysql':
         mysql_root_password  => $mysql_root_password,
@@ -61,7 +37,7 @@ class quickstack::neutron::controller (
         # neutron
         neutron                => true,
 
-        allowed_hosts          => ['%',$pacemaker_priv_floating_ip],
+        allowed_hosts          => ['%',$controller_priv_floating_ip],
         enabled                => true,
     }
 
@@ -70,7 +46,7 @@ class quickstack::neutron::controller (
     }
 
     class {'openstack::keystone':
-        db_host               => $pacemaker_priv_floating_ip,
+        db_host               => $controller_priv_floating_ip,
         db_password           => $keystone_db_password,
         admin_token           => $keystone_admin_token,
         admin_email           => $admin_email,
@@ -79,9 +55,9 @@ class quickstack::neutron::controller (
         nova_user_password    => $nova_user_password,
         cinder_user_password  => $cinder_user_password,
         neutron_user_password => $neutron_user_password,
-        public_address        => $pacemaker_pub_floating_ip,
-        admin_address         => $pacemaker_priv_floating_ip,
-        internal_address      => $pacemaker_priv_floating_ip,
+        public_address        => $controller_pub_floating_ip,
+        admin_address         => $controller_priv_floating_ip,
+        internal_address      => $controller_priv_floating_ip,
         neutron               => false,
         cinder                => false,
         enabled               => true,
@@ -90,11 +66,11 @@ class quickstack::neutron::controller (
 
     class { 'swift::keystone::auth':
         password => $swift_admin_password,
-        address  => $pacemaker_priv_floating_ip,
+        address  => $controller_priv_floating_ip,
     }
 
     class {'openstack::glance':
-        db_host        => $pacemaker_priv_floating_ip,
+        db_host        => $controller_priv_floating_ip,
         user_password  => $glance_user_password,
         db_password    => $glance_db_password,
         require        => Class['openstack::db::mysql'],
@@ -102,9 +78,9 @@ class quickstack::neutron::controller (
 
     # Configure Nova
     class { 'nova':
-        sql_connection     => "mysql://nova:${nova_db_password}@${pacemaker_priv_floating_ip}/nova",
+        sql_connection     => "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova",
         image_service      => 'nova.image.glance.GlanceImageService',
-        glance_api_servers => "http://${pacemaker_priv_floating_ip}:9292/v1",
+        glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
         rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
         verbose            => $verbose,
         require            => Class['openstack::db::mysql', 'qpid::server'],
@@ -113,8 +89,8 @@ class quickstack::neutron::controller (
     class { 'nova::api':
         enabled           => true,
         admin_password    => $nova_user_password,
-        auth_host         => $pacemaker_priv_floating_ip,
-        neutron_metadata_proxy_shared_secret => 'shared_secret',
+        auth_host         => $controller_priv_floating_ip,
+        neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
     }
 
     nova_config {
@@ -150,34 +126,30 @@ class quickstack::neutron::controller (
 
     class {'horizon':
         secret_key    => $horizon_secret_key,
-        keystone_host => $pacemaker_priv_floating_ip,
+        keystone_host => $controller_priv_floating_ip,
     }
 
     class {'memcached':}
 
-    ### Neutron
-    # Configures everything in neutron.conf
     class { '::neutron':
         enabled               => true,
         verbose               => true,
         allow_overlapping_ips => true,
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-        qpid_hostname         => $pacemaker_priv_floating_ip,
+        qpid_hostname         => $controller_priv_floating_ip,
     }
 
-    # To be done by neutron module
     neutron_config {
-        'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
+        'database/connection': value => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron";
     }
 
     class { '::neutron::keystone::auth':
         password         => $admin_password,
-        public_address   => $pacemaker_pub_floating_ip,
-        admin_address    => $pacemaker_priv_floating_ip,
-        internal_address => $pacemaker_priv_floating_ip,
+        public_address   => $controller_pub_floating_ip,
+        admin_address    => $controller_priv_floating_ip,
+        internal_address => $controller_priv_floating_ip,
     }
 
-    # The API server talks to keystone for authorisation
     class { '::neutron::server':
         auth_host        => $::ipaddress,
         auth_password    => $admin_password,
@@ -190,9 +162,8 @@ class quickstack::neutron::controller (
         value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
     }
 
-    # Plugin
     class { '::neutron::plugins::ovs':
-        sql_connection      => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron",
+        sql_connection      => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron",
         tenant_network_type => 'gre',
     }
 
@@ -202,8 +173,7 @@ class quickstack::neutron::controller (
 
     firewall { '001 controller incoming':
         proto    => 'tcp',
-        # need to refine this list
-        dport    => ['80', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080', '9696'],
+        dport    => ['80', '443', '3260', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080', '9696'],   
         action   => 'accept',
     }
 
