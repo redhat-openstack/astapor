@@ -12,6 +12,17 @@ class quickstack::neutron::networker (
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+    vs_bridge { 'br-ex':
+        provider => ovs,
+        ensure   => present,
+    } ~> vs_port { 'external':
+         bridge    => 'br-ex',
+         interface => $public_interface,
+         keep_ip   => true,
+         provider  => ovs,
+         ensure    => present,
+        }
+
     class { '::neutron':
         verbose               => true,
         allow_overlapping_ips => true,
