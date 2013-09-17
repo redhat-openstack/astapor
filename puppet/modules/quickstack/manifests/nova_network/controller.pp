@@ -118,7 +118,6 @@ class quickstack::nova_network::controller (
         qpid_hostname   => $controller_priv_floating_ip,
         rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
         verbose         => $verbose,
-        debug           => true,
     }
 
     class { 'ceilometer::db':
