@@ -13,13 +13,13 @@ class quickstack::neutron::networker (
 ) inherits quickstack::params {
 
     vs_bridge { 'br-ex':
-        provider => ovs,
+        provider => ovs_redhat,
         ensure   => present,
-    } ~> vs_port { 'external':
+    } -> vs_port { 'external':
          bridge    => 'br-ex',
          interface => $public_interface,
          keep_ip   => true,
-         provider  => ovs,
+         provider  => ovs_redhat,
          ensure    => present,
         }
 
