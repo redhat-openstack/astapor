@@ -228,7 +228,7 @@ fi
 cat >/tmp/foreman_client.sh <<EOF
 
 # start with a subscribed RHEL6 box needs optional channels and epel
-yum install -y augeas puppet
+yum install -y augeas puppet nc
 
 # Puppet configuration
 augtool -s <<EOA
