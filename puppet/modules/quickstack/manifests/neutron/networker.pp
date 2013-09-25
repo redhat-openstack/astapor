@@ -19,6 +19,7 @@ class quickstack::neutron::networker (
          bridge    => 'br-ex',
          interface => $public_interface,
          keep_ip   => true,
+         sleep     => '30',
          provider  => ovs_redhat,
          ensure    => present,
         }
