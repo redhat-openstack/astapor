@@ -267,7 +267,9 @@ hostgroups = [
     {:name=>"OpenStack Neutron Compute",
      :class=>"quickstack::neutron::compute"},
     {:name=>"OpenStack Neutron Networker",
-     :class=>"quickstack::neutron::networker"}
+     :class=>"quickstack::neutron::networker"},
+    {:name=>"OpenStack Block Storage",
+     :class=>"quickstack::cinder_storage"},
 ]
 
 hostgroups.each do |hg|

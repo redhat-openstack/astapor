@@ -33,9 +33,6 @@ class quickstack::neutron::controller (
         mysql_bind_address     => '0.0.0.0',
         mysql_account_security => true,
 
-        # Cinder
-        cinder                 => false,
-
         # neutron
         neutron                => true,
 
@@ -61,7 +58,6 @@ class quickstack::neutron::controller (
         admin_address         => $controller_priv_floating_ip,
         internal_address      => $controller_priv_floating_ip,
         neutron               => false,
-        cinder                => false,
         enabled               => true,
         require               => Class['openstack::db::mysql'],
     }
@@ -157,6 +153,13 @@ class quickstack::neutron::controller (
 
     glance_api_config {
         'DEFAULT/notifier_strategy': value => 'qpid'
+    }
+
+    class { 'quickstack::cinder_controller':
+      cinder_db_password          => $cinder_db_password,
+      cinder_user_password        => $cinder_user_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      verbose                     => $verbose,
     }
 
     package {'horizon-packages':
