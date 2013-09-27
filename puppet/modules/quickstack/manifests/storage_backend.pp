@@ -4,7 +4,7 @@ class quickstack::storage_backend (
 ) inherits quickstack::params {
   case $storage_backend {
     'gluster': {
-      class { 'quickstack::storage::gluster': }
+      class { 'quickstack::storage_backend::gluster': }
     }
   }
 }
