@@ -7,6 +7,8 @@ class quickstack::params {
   $admin_password             = 'CHANGEME'
   $ceilometer_metering_secret = 'CHANGEME'
   $ceilometer_user_password   = 'CHANGEME'
+  $heat_user_password         = 'CHANGEME'
+  $heat_db_password           = 'CHANGEME'
   $cinder_db_password         = 'CHANGEME'
   $cinder_user_password       = 'CHANGEME'
   $glance_db_password         = 'CHANGEME'
