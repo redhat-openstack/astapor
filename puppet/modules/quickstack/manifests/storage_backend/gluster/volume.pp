@@ -1,15 +1,15 @@
 # quickstack gluster volume class
 class quickstack::storage_backend::gluster::volume ( 
-  $cinder_path          = $quickstack::params::cinder_path,
-  $cinder_gluster_peers = $quickstack::params::cinder_gluster_peers,
-  $cinder_replica_count = $quickstack::params::cinder_replica_count,
-  $glance_path          = $quickstack::params::glance_path,
-  $glance_gluster_peers = $quickstack::params::glance_gluster_peers,
-  $glance_replica_count = $quickstack::params::glance_replica_count,
-  $swift_path           = $quickstack::params::swift_path,
-  $swift_gluster_peers  = $quickstack::params::swift_gluster_peers,
-  $swift_replica_count  = $quickstack::params::swift_replica_count,
-) inherits quickstack::params {
+  $cinder_path          = $quickstack::storage_backend::gluster::params::cinder_path,
+  $cinder_gluster_peers = $quickstack::storage_backend::gluster::params::cinder_gluster_peers,
+  $cinder_replica_count = $quickstack::storage_backend::gluster::params::cinder_replica_count,
+  $glance_path          = $quickstack::storage_backend::gluster::params::glance_path,
+  $glance_gluster_peers = $quickstack::storage_backend::gluster::params::glance_gluster_peers,
+  $glance_replica_count = $quickstack::storage_backend::gluster::params::glance_replica_count,
+  $swift_path           = $quickstack::storage_backend::gluster::params::swift_path,
+  $swift_gluster_peers  = $quickstack::storage_backend::gluster::params::swift_gluster_peers,
+  $swift_replica_count  = $quickstack::storage_backend::gluster::params::swift_replica_count,
+) inherits quickstack::storage_backend::gluster::params {
   volume { 'glance':
     ensure         => present,
     path           => $cinder_path,
