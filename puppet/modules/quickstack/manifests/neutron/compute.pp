@@ -1,6 +1,8 @@
 # Common quickstack configurations
 class quickstack::neutron::compute (
   $admin_password              = $quickstack::params::admin_password,
+  $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $fixed_network_range         = $quickstack::params::fixed_network_range,
   $floating_network_range      = $quickstack::params::floating_network_range,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
@@ -58,6 +60,18 @@ class quickstack::neutron::compute (
       enabled           => true,
       admin_password    => $nova_user_password,
       auth_host         => $controller_priv_floating_ip,
+  }
+
+  class { 'ceilometer':
+      metering_secret => $ceilometer_metering_secret,
+      qpid_hostname   => $controller_priv_floating_ip,
+      rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
+      verbose         => $verbose,
+  }
+
+  class { 'ceilometer::agent::compute':
+      auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
+      auth_password => $ceilometer_user_password,
   }
 
   class { '::neutron':

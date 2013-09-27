@@ -55,9 +55,6 @@ class quickstack::nova_network::controller (
         mysql_bind_address     => '0.0.0.0',
         mysql_account_security => true,
 
-        # Cinder
-        cinder                 => false,
-
         # neutron
         neutron                => false,
 
@@ -83,7 +80,6 @@ class quickstack::nova_network::controller (
         admin_address         => $controller_priv_floating_ip,
         internal_address      => $controller_priv_floating_ip,
         neutron               => false,
-        cinder                => false,
         enabled               => true,
         require               => Class['openstack::db::mysql'],
     }
@@ -118,7 +114,6 @@ class quickstack::nova_network::controller (
         qpid_hostname   => $controller_priv_floating_ip,
         rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
         verbose         => $verbose,
-        debug           => true,
     }
 
     class { 'ceilometer::db':
@@ -143,6 +138,13 @@ class quickstack::nova_network::controller (
 
     glance_api_config {
         'DEFAULT/notifier_strategy': value => 'qpid'
+    }
+
+    class { 'quickstack::cinder_controller':
+      cinder_db_password          => $cinder_db_password,
+      cinder_user_password        => $cinder_user_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      verbose                     => $verbose,
     }
 
     # Configure Nova

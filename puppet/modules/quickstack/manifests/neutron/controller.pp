@@ -1,6 +1,8 @@
 class quickstack::neutron::controller (
   $admin_email                  = $quickstack::params::admin_email,
   $admin_password               = $quickstack::params::admin_password,
+  $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
   $cinder_db_password           = $quickstack::params::cinder_db_password,
   $cinder_user_password         = $quickstack::params::cinder_user_password,
   $glance_db_password           = $quickstack::params::glance_db_password,
@@ -31,9 +33,6 @@ class quickstack::neutron::controller (
         mysql_bind_address     => '0.0.0.0',
         mysql_account_security => true,
 
-        # Cinder
-        cinder                 => false,
-
         # neutron
         neutron                => true,
 
@@ -59,7 +58,6 @@ class quickstack::neutron::controller (
         admin_address         => $controller_priv_floating_ip,
         internal_address      => $controller_priv_floating_ip,
         neutron               => false,
-        cinder                => false,
         enabled               => true,
         require               => Class['openstack::db::mysql'],
     }
@@ -67,6 +65,13 @@ class quickstack::neutron::controller (
     class { 'swift::keystone::auth':
         password => $swift_admin_password,
         address  => $controller_priv_floating_ip,
+    }
+
+    class { 'ceilometer::keystone::auth':
+        password => $ceilometer_user_password,
+        public_address => $controller_priv_floating_ip,
+        admin_address => $controller_priv_floating_ip,
+        internal_address => $controller_priv_floating_ip,
     }
 
     class {'openstack::glance':
@@ -111,6 +116,50 @@ class quickstack::neutron::controller (
     class { 'nova::vncproxy':
         host    => '0.0.0.0',
         enabled => true,
+    }
+
+    # Configure Ceilometer
+    class { 'mongodb':
+       enable_10gen => false,
+       port         => '27017',
+    }
+
+    class { 'ceilometer':
+        metering_secret => $ceilometer_metering_secret,
+        qpid_hostname   => $controller_priv_floating_ip,
+        rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
+        verbose         => $verbose,
+    }
+
+    class { 'ceilometer::db':
+        database_connection => 'mongodb://localhost:27017/ceilometer',
+        require             => Class['mongodb'],
+    }
+
+    class { 'ceilometer::collector':
+        require => Class['ceilometer::db'],
+    }
+
+    class { 'ceilometer::agent::central':
+        auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
+        auth_password => $ceilometer_user_password,
+    }
+
+    class { 'ceilometer::api':
+        keystone_host     => $controller_priv_floating_ip,
+        keystone_password => $ceilometer_user_password,
+        require           => Class['mongodb'],
+    }
+
+    glance_api_config {
+        'DEFAULT/notifier_strategy': value => 'qpid'
+    }
+
+    class { 'quickstack::cinder_controller':
+      cinder_db_password          => $cinder_db_password,
+      cinder_user_password        => $cinder_user_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      verbose                     => $verbose,
     }
 
     package {'horizon-packages':

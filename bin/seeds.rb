@@ -266,7 +266,9 @@ hostgroups = [
     {:name=>"OpenStack Neutron Compute",
      :class=>"quickstack::neutron::compute"},
     {:name=>"OpenStack Neutron Networker",
-     :class=>"quickstack::neutron::networker"}
+     :class=>"quickstack::neutron::networker"},
+    {:name=>"OpenStack Block Storage",
+     :class=>"quickstack::cinder_storage"},
 ]
 
 hostgroups.each do |hg|
@@ -286,6 +288,7 @@ hostgroups.each do |hg|
   h=Hostgroup.find_or_create_by_name hg[:name]
   h.environment = Environment.find_by_name('production')
   h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  h.save!
 end
 
 if ENV["FOREMAN_PROVISIONING"] == "true" then
