@@ -7,6 +7,8 @@ class quickstack::nova_network::controller (
   $admin_password              = $quickstack::params::admin_password,
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
+  $heat_cfn                    = $quickstack::params::heat_cfn,
+  $heat_cloudwatch             = $quickstack::params::heat_cloudwatch,
   $heat_user_password          = $quickstack::params::heat_user_password,
   $heat_db_password            = $quickstack::params::heat_db_password,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
@@ -98,13 +100,25 @@ class quickstack::nova_network::controller (
         internal_address => $controller_priv_floating_ip,
     }
 
-    class {"heat::keystone::auth":
+    if $heat_cfn == true {
+      class {"heat::keystone::auth":
         password => $heat_user_password,
         heat_public_address => $controller_priv_floating_ip,
         heat_admin_address => $controller_priv_floating_ip,
         heat_internal_address => $controller_priv_floating_ip,
-        cfn_auth_name => undef,
-    }
+        cfn_public_address => $controller_priv_floating_ip,
+        cfn_admin_address => $controller_priv_floating_ip,
+        cfn_internal_address => $controller_priv_floating_ip,
+        }
+      } else {
+         class {"heat::keystone::auth":
+           password => $heat_user_password,
+           heat_public_address => $controller_priv_floating_ip,
+           heat_admin_address => $controller_priv_floating_ip,
+           heat_internal_address => $controller_priv_floating_ip,
+           cfn_auth_name => undef,
+         }
+      }
 
     class {'openstack::glance':
         db_host               => $controller_priv_floating_ip,
@@ -155,6 +169,17 @@ class quickstack::nova_network::controller (
         verbose           => $verbose,
     }
 
+    if $heat_cfn == true {
+      class { 'heat::api_cfn':
+      }
+    }
+
+    if $heat_cloudwatch == true {
+      
+      class { 'heat::api_cfn':
+      }
+    }
+    
     class { 'heat::engine':
         heat_metadata_server_url      => "http://${controller_priv_floating_ip}:8000",
         heat_waitcondition_server_url => "http://${controller_priv_floating_ip}:8000/v1/waitcondition",
