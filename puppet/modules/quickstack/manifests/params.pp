@@ -11,10 +11,6 @@ class quickstack::params {
   $ceilometer_user_password   = 'CHANGEME'
   $heat_user_password         = 'CHANGEME'
   $heat_db_password           = 'CHANGEME'
-  $cinder_db_password         = 'CHANGEME'
-  $cinder_user_password       = 'CHANGEME'
-  $glance_db_password         = 'CHANGEME'
-  $glance_user_password       = 'CHANGEME'
   $horizon_secret_key         = 'CHANGEME'
   $keystone_admin_token       = 'CHANGEME'
   $keystone_db_password       = 'CHANGEME'
@@ -43,16 +39,21 @@ class quickstack::params {
   $public_allocation_pools_start = 'CHANGEME'
   $public_allocation_pools_end   = 'CHANGEME'
 
-  # Storage Backend - Optional - Need seeds: not sure how yet!
-  #$storage_backend = 'gluster'
-  ## Storage Backend Volumes 
-  #$cinder_path          = '/srv/gluster/cinder'
-  #$cinder_gluster_peers = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
-  #$cinder_replica_count = '3'
-  #$glance_path          = '/srv/gluster/glance'
-  #$glance_gluster_peers = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
-  #$glance_replica_count = '3'
-  #$swift_path          = '/srv/gluster/swift'
-  #$swift_gluster_peers = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
-  #$swift_replica_count = '3'
+  # Cinder
+  $cinder_db_password           = 'CHANGEME'
+  $cinder_user_password         = 'CHANGEME'
+  # $cinder_storage_backend       = 'iscsi'
+  $cinder_storage_backend       = 'gluster'
+  $cinder_gluster_path          = '/srv/gluster/cinder'
+  $cinder_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  $cinder_gluster_replica_count = '3'
+
+  # Glance
+  $glance_db_password           = 'CHANGEME'
+  $glance_user_password         = 'CHANGEME'
+  # $glance_storage_backend       = 'iscsi'
+  $glance_storage_backend       = 'gluster'
+  $glance_gluster_path          = '/srv/gluster/glance'
+  $glance_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  $glance_gluster_replica_count = '3'
 }

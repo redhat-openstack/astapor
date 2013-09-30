@@ -1,10 +1,11 @@
 class quickstack::cinder_storage(
   $cinder_db_password          = $quickstack::params::cinder_db_password,
+  $cinder_gluster_path         = $quickstack::params::cinder_gluster_path,
+  $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
-
   class { 'cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $controller_priv_floating_ip,
@@ -15,13 +16,31 @@ class quickstack::cinder_storage(
 
   class { 'cinder::volume': }
 
-  class { 'cinder::volume::iscsi':
-    iscsi_ip_address => getvar("ipaddress_${private_interface}"),
-  }
+  case $cinder_storage_backend {
+    'gluster': {
+      class { 'gluster::client': }
 
-  firewall { '010 cinder iscsi':
-      proto => 'tcp',
-      dport => ['3260'],
-      action => 'accept',
+      class { 'cinder::volume::glusterfs':
+        glusterfs_shares = split(join($cinder_gluster_peers, $cinder_path + ','), ',')
+      } 
+
+      firewall { '001 gluster bricks incoming':
+        proto  => 'tcp',
+        dport  => port_range($cinder_gluster_peers.size, 24009)
+        action => 'accept',
+      } 
+    }
+
+    'iscsi': {
+      class { 'cinder::volume::iscsi':
+        iscsi_ip_address => getvar("ipaddress_${private_interface}"),
+      }
+
+      firewall { '010 cinder iscsi':
+        proto => 'tcp',
+        dport => ['3260'],
+        action => 'accept',
+      }
+    }
   }
 }
