@@ -1,7 +1,6 @@
 
 class quickstack::neutron::networker (
   $fixed_network_range          = $quickstack::params::fixed_network_range,
-  $floating_network_range       = $quickstack::params::floating_network_range,
   $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $nova_db_password             = $quickstack::params::nova_db_password,
