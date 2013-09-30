@@ -31,4 +31,8 @@ class quickstack::params {
 
   # Logs
   $admin_email                = "admin@${::domain}"
+  
+  # Storage - Optional
+  $storage_backend = 'gluster' # See storage/gluster/params.pp
+
 }
