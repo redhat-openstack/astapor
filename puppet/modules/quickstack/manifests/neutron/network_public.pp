@@ -1,12 +1,12 @@
 class quickstack::neutron::public_network (
-  $allocation_pools_start = $quickstack::neutron::public_network_params::allocation_pools_start,
-  $allocation_pools_end   = $quickstack::neutron::public_network_params::allocation_pools_end,
-  $cidr                   = $quickstack::neutron::public_network_params::cidr,
-  $gateway_ip             = $quickstack::neutron::public_network_params::gateway_ip,
-  $network_name           = $quickstack::neutron::public_network_params::network_name,
+  $allocation_pools_start = $quickstack::params::allocation_pools_start,
+  $allocation_pools_end   = $quickstack::params::allocation_pools_end,
+  $cidr                   = $quickstack::params::cidr,
+  $gateway_ip             = $quickstack::params::gateway_ip,
+  $network_name           = $quickstack::params::network_name,
   $tenant_name            = 'admin',
   $router_external        = 'True',
-) inherits quickstack::neutron::public_network_params {
+) inherits quickstack::params {
 
     neutron_network { 'public':
         ensure          => present,

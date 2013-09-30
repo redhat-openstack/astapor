@@ -1,4 +1,6 @@
 class quickstack::params {
+  # Logs
+  $admin_email                = "admin@${::domain}"
   $verbose                    = 'true'
 
   $heat_cfn                   = 'false'
@@ -36,6 +38,10 @@ class quickstack::params {
   $qpid_host                     = 'PRIV_IP'
   $metadata_proxy_shared_secret  = 'CHANGEME'
 
-  # Logs
-  $admin_email                = "admin@${::domain}"
+  # Floating IPs
+  $network_name           = 'public'
+  $cidr                   = 'CHANGEME'
+  $gateway_ip             = 'CHANGEME'
+  $allocation_pools_start = 'CHANGEME'
+  $allocation_pools_end   = 'CHANGEME'
 }
