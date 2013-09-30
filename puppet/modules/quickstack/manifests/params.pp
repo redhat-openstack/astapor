@@ -42,4 +42,17 @@ class quickstack::params {
   $public_gateway_ip             = 'CHANGEME'
   $public_allocation_pools_start = 'CHANGEME'
   $public_allocation_pools_end   = 'CHANGEME'
+
+  # Storage Backend - Optional - Need seeds: not sure how yet!
+  #$storage_backend = 'gluster'
+  ## Storage Backend Volumes 
+  #$cinder_path          = '/srv/gluster/cinder'
+  #$cinder_gluster_peers = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  #$cinder_replica_count = '3'
+  #$glance_path          = '/srv/gluster/glance'
+  #$glance_gluster_peers = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  #$glance_replica_count = '3'
+  #$swift_path          = '/srv/gluster/swift'
+  #$swift_gluster_peers = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  #$swift_replica_count = '3'
 }
