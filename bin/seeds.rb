@@ -255,7 +255,6 @@ params = {
   "controller_priv_floating_ip"  => 'PRIV_IP',
   "controller_pub_floating_ip"   => 'PUB_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
-  "private_ip"                   => "$ipaddress_@#{private_int}",
   "metadata_proxy_shared_secret" => SecureRandom.hex
 }
 
