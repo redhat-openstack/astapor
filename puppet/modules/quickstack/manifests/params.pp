@@ -43,8 +43,8 @@ class quickstack::params {
   $cinder_db_password           = 'CHANGEME'
   $cinder_user_password         = 'CHANGEME'
   # Cinder backend - Several backends should be able to coexist
-  $cinder_backend_gluster       = 'true' 
-  $cinder_backend_iscsi         = 'false'
+  $cinder_backend_gluster       = true
+  $cinder_backend_iscsi         = false
   # Cinder gluster
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
