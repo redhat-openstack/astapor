@@ -1,11 +1,11 @@
 Puppet::Parser::Functions::newfunction(
-  :port_range,
-  :first_port => :rvalue,
-  :range_size => :rvalue,
-  :doc => "Return an array of ports starting at first port of range_size") do |args|
+  :first_port,
+  :interval,
+  :type => :rvalue,
+  :doc  => "Return an array of ports from first port to interval size") do |args|
     list = []
-	for counter in 0..range_size-1
-		list << (first_port.to_i + counter).to_s
+	for counter in 0..args[1]-1
+		list << (args[0].to_i + counter).to_s
 	end
     return list
 end
