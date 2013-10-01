@@ -16,13 +16,8 @@ class quickstack::cinder_storage (
 
     class { 'cinder::volume::glusterfs':
       # glusterfs_shares = ['192.168.1.1:/volumes'],
-      glusterfs_shares => suffix($cinder_gluster_peers, ":${cinder_gluster_path}")
-    }
- 
-    $foo = suffix($cinder_gluster_peers, ":${cinder_gluster_path}")
-
-    notify { 'foo': 
-      message => "foo = $foo"
+      glusterfs_mount_point_base => '/var/lib/cinder/volumes',
+      glusterfs_shares           => suffix($cinder_gluster_peers, ":${cinder_gluster_path}")
     }
 
     firewall { '001 gluster bricks incoming':
