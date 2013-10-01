@@ -23,6 +23,6 @@ class quickstack::storage_backend::gluster {
   } 
 
   notify { 'foo':
-    message => range('24009','24009'+6)
+    message => range('24009',('24009'.to_i+6).to_s)
   }
 }
