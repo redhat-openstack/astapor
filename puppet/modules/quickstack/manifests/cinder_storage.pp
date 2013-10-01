@@ -16,10 +16,10 @@ class quickstack::cinder_storage (
 
     class { 'cinder::volume::glusterfs':
       # glusterfs_shares = ['192.168.1.1:/volumes'],
-      glusterfs_shares => split(join($cinder_gluster_peers, ":${cinder_gluster_path},"), ','),
+      glusterfs_shares => suffix($cinder_gluster_peers, ":${cinder_gluster_path}")
     }
  
-    $foo = join($cinder_gluster_peers, ":${cinder_gluster_path},")
+    $foo = suffix($cinder_gluster_peers, ":${cinder_gluster_path}")
 
     notify { 'foo': 
       message => "foo = $foo"
