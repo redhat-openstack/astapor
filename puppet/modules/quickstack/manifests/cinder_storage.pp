@@ -1,4 +1,5 @@
-class quickstack::cinder_storage(
+# Cinder Storage
+class quickstack::cinder_storage (
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_iscsi        = $quickstack::params::cinder_backend_iscsi,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
@@ -18,29 +19,29 @@ class quickstack::cinder_storage(
 
   class { 'cinder::volume': }
 
-  if $cinder_backend_gluster == 'true' {
+  if $cinder_backend_gluster == true {
     class { 'gluster::client': }
 
     class { 'cinder::volume::glusterfs':
       glusterfs_shares = split(join($cinder_gluster_peers, $cinder_path + ','), ',')
-    } 
+    }
 
     firewall { '001 gluster bricks incoming':
       proto  => 'tcp',
       # dport  => port_range('24009', 3) # size($cinder_gluster_peers))
-      dport   => [ '24009', '24010', '24011' ],
+      dport  => [ '24009', '24010', '24011' ],
       action => 'accept',
-    } 
+    }
   }
-  
-  if $cinder_backend_iscsi == 'true' {
+
+  if $cinder_backend_iscsi == true {
     class { 'cinder::volume::iscsi':
       iscsi_ip_address => getvar("ipaddress_${private_interface}"),
     }
 
     firewall { '010 cinder iscsi':
-      proto => 'tcp',
-      dport => ['3260'],
+      proto  => 'tcp',
+      dport  => ['3260'],
       action => 'accept',
     }
   }
