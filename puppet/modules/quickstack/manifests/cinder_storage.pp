@@ -9,14 +9,6 @@ class quickstack::cinder_storage (
   $private_interface           = $quickstack::params::private_interface,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
-  class { 'cinder':
-    rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
-    qpid_hostname  => $controller_priv_floating_ip,
-    qpid_password  => 'guest',
-    sql_connection => "mysql://cinder:${cinder_db_password}@${controller_priv_floating_ip}/cinder",
-    verbose        => $verbose,
-  }
-
   class { 'cinder::volume': }
 
   if $cinder_backend_gluster == true {
