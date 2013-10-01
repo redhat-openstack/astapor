@@ -28,7 +28,7 @@ class quickstack::cinder_storage (
 
     firewall { '001 gluster bricks incoming':
       proto  => 'tcp',
-      # dport  => port_range('24009', 3) # size($cinder_gluster_peers))
+      # dport  => port_range('24009', size($cinder_gluster_peers))
       dport  => [ '24009', '24010', '24011' ],
       action => 'accept',
     }
