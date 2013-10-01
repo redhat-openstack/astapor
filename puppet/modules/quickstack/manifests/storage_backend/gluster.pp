@@ -19,11 +19,10 @@ class quickstack::storage_backend::gluster {
     proto    => 'tcp',
     #dport    => port_range('24009', 6)
     dport    => [ '24009', '24010', '24011' ],
-
-    notify { 'foo':
-      message => range('24009','24009'+6)
-    }
-
     action   => 'accept',
   } 
+
+  notify { 'foo':
+    message => range('24009','24009'+6)
+  }
 }
