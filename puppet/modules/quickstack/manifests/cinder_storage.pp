@@ -18,6 +18,11 @@ class quickstack::cinder_storage (
       # glusterfs_shares = ['192.168.1.1:/volumes'],
       glusterfs_shares => split(join($cinder_gluster_peers, ":${cinder_gluster_path},"), ','),
     }
+ 
+    notify { 'foo': 
+      $foo = join($cinder_gluster_peers, ":${cinder_gluster_path},")
+      message => "foo = $foo"
+    }
 
     firewall { '001 gluster bricks incoming':
       proto  => 'tcp',
