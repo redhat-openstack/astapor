@@ -23,6 +23,6 @@ class quickstack::storage_backend::gluster {
   } 
 
   notify { 'foo':
-    message => range('24009',('24009'.to_i+6).to_s)
+    message => port_range('24009', 6)
   }
 }
