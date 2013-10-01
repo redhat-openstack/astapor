@@ -23,9 +23,9 @@ class quickstack::cinder_storage (
     class { 'gluster::client': }
 
     class { 'cinder::volume::glusterfs':
-      glusterfs_shares => split(join($cinder_gluster_peers, $cinder_path + ','), ',')
+      # glusterfs_shares = ['192.168.1.1:/volumes'],
+      glusterfs_shares => split(join($cinder_gluster_peers, "${cinder_path},"), ','),
     }
-
     firewall { '001 gluster bricks incoming':
       proto  => 'tcp',
       # dport  => port_range('24009', size($cinder_gluster_peers)),
