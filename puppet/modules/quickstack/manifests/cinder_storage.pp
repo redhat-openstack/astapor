@@ -18,7 +18,7 @@ class quickstack::cinder_storage(
 
   class { 'cinder::volume': }
 
-  if $cinder_gluster == 'true'  {
+  if $cinder_backend_gluster == 'true'  {
     class { 'gluster::client': }
 
     class { 'cinder::volume::glusterfs':
@@ -27,12 +27,12 @@ class quickstack::cinder_storage(
 
     firewall { '001 gluster bricks incoming':
       proto  => 'tcp',
-      dport  => port_range(24009, $cinder_gluster_peers.size)
+      dport  => port_range('24009', size($cinder_gluster_peers))
       action => 'accept',
     } 
   }
   
-  if cinder_iscsi == 'true' {
+  if cinder_backend_iscsi == 'true' {
     class { 'cinder::volume::iscsi':
         iscsi_ip_address => getvar("ipaddress_${private_interface}"),
     }
