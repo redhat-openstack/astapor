@@ -19,8 +19,9 @@ class quickstack::cinder_storage (
       glusterfs_shares => split(join($cinder_gluster_peers, ":${cinder_gluster_path},"), ','),
     }
  
+    $foo = join($cinder_gluster_peers, ":${cinder_gluster_path},")
+
     notify { 'foo': 
-      $foo = join($cinder_gluster_peers, ":${cinder_gluster_path},"),
       message => "foo = $foo"
     }
 
