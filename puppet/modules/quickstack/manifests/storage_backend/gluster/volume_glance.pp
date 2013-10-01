@@ -6,8 +6,8 @@ class quickstack::storage_backend::gluster::volume_glance (
 ) inherits quickstack::params {
   volume { 'glance':
     ensure         => present,
-    path           => $cinder_path,
-    peers          => $cinder_gluster_peers,
-    replica_count  => $cinder_replica_count, 
+    path           => $glance_path,
+    peers          => $glance_gluster_peers,
+    replica_count  => $glance_replica_count, 
   }
 }

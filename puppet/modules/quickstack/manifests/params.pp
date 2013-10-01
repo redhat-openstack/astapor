@@ -32,7 +32,7 @@ class quickstack::params {
 
   # Neutron specific
   $metadata_proxy_shared_secret  = 'CHANGEME'
-  # Floating IPs - Needs seeds
+  # Floating IPs - Seeds needed
   $public_network_name           = 'public'
   $public_cidr                   = 'CHANGEME'
   $public_gateway_ip             = 'CHANGEME'
@@ -42,8 +42,10 @@ class quickstack::params {
   # Cinder
   $cinder_db_password           = 'CHANGEME'
   $cinder_user_password         = 'CHANGEME'
-  # $cinder_storage_backend       = 'iscsi'
-  $cinder_storage_backend       = 'gluster'
+  # Cinder backend - Several backends should be able to coexist
+  $cinder_backend_gluster       = 'true' 
+  $cinder_backend_iscsi         = 'false'
+  # Cinder gluster
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
   $cinder_gluster_replica_count = '3'
@@ -51,8 +53,7 @@ class quickstack::params {
   # Glance
   $glance_db_password           = 'CHANGEME'
   $glance_user_password         = 'CHANGEME'
-  # $glance_storage_backend       = 'iscsi'
-  $glance_storage_backend       = 'gluster'
+  # Glance_Gluster
   $glance_gluster_path          = '/srv/gluster/glance'
   $glance_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
   $glance_gluster_replica_count = '3'
