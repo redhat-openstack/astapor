@@ -3,6 +3,8 @@ class quickstack::neutron::controller (
   $admin_password               = $quickstack::params::admin_password,
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
+  $heat_cfn                     = $quickstack::params::heat_cfn,
+  $heat_cloudwatch              = $quickstack::params::heat_cloudwatch,
   $heat_user_password           = $quickstack::params::heat_user_password,
   $heat_db_password             = $quickstack::params::heat_db_password,
   $cinder_db_password           = $quickstack::params::cinder_db_password,
@@ -74,14 +76,6 @@ class quickstack::neutron::controller (
         public_address => $controller_priv_floating_ip,
         admin_address => $controller_priv_floating_ip,
         internal_address => $controller_priv_floating_ip,
-    }
-
-    class {"heat::keystone::auth":
-        password => $heat_user_password,
-        heat_public_address => $controller_priv_floating_ip,
-        heat_admin_address => $controller_priv_floating_ip,
-        heat_internal_address => $controller_priv_floating_ip,
-        cfn_auth_name => undef,
     }
 
     class {'openstack::glance':
@@ -161,33 +155,6 @@ class quickstack::neutron::controller (
         require           => Class['mongodb'],
     }
 
-    class { 'heat':
-        keystone_host     => $controller_priv_floating_ip,
-        keystone_password => $heat_user_password,
-        auth_uri          => "http://${controller_priv_floating_ip}:35357/v2.0",
-        rpc_backend       => 'heat.openstack.common.rpc.impl_qpid',
-        qpid_hostname     => $controller_priv_floating_ip,
-        verbose           => $verbose,
-    }
-
-    class {'heat::db::mysql':
-        password => $heat_db_password,
-        allowed_hosts => "%%",
-    }
-
-    class {'heat::db':
-       sql_connection => "mysql://heat:${heat_db_password}@${controller_floating_ip}/heat"
-    }
-
-    class {'heat::api':
-    }
-
-    class {'heat::engine':
-        heat_metadata_server_url      => "http://${controller_priv_floating_ip}:8000",
-        heat_waitcondition_server_url => "http://${controller_priv_floating_ip}:8000/v1/waitcondition",
-        heat_watch_server_url         => "http://${controller_priv_floating_ip}:8003",
-    }
-
     glance_api_config {
         'DEFAULT/notifier_strategy': value => 'qpid'
     }
@@ -195,6 +162,15 @@ class quickstack::neutron::controller (
     class { 'quickstack::cinder_controller':
       cinder_db_password          => $cinder_db_password,
       cinder_user_password        => $cinder_user_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      verbose                     => $verbose,
+    }
+
+    class { 'quickstack::heat_controller':
+      heat_cfn                    => $heat_cfn,
+      heat_cloudwatch             => $heat_cloudwatch,
+      heat_user_password          => $heat_user_password,
+      heat_db_password            => $heat_db_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       verbose                     => $verbose,
     }

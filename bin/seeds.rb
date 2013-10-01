@@ -231,6 +231,8 @@ end
 
 params = {
   "verbose"                      => "true",
+  "heat_cfn"                     => "false",
+  "heat_cloudwatch"              => "false",
   "admin_password"               => SecureRandom.hex,
   "ceilometer_metering_secret"   => SecureRandom.hex,
   "ceilometer_user_password"     => SecureRandom.hex,

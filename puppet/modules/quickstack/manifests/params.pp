@@ -1,6 +1,9 @@
 class quickstack::params {
   $verbose                    = 'true'
 
+  $heat_cfn                   = 'false'
+  $heat_cloudwatch            = 'false'
+
   # Passwords are currently changed to decent strings by sed
   # during the setup process. This will move to the Foreman API v2
   # at some point.
