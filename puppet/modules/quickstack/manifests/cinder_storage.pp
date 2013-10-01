@@ -32,7 +32,7 @@ class quickstack::cinder_storage(
     } 
   }
   
-  if cinder_iscsi == 'true'
+  if cinder_iscsi == 'true' {
     class { 'cinder::volume::iscsi':
         iscsi_ip_address => getvar("ipaddress_${private_interface}"),
     }
