@@ -8,6 +8,6 @@ class quickstack::storage_backend::gluster::volume_glance (
     ensure         => present,
     path           => $glance_gluster_path,
     peers          => $glance_gluster_peers,
-    replica_count  => $glance_replica_count, 
+    replica_count  => $glance_gluster_replica_count, 
   }
 }

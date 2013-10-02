@@ -8,6 +8,6 @@ class quickstack::storage_backend::gluster::volume_swift (
     ensure         => present,
     path           => $swift_gluster_path,
     peers          => $swift_gluster_peers,
-    replica_count  => $swift_replica_count, 
+    replica_count  => $swift_gluster_replica_count, 
   }
 }
