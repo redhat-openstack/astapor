@@ -6,7 +6,7 @@ class quickstack::storage_backend::gluster::volume_swift (
 ) inherits quickstack::params {
   volume { 'swift':
     ensure         => present,
-    path           => $swift_path,
+    path           => $swift_gluster_path,
     peers          => $swift_gluster_peers,
     replica_count  => $swift_replica_count, 
   }

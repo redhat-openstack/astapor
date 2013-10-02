@@ -6,7 +6,7 @@ class quickstack::storage_backend::gluster::volume_cinder (
 ) inherits quickstack::params {
   volume { 'cinder':
     ensure         => present,
-    path           => $cinder_path,
+    path           => $cinder_gluster_path,
     peers          => $cinder_gluster_peers,
     replica_count  => $cinder_replica_count, 
   }
