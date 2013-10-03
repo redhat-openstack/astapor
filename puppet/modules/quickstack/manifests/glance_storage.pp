@@ -5,7 +5,7 @@ class quickstack::glance_storage (
   $glance_gluster_volume       = $quickstack::params::glance_gluster_volume,
   $glance_gluster_peers        = $quickstack::params::glance_gluster_peers,
 ) inherits quickstack::params {
-  class { 'glance::volume': }
+#  class { 'glance::volume': }
 
   if $glance_backend_gluster == true {
     class { 'gluster::client': }
@@ -27,6 +27,7 @@ class quickstack::glance_storage (
 # service openstack-glance-api restart
   }
 
-  if $glance_backend_iscsi == true {
-  }
+  #if $glance_backend_iscsi == true {
+  # 
+  #}
 }
