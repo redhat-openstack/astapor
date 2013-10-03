@@ -48,7 +48,7 @@ class quickstack::params {
   # Cinder gluster
   $cinder_gluster_volume        = 'cinder'
   $cinder_gluster_path          = '/srv/gluster/cinder'
-  $cinder_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $cinder_gluster_replica_count = '3'
 
   # Glance
@@ -57,6 +57,6 @@ class quickstack::params {
   # Glance_Gluster
   $glance_gluster_volume        = 'glance'
   $glance_gluster_path          = '/srv/gluster/glance'
-  $glance_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
+  $glance_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $glance_gluster_replica_count = '3'
 }
