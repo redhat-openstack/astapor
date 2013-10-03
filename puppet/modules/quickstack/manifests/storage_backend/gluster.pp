@@ -14,11 +14,11 @@ class quickstack::storage_backend::gluster {
     action => 'accept',
   } 
 
-  # 1 port per brick - We start with three
+  # 1 port per brick
   firewall { '002 gluster bricks incoming':
     proto  => 'tcp',
     #dport  => port_range('24009', '6'),
-    dport    => [ '24009', '24010', '24011' ],
+    dport    => [ '24009', '24010', '24011', '24012', '24013', '24014' ],
     action => 'accept',
   } 
 }

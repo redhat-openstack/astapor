@@ -46,6 +46,7 @@ class quickstack::params {
   $cinder_backend_gluster       = true
   $cinder_backend_iscsi         = false
   # Cinder gluster
+  $cinder_gluster_volume        = 'glance'
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
   $cinder_gluster_replica_count = '3'
@@ -54,6 +55,7 @@ class quickstack::params {
   $glance_db_password           = 'CHANGEME'
   $glance_user_password         = 'CHANGEME'
   # Glance_Gluster
+  $glance_gluster_volume        = 'glance'
   $glance_gluster_path          = '/srv/gluster/glance'
   $glance_gluster_peers         = [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ]
   $glance_gluster_replica_count = '3'
