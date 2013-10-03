@@ -17,14 +17,6 @@ class quickstack::cinder_storage (
       glusterfs_mount_point_base => '/var/lib/cinder/volumes',
       glusterfs_shares           => suffix($cinder_gluster_peers, ":/${cinder_gluster_volume}")
     }
-
-    firewall { '001 gluster bricks incoming':
-      proto  => 'tcp',
-      # dport  => port_range('24009', size($cinder_gluster_peers)),
-      dport  => [ '24009', '24010', '24011' ],
-      action => 'accept',
-    }
-
   }
 
   if $cinder_backend_iscsi == true {
