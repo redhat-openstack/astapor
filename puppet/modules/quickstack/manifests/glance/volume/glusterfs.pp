@@ -1,4 +1,4 @@
-class glance::volume::glusterfs (
+class quickstack::glance::volume::glusterfs (
   $glusterfs_shares,
   $glusterfs_disk_util = undef,
   $glusterfs_sparsed_volumes = undef,
