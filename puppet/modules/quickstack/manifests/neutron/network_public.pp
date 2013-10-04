@@ -1,4 +1,4 @@
-class quickstack::neutron::public_network (
+class quickstack::neutron::network_public (
   $allocation_pools_start = $quickstack::params::allocation_pools_start,
   $allocation_pools_end   = $quickstack::params::allocation_pools_end,
   $cidr                   = $quickstack::params::cidr,

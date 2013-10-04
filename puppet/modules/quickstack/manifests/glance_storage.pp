@@ -16,13 +16,6 @@ class quickstack::glance_storage (
       options => "defaults,_netdev",
       atboot  => "true",
     }
-  
-# Following should be taken care by glance module
-# mkdir -p /var/lib/glance/image-cache/
-# mkdir -p /var/lib/glance/images
-# chown -R glance:glance /var/lib/glance/images
-# chown -R glance:glance /var/lib/glance/image-cache
-# service openstack-glance-api restart
   }
 
   #if $glance_backend_iscsi == true {
