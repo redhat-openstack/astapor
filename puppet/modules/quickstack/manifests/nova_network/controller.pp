@@ -71,33 +71,42 @@ class quickstack::nova_network::controller (
     }
 
     class {'openstack::keystone':
-        db_host               => $controller_priv_floating_ip,
-        db_password           => $keystone_db_password,
-        admin_token           => $keystone_admin_token,
-        admin_email           => $admin_email,
-        admin_password        => $admin_password,
-        glance_user_password  => $glance_user_password,
-        nova_user_password    => $nova_user_password,
-        cinder_user_password  => $cinder_user_password,
-        neutron_user_password => "",
-        public_address        => $controller_pub_floating_ip,
-        admin_address         => $controller_priv_floating_ip,
-        internal_address      => $controller_priv_floating_ip,
-        neutron               => false,
-        enabled               => true,
-        require               => Class['openstack::db::mysql'],
+        db_host                 => $controller_priv_floating_ip,
+        db_password             => $keystone_db_password,
+        admin_token             => $keystone_admin_token,
+        admin_email             => $admin_email,
+        admin_password          => $admin_password,
+        glance_user_password    => $glance_user_password,
+        nova_user_password      => $nova_user_password,
+        cinder_user_password    => $cinder_user_password,
+        neutron_user_password   => "",
+
+        public_address          => $controller_pub_floating_ip,
+        admin_address           => $controller_priv_floating_ip,
+        internal_address        => $controller_priv_floating_ip,
+
+        glance_public_address   => $controller_pub_floating_ip,
+        glance_admin_address    => $controller_priv_floating_ip,
+        glance_internal_address => $controller_priv_floating_ip,
+
+        nova_public_address     => $controller_pub_floating_ip,
+        nova_admin_address      => $controller_priv_floating_ip,
+        nova_internal_address   => $controller_priv_floating_ip,
+
+        cinder_public_address   => $controller_pub_floating_ip,
+        cinder_admin_address    => $controller_priv_floating_ip,
+        cinder_internal_address => $controller_priv_floating_ip,
+
+        neutron                 => false,
+        enabled                 => true,
+        require                 => Class['openstack::db::mysql'],
     }
 
     class { 'swift::keystone::auth':
-        password => $swift_admin_password,
-        address  => $controller_priv_floating_ip,
-    }
-
-    class { 'ceilometer::keystone::auth':
-        password => $ceilometer_user_password,
-        public_address => $controller_priv_floating_ip,
-        admin_address => $controller_priv_floating_ip,
+        password         => $swift_admin_password,
+        public_address   => $controller_pub_floating_ip,
         internal_address => $controller_priv_floating_ip,
+        admin_address    => $controller_priv_floating_ip,
     }
 
     class {'openstack::glance':
@@ -107,41 +116,12 @@ class quickstack::nova_network::controller (
         require               => Class['openstack::db::mysql'],
     }
 
-    # Configure Ceilometer
-    class { 'mongodb':
-       enable_10gen => false,
-       port         => '27017',
-    }
-
-    class { 'ceilometer':
-        metering_secret => $ceilometer_metering_secret,
-        qpid_hostname   => $controller_priv_floating_ip,
-        rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
-        verbose         => $verbose,
-    }
-
-    class { 'ceilometer::db':
-        database_connection => 'mongodb://localhost:27017/ceilometer',
-        require             => Class['mongodb'],
-    }
-
-    class { 'ceilometer::collector':
-        require => Class['ceilometer::db'],
-    }
-
-    class { 'ceilometer::agent::central':
-        auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
-        auth_password => $ceilometer_user_password,
-    }
-
-    class { 'ceilometer::api':
-        keystone_host     => $controller_priv_floating_ip,
-        keystone_password => $ceilometer_user_password,
-        require           => Class['mongodb'],
-    }
-
-    glance_api_config {
-        'DEFAULT/notifier_strategy': value => 'qpid'
+    class { 'quickstack::ceilometer_controller':
+      ceilometer_metering_secret  => $ceilometer_metering_secret,
+      ceilometer_user_password    => $ceilometer_user_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
+      verbose                     => $verbose,
     }
 
     class { 'quickstack::cinder_controller':
@@ -157,6 +137,7 @@ class quickstack::nova_network::controller (
       heat_user_password          => $heat_user_password,
       heat_db_password            => $heat_db_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
       verbose                     => $verbose,
     }
 
