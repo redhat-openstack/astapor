@@ -22,6 +22,8 @@ class quickstack::neutron::controller (
   $nova_user_password           = $quickstack::params::nova_user_password,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
+  $mysql_host                   = $quickstack::params::mysql_host,
+  $qpid_host                    = $quickstack::params::qpid_host,
   $verbose                      = $quickstack::params::verbose
 ) inherits quickstack::params {
 
@@ -49,7 +51,7 @@ class quickstack::neutron::controller (
     }
 
     class {'openstack::keystone':
-        db_host                 => $controller_priv_floating_ip,
+        db_host                 => $mysql_host,
         db_password             => $keystone_db_password,
         admin_token             => $keystone_admin_token,
         admin_email             => $admin_email,
@@ -88,7 +90,7 @@ class quickstack::neutron::controller (
     }
 
     class {'openstack::glance':
-        db_host        => $controller_priv_floating_ip,
+        db_host        => $mysql_host,
         user_password  => $glance_user_password,
         db_password    => $glance_db_password,
         require        => Class['openstack::db::mysql'],
@@ -96,7 +98,7 @@ class quickstack::neutron::controller (
 
     # Configure Nova
     class { 'nova':
-        sql_connection     => "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova",
+        sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
         image_service      => 'nova.image.glance.GlanceImageService',
         glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
         rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
@@ -179,11 +181,11 @@ class quickstack::neutron::controller (
         verbose               => true,
         allow_overlapping_ips => true,
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-        qpid_hostname         => $controller_priv_floating_ip,
+        qpid_hostname         => $qpid_host,
     }
 
     neutron_config {
-        'database/connection': value => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron";
+        'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
     }
 
     class { '::neutron::keystone::auth':
@@ -206,7 +208,7 @@ class quickstack::neutron::controller (
     }
 
     class { '::neutron::plugins::ovs':
-        sql_connection      => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron",
+        sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
         tenant_network_type => 'gre',
     }
 

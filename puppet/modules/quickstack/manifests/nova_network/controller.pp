@@ -23,6 +23,8 @@ class quickstack::nova_network::controller (
   $nova_user_password          = $quickstack::params::nova_user_password,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
+  $mysql_host                  = $quickstack::params::mysql_host,
+  $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose
 ) inherits quickstack::params {
 
@@ -71,7 +73,7 @@ class quickstack::nova_network::controller (
     }
 
     class {'openstack::keystone':
-        db_host                 => $controller_priv_floating_ip,
+        db_host                 => $mysql_host,
         db_password             => $keystone_db_password,
         admin_token             => $keystone_admin_token,
         admin_email             => $admin_email,
@@ -110,10 +112,10 @@ class quickstack::nova_network::controller (
     }
 
     class {'openstack::glance':
-        db_host               => $controller_priv_floating_ip,
-        user_password  => $glance_user_password,
-        db_password    => $glance_db_password,
-        require               => Class['openstack::db::mysql'],
+        db_host       => $mysql_host,
+        user_password => $glance_user_password,
+        db_password   => $glance_db_password,
+        require       => Class['openstack::db::mysql'],
     }
 
     class { 'quickstack::ceilometer_controller':
@@ -121,6 +123,7 @@ class quickstack::nova_network::controller (
       ceilometer_user_password    => $ceilometer_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
@@ -128,6 +131,8 @@ class quickstack::nova_network::controller (
       cinder_db_password          => $cinder_db_password,
       cinder_user_password        => $cinder_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
@@ -138,12 +143,14 @@ class quickstack::nova_network::controller (
       heat_db_password            => $heat_db_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
     # Configure Nova
     class { 'nova':
-        sql_connection     => "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova",
+        sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
         image_service      => 'nova.image.glance.GlanceImageService',
         glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
         rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',

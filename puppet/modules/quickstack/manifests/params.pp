@@ -32,6 +32,8 @@ class quickstack::params {
   $floating_network_range        = 'PUB_RANGE'
   $controller_priv_floating_ip   = 'PRIV_IP'
   $controller_pub_floating_ip    = 'PUB_IP'
+  $mysql_host                    = 'PRIV_IP'
+  $qpid_host                     = 'PRIV_IP'
   $metadata_proxy_shared_secret  = 'CHANGEME'
 
   # Logs

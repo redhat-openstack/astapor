@@ -13,6 +13,8 @@ class quickstack::neutron::compute (
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
+  $mysql_host                  = $quickstack::params::mysql_host,
+  $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -26,11 +28,11 @@ class quickstack::neutron::compute (
     }
 
   class { 'nova':
-      sql_connection     => "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova",
+      sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
       image_service      => 'nova.image.glance.GlanceImageService',
       glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
       rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
-      qpid_hostname      => $controller_priv_floating_ip,
+      qpid_hostname      => $qpid_host,
       verbose            => $verbose,
   }
 
@@ -64,7 +66,7 @@ class quickstack::neutron::compute (
 
   class { 'ceilometer':
       metering_secret => $ceilometer_metering_secret,
-      qpid_hostname   => $controller_priv_floating_ip,
+      qpid_hostname   => $qpid_host,
       rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
       verbose         => $verbose,
   }
@@ -77,11 +79,11 @@ class quickstack::neutron::compute (
   class { '::neutron':
       allow_overlapping_ips => true,
       rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-      qpid_hostname         => $controller_priv_floating_ip,
+      qpid_hostname         => $qpid_host,
   }
 
   neutron_config {
-      'database/connection': value => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron";
+      'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
       'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
       'keystone_authtoken/admin_tenant_name': value => 'admin';
       'keystone_authtoken/admin_user':        value => 'admin';
@@ -89,7 +91,7 @@ class quickstack::neutron::compute (
   }
 
   class { '::neutron::plugins::ovs':
-      sql_connection      => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron",
+      sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
       tenant_network_type => 'gre',
   }
 
