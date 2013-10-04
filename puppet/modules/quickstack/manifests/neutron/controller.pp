@@ -269,4 +269,6 @@ class quickstack::neutron::controller (
           persistent => true,
       }
     }
+
+    class { 'quickstack::neutron::network_public': }
 }
