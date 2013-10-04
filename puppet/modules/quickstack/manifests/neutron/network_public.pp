@@ -14,6 +14,8 @@ class quickstack::neutron::network_public (
         tenant_name     => $tenant_name,
     }
 
+    # Not ready yet:
+    # https://github.com/stackforge/puppet-neutron/blob/b6b50a97e060261ce66817ba8255ae4d710e0009/lib/puppet/type/neutron_subnet.rb#L29
     neutron_subnet { 'public_subnet':
         ensure           => 'present',
         cidr             => $cidr,
