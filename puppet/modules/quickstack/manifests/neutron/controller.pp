@@ -216,6 +216,8 @@ class quickstack::neutron::controller (
         neutron_admin_password    => $neutron_user_password,
     }
 
+    class { 'quickstack::neutron::network_public': }
+
     firewall { '001 controller incoming':
         proto    => 'tcp',
         dport    => ['80', '443', '3260', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080', '9696'],   

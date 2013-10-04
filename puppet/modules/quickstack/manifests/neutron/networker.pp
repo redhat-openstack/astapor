@@ -66,6 +66,4 @@ class quickstack::neutron::networker (
     #class { 'neutron::agents::lbaas': }
 
     #class { 'neutron::agents::fwaas': }
-
-    class { 'quickstack::neutron::network_public': }
 }
