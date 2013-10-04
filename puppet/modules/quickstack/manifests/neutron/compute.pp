@@ -22,9 +22,6 @@ class quickstack::neutron::compute (
       'keystone_authtoken/admin_user':                value => 'admin';
       'keystone_authtoken/admin_password':            value => $admin_password;
       'keystone_authtoken/auth_host':                 value => $controller_priv_floating_ip;
-
-      'DEFAULT/service_neutron_metadata_proxy':       value => true;  
-      'DEFAULT/neutron_metadata_proxy_shared_secret': value => $metadata_proxy_shared_secret;
     }
 
   class { 'nova':
@@ -59,9 +56,10 @@ class quickstack::neutron::compute (
   }
 
   class { 'nova::api':
-      enabled           => true,
-      admin_password    => $nova_user_password,
-      auth_host         => $controller_priv_floating_ip,
+      enabled                              => true,
+      admin_password                       => $nova_user_password,
+      auth_host                            => $controller_priv_floating_ip,
+      neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
   }
 
   class { 'ceilometer':
