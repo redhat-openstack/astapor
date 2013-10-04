@@ -1,26 +1,30 @@
 # Common quickstack configurations
 class quickstack::neutron::compute (
-  $admin_password              = $quickstack::params::admin_password,
-  $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
-  $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
-  $neutron_db_password         = $quickstack::params::neutron_db_password,
-  $neutron_user_password       = $quickstack::params::neutron_user_password,
-  $nova_db_password            = $quickstack::params::nova_db_password,
-  $nova_user_password          = $quickstack::params::nova_user_password,
-  $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
-  $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
-  $private_interface           = $quickstack::params::private_interface,
-  $public_interface            = $quickstack::params::public_interface,
-  $verbose                     = $quickstack::params::verbose,
+  $admin_password               = $quickstack::params::admin_password,
+  $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
+  $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
+  $neutron_db_password          = $quickstack::params::neutron_db_password,
+  $neutron_user_password        = $quickstack::params::neutron_user_password,
+  $nova_db_password             = $quickstack::params::nova_db_password,
+  $nova_user_password           = $quickstack::params::nova_user_password,
+  $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
+  $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
+  $private_interface            = $quickstack::params::private_interface,
+  $public_interface             = $quickstack::params::public_interface,
+  $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   # Configure Nova
   nova_config{
-      'DEFAULT/libvirt_inject_partition':     value => '-1';
-      'keystone_authtoken/admin_tenant_name': value => 'admin';
-      'keystone_authtoken/admin_user':        value => 'admin';
-      'keystone_authtoken/admin_password':    value => $admin_password;
-      'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
+      'DEFAULT/libvirt_inject_partition':             value => '-1';
+      'keystone_authtoken/admin_tenant_name':         value => 'admin';
+      'keystone_authtoken/admin_user':                value => 'admin';
+      'keystone_authtoken/admin_password':            value => $admin_password;
+      'keystone_authtoken/auth_host':                 value => $controller_priv_floating_ip;
+
+      'DEFAULT/service_neutron_metadata_proxy':       value => true;  
+      'DEFAULT/neutron_metadata_proxy_shared_secret': value => $metadata_proxy_shared_secret;
     }
 
   class { 'nova':
