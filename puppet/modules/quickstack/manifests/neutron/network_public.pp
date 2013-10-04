@@ -14,12 +14,14 @@ class quickstack::neutron::public_network (
         tenant_name     => $tenant_name,
     }
 
-    neutron_subnet { 'public_subnet':
-        ensure           => 'present',
-        cidr             => $cidr,
-        gateway_ip       => $gateway_ip,
-        allocation_pools => "start=${allocation_pools_start},end=${allocation_pools_end}",
-        network_name     => $network_name,
-        tenant_name      => $tenant_name,
-    }
+    # Not ready yet:
+    # https://github.com/stackforge/puppet-neutron/blob/b6b50a97e060261ce66817ba8255ae4d710e0009/lib/puppet/type/neutron_subnet.rb#L29
+    #neutron_subnet { 'public_subnet':
+    #    ensure           => 'present',
+    #    cidr             => $cidr,
+    #    gateway_ip       => $gateway_ip,
+    #    allocation_pools => "start=${allocation_pools_start},end=${allocation_pools_end}",
+    #    network_name     => $network_name,
+    #    tenant_name      => $tenant_name,
+    #}
 }
