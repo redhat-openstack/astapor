@@ -74,7 +74,7 @@ class quickstack::nova_network::compute (
         install_service   => true,
     }
 
-    firewall { '001 nove compute incoming':
+    firewall { '001 nova compute incoming':
         proto    => 'tcp',
         dport    => '5900-5999',
         action   => 'accept',
