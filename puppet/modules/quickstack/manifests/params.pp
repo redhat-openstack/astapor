@@ -27,11 +27,9 @@ class quickstack::params {
   $nova_db_password           = 'CHANGEME'
   $nova_user_password         = 'CHANGEME'
 
-  # Networking
+  # Networking - Common
   $private_interface             = 'PRIV_INTERFACE'
   $public_interface              = 'PUB_INTERFACE'
-  $fixed_network_range           = 'PRIV_RANGE'
-  $floating_network_range        = 'PUB_RANGE'
   $controller_priv_floating_ip   = 'PRIV_IP'
   $controller_pub_floating_ip    = 'PUB_IP'
   $mysql_host                    = 'PRIV_IP'
@@ -44,4 +42,16 @@ class quickstack::params {
   $gateway_ip             = 'CHANGEME'
   $allocation_pools_start = 'CHANGEME'
   $allocation_pools_end   = 'CHANGEME'
+  # Nova-network specific
+  $fixed_network_range           = 'PRIV_RANGE'
+  $floating_network_range        = 'PUB_RANGE'
+
+  # Neutron specific
+  $metadata_proxy_shared_secret  = 'CHANGEME'
+  # Floating IPs - Needs seeds
+  $public_network_name           = 'public'
+  $public_cidr                   = 'CHANGEME'
+  $public_gateway_ip             = 'CHANGEME'
+  $public_allocation_pools_start = 'CHANGEME'
+  $public_allocation_pools_end   = 'CHANGEME'
 }

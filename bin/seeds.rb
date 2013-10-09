@@ -265,6 +265,7 @@ params = {
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+  "metadata_proxy_shared_secret" => SecureRandom.hex
 }
 
 hostgroups = [
