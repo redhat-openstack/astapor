@@ -36,19 +36,13 @@ class quickstack::params {
   $qpid_host                     = 'PRIV_IP'
   $metadata_proxy_shared_secret  = 'CHANGEME'
 
-  # Floating IPs
-  $network_name           = 'public'
-  $cidr                   = 'CHANGEME'
-  $gateway_ip             = 'CHANGEME'
-  $allocation_pools_start = 'CHANGEME'
-  $allocation_pools_end   = 'CHANGEME'
   # Nova-network specific
   $fixed_network_range           = 'PRIV_RANGE'
   $floating_network_range        = 'PUB_RANGE'
 
   # Neutron specific
   $metadata_proxy_shared_secret  = 'CHANGEME'
-  # Floating IPs - Needs seeds
+  # Floating IPs - [WIP] Needs seeds
   $public_network_name           = 'public'
   $public_cidr                   = 'CHANGEME'
   $public_gateway_ip             = 'CHANGEME'
