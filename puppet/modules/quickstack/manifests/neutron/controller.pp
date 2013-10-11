@@ -138,6 +138,7 @@ class quickstack::neutron::controller (
       ceilometer_user_password    => $ceilometer_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
@@ -145,6 +146,8 @@ class quickstack::neutron::controller (
       cinder_db_password          => $cinder_db_password,
       cinder_user_password        => $cinder_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
@@ -155,6 +158,8 @@ class quickstack::neutron::controller (
       heat_db_password            => $heat_db_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
