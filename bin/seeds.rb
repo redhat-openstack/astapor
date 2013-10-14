@@ -282,6 +282,8 @@ hostgroups = [
      :class=>"quickstack::cinder_storage"},
     {:name=>"OpenStack Load Balancer",
      :class=>"quickstack::load_balancer"},
+    {:name=>"HA Mysql Node",
+     :class=>"quickstack::hamysql::node"},
 ]
 
 hostgroups.each do |hg|
