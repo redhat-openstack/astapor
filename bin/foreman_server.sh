@@ -29,15 +29,15 @@ if [ "x$FOREMAN_PROVISIONING" = "x" ]; then
 fi
 
 # openstack networking configs.  These must be set to something sensible.
-#PRIVATE_CONTROLLER_IP=10.0.0.10
+#PRIVATE_CONTROLLER_FQDN=private.example.com
 #PRIVATE_INTERFACE=eth1
 #PRIVATE_NETMASK=10.0.0.0/23
-#PUBLIC_CONTROLLER_IP=10.9.9.10
+#PUBLIC_CONTROLLER_FQDN=public.example.com
 #PUBLIC_INTERFACE=eth2
 #PUBLIC_NETMASK=10.9.9.0/24
 #FOREMAN_GATEWAY=10.0.0.1 (or false for no gateway)
-if [ "x$PRIVATE_CONTROLLER_IP" = "x" ]; then
-  echo "You must define PRIVATE_CONTROLLER_IP before running this script"
+if [ "x$PRIVATE_CONTROLLER_FQDN" = "x" ]; then
+  echo "You must define PRIVATE_CONTROLLER_FQDN before running this script"
   exit 1
 fi
 if [ "x$PRIVATE_INTERFACE" = "x" ]; then
@@ -48,8 +48,8 @@ if [ "x$PRIVATE_NETMASK" = "x" ]; then
   echo "You must define PRIVATE_NETMASK before running this script"
   exit 1
 fi
-if [ "x$PUBLIC_CONTROLLER_IP" = "x" ]; then
-  echo "You must define PUBLIC_CONTROLLER_IP before running this script"
+if [ "x$PUBLIC_CONTROLLER_FQDN" = "x" ]; then
+  echo "You must define PUBLIC_CONTROLLER_FQDN before running this script"
   exit 1
 fi
 if [ "x$PUBLIC_INTERFACE" = "x" ]; then
@@ -212,8 +212,8 @@ cp ./seeds.rb $FOREMAN_DIR/db/.
 sed -i "s#SECONDARY_INT#$SECONDARY_INT#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PRIV_FQDN#$PRIVATE_CONTROLLER_FQDN#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_FQDN#$PUBLIC_CONTROLLER_FQDN#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
