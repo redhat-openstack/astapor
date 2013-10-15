@@ -265,6 +265,14 @@ params = {
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+  "ssl"                          => true,
+  "freeipa"                      => false,
+  "mysql_ca"                     => "/etc/ipa/ca.crt",
+  "mysql_cert"                   => "/etc/pki/tls/certs/PRIV_FQDN-mysql.crt",
+  "mysql_key"                    => "/etc/pki/tls/private/PRIV_FQDN-mysql.key",
+  "qpid_ca"                      => "/etc/ipa/ca.crt",
+  "qpid_cert"                    => "/etc/pki/tls/certs/PRIV_FQDN-qpid.crt",
+  "qpid_key"                     => "/etc/pki/tls/private/PRIV_FQDN-qpid.key",
 }
 
 hostgroups = [
