@@ -1,6 +1,6 @@
 class quickstack::cinder_storage(
   $cinder_db_password          = $quickstack::params::cinder_db_password,
-  $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
+  $controller_priv_fqdn = $quickstack::params::controller_priv_fqdn,
   $private_interface           = $quickstack::params::private_interface,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
