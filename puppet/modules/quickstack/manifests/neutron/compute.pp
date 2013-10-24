@@ -3,8 +3,6 @@ class quickstack::neutron::compute (
   $admin_password              = $quickstack::params::admin_password,
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
-  $fixed_network_range         = $quickstack::params::fixed_network_range,
-  $floating_network_range      = $quickstack::params::floating_network_range,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
   $neutron_user_password       = $quickstack::params::neutron_user_password,
   $nova_db_password            = $quickstack::params::nova_db_password,

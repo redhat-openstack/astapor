@@ -259,12 +259,12 @@ params = {
   "mysql_host"                   => 'PRIV_IP',
   "qpid_host"                    => 'PRIV_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
-  "private_ip"                   => "$ipaddress_@#{private_int}",
   "metadata_proxy_shared_secret" => SecureRandom.hex,
   "lb_private_vip"               => '',
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+  "metadata_proxy_shared_secret" => SecureRandom.hex
 }
 
 hostgroups = [
