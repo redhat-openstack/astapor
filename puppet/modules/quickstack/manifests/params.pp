@@ -1,5 +1,6 @@
 class quickstack::params {
   $verbose                    = 'true'
+  $is_ha                      = false
 
   $heat_cfn                   = 'false'
   $heat_cloudwatch            = 'false'
