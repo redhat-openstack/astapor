@@ -25,29 +25,10 @@ class quickstack::nova_network::controller (
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
-  $verbose                     = $quickstack::params::verbose
+  $verbose                     = $quickstack::params::verbose,
+  $is_ha                       = $quickstack::params::is_ha
 ) inherits quickstack::params {
 
-    #controller::corosync { 'quickstack': }
-
-    #controller::corosync::node { '10.100.0.2': }
-    #controller::corosync::node { '10.100.0.3': }
-
-    #controller::resources::ip { '8.21.28.222':
-    #    address => '8.21.28.222',
-    #}
-    #controller::resources::ip { '10.100.0.222':
-    #    address => '10.100.0.222',
-    #}
-
-    #controller::resources::lsb { 'qpidd': }
-
-    #controller::stonith::ipmilan { $ipmi_address:
-    #    address  => $ipmi_address,
-    #    user     => $ipmi_user,
-    #    password => $ipmi_pass,
-    #    hostlist => $ipmi_host_list,
-    #}
 
     class {'openstack::db::mysql':
         mysql_root_password  => $mysql_root_password,
@@ -65,7 +46,7 @@ class quickstack::nova_network::controller (
         neutron                => false,
 
         allowed_hosts          => '%',
-        enabled                => true,
+        enabled                => $is_ha,
     }
 
     class {'qpid::server':

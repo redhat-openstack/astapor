@@ -286,6 +286,7 @@ params = {
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+  "is_ha"                        => false,
 }
 
 hostgroups = [

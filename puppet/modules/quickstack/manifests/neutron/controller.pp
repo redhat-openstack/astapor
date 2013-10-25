@@ -35,7 +35,8 @@ class quickstack::neutron::controller (
   $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                   = $quickstack::params::mysql_host,
   $qpid_host                    = $quickstack::params::qpid_host,
-  $verbose                      = $quickstack::params::verbose
+  $verbose                      = $quickstack::params::verbose,
+  $is_ha                        = $quickstack::params::is_ha
 ) inherits quickstack::params {
 
     class {'openstack::db::mysql':
@@ -54,7 +55,7 @@ class quickstack::neutron::controller (
         neutron                => true,
 
         allowed_hosts          => ['%',$controller_priv_floating_ip],
-        enabled                => true,
+        enabled                => $is_ha,
     }
 
     class {'qpid::server':
