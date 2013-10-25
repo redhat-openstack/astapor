@@ -29,15 +29,21 @@ if [ "x$FOREMAN_PROVISIONING" = "x" ]; then
 fi
 
 # openstack networking configs.  These must be set to something sensible.
-#PRIVATE_CONTROLLER_FQDN=private.example.com
+
+# For each controller, only the IP or FQDN value should be provided. If you
+# intend to enable SSL then setting the FQDN values is required.
+#PRIVATE_CONTROLLER_IP=10.0.0.10
 #PRIVATE_INTERFACE=eth1
 #PRIVATE_NETMASK=10.0.0.0/23
-#PUBLIC_CONTROLLER_FQDN=public.example.com
+#PUBLIC_CONTROLLER_IP=10.9.9.10
 #PUBLIC_INTERFACE=eth2
 #PUBLIC_NETMASK=10.9.9.0/24
 #FOREMAN_GATEWAY=10.0.0.1 (or false for no gateway)
-if [ "x$PRIVATE_CONTROLLER_FQDN" = "x" ]; then
-  echo "You must define PRIVATE_CONTROLLER_FQDN before running this script"
+#PRIVATE_CONTROLLER_FQDN=private.example.com
+#PUBLIC_CONTROLLER_FQDN=public.example.com
+if [ "x$PRIVATE_CONTROLLER_FQDN" = "x" -a "x$PRIVATE_CONTROLLER_IP" = "x" ];
+then
+  echo "You must define either PRIVATE_CONTROLLER_IP or PRIVATE_CONTROLLER_FQDN before running this script"
   exit 1
 fi
 if [ "x$PRIVATE_INTERFACE" = "x" ]; then
@@ -48,8 +54,9 @@ if [ "x$PRIVATE_NETMASK" = "x" ]; then
   echo "You must define PRIVATE_NETMASK before running this script"
   exit 1
 fi
-if [ "x$PUBLIC_CONTROLLER_FQDN" = "x" ]; then
-  echo "You must define PUBLIC_CONTROLLER_FQDN before running this script"
+if [ "x$PUBLIC_CONTROLLER_FQDN" = "x" -a "x$PUBLIC_CONTROLLER_IP" = "x" ];
+then
+  echo "You must define either PRIVATE_CONTROLLER_IP or PUBLIC_CONTROLLER_FQDN before running this script"
   exit 1
 fi
 if [ "x$PUBLIC_INTERFACE" = "x" ]; then
@@ -86,6 +93,18 @@ fi
 if [ ! -d $FOREMAN_INSTALLER_DIR ]; then
   echo "$FOREMAN_INSTALLER_DIR does not exist.  exiting"
   exit 1
+fi
+
+if [ "x$PUBLIC_CONTROLLER_IP" != "x" ]; then
+  PUBLIC_CONTROLLER_NAME=$PUBLIC_CONTROLLER_IP
+else
+  PUBLIC_CONTROLLER_NAME=$PUBLIC_CONTROLLER_FQDN
+fi
+
+if [ "x$PRIVATE_CONTROLLER_IP" != "x" ]; then
+  PRIVATE_CONTROLLER_NAME=$PRIVATE_CONTROLLER_IP
+else
+  PRIVATE_CONTROLLER_NAME=$PRIVATE_CONTROLLER_FQDN
 fi
 
 if [ ! -f foreman_server.sh ]; then
@@ -212,8 +231,8 @@ cp ./seeds.rb $FOREMAN_DIR/db/.
 sed -i "s#SECONDARY_INT#$SECONDARY_INT#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PRIV_FQDN#$PRIVATE_CONTROLLER_FQDN#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PUB_FQDN#$PUBLIC_CONTROLLER_FQDN#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_NAME#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_NAME#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
