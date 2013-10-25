@@ -1,14 +1,14 @@
 class quickstack::cinder_controller(
   $cinder_db_password,
   $cinder_user_password,
-  $controller_priv_fqdn,
+  $controller_priv_ip,
   $mysql_host,
   $qpid_host,
   $verbose,
 ) {
 
   cinder_config {
-    'DEFAULT/glance_host': value => $controller_priv_fqdn;
+    'DEFAULT/glance_host': value => $controller_priv_ip;
     'DEFAULT/notification_driver': value => 'cinder.openstack.common.notifier.rpc_notifier'
   }
 
@@ -25,7 +25,7 @@ class quickstack::cinder_controller(
     keystone_password => $cinder_user_password,
     keystone_tenant => "services",
     keystone_user => "cinder",
-    keystone_auth_host => $controller_priv_fqdn,
+    keystone_auth_host => $controller_priv_ip,
   }
 
   class {'cinder::scheduler': }

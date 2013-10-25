@@ -3,8 +3,8 @@ class quickstack::heat_controller(
   $heat_cloudwatch,
   $heat_user_password,
   $heat_db_password,
-  $controller_priv_fqdn,
-  $controller_pub_fqdn,
+  $controller_priv_ip,
+  $controller_pub_ip,
   $mysql_host,
   $qpid_host,
   $verbose,
@@ -13,27 +13,27 @@ class quickstack::heat_controller(
   if str2bool($heat_cfn) == true {
     class {"heat::keystone::auth":
       password => $heat_user_password,
-      heat_public_address => $controller_pub_fqdn,
-      heat_admin_address => $controller_priv_fqdn,
-      heat_internal_address => $controller_priv_fqdn,
-      cfn_public_address => $controller_pub_fqdn,
-      cfn_admin_address => $controller_priv_fqdn,
-      cfn_internal_address => $controller_priv_fqdn,
+      heat_public_address => $controller_pub_ip,
+      heat_admin_address => $controller_priv_ip,
+      heat_internal_address => $controller_priv_ip,
+      cfn_public_address => $controller_pub_ip,
+      cfn_admin_address => $controller_priv_ip,
+      cfn_internal_address => $controller_priv_ip,
     }
   } else {
     class {"heat::keystone::auth":
       password => $heat_user_password,
-      heat_public_address => $controller_pub_fqdn,
-      heat_admin_address => $controller_priv_fqdn,
-      heat_internal_address => $controller_priv_fqdn,
+      heat_public_address => $controller_pub_ip,
+      heat_admin_address => $controller_priv_ip,
+      heat_internal_address => $controller_priv_ip,
       cfn_auth_name => undef,
     }
   }
 
   class { 'heat':
-      keystone_host     => $controller_priv_fqdn,
+      keystone_host     => $controller_priv_ip,
       keystone_password => $heat_user_password,
-      auth_uri          => "http://${controller_priv_fqdn}:35357/v2.0",
+      auth_uri          => "http://${controller_priv_ip}:35357/v2.0",
       rpc_backend       => 'heat.openstack.common.rpc.impl_qpid',
       qpid_hostname     => $qpid_host,
       verbose           => $verbose,
@@ -50,9 +50,9 @@ class quickstack::heat_controller(
   }
 
   class { 'heat::engine':
-      heat_metadata_server_url      => "http://${controller_priv_fqdn}:8000",
-      heat_waitcondition_server_url => "http://${controller_priv_fqdn}:8000/v1/waitcondition",
-      heat_watch_server_url         => "http://${controller_priv_fqdn}:8003",
+      heat_metadata_server_url      => "http://${controller_priv_ip}:8000",
+      heat_waitcondition_server_url => "http://${controller_priv_ip}:8000/v1/waitcondition",
+      heat_watch_server_url         => "http://${controller_priv_ip}:8003",
   }
 
   class { 'heat::db::mysql':
