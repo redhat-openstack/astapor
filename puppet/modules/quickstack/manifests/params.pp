@@ -35,6 +35,7 @@ class quickstack::params {
   $mysql_host                    = 'PRIV_IP'
   $qpid_host                     = 'PRIV_IP'
   $metadata_proxy_shared_secret  = 'CHANGEME'
+  $configure_ovswitch            = 'true'
 
   # Logs
   $admin_email                = "admin@${::domain}"
