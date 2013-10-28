@@ -36,7 +36,6 @@ class quickstack::neutron::networker (
         qpid_hostname         => $qpid_host,
     }
     
-
     neutron_config {
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
 
