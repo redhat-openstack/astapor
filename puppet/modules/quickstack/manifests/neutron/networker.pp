@@ -1,5 +1,6 @@
 
 class quickstack::neutron::networker (
+  $configure_ovswitch           = $quickstack::params::configure_ovswitch,
   $fixed_network_range          = $quickstack::params::fixed_network_range,
   $floating_network_range       = $quickstack::params::floating_network_range,
   $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
