@@ -21,8 +21,8 @@ class quickstack::nova_network::controller (
   $mysql_root_password         = $quickstack::params::mysql_root_password,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
-  $controller_priv_ip        = $quickstack::params::controller_priv_ip,
-  $controller_pub_ip         = $quickstack::params::controller_pub_ip,
+  $controller_priv_ip          = $quickstack::params::controller_priv_ip,
+  $controller_pub_ip           = $quickstack::params::controller_pub_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
@@ -34,6 +34,9 @@ class quickstack::nova_network::controller (
   $qpid_ca                     = $quickstack::params::qpid_ca,
   $qpid_cert                   = $quickstack::params::qpid_cert,
   $qpid_key                    = $quickstack::params::qpid_key,
+  $horizon_ca                  = $quickstack::params::horizon_ca,
+  $horizon_cert                = $quickstack::params::horizon_cert,
+  $horizon_key                 = $quickstack::params::horizon_key,
 ) inherits quickstack::params {
 
     #controller::corosync { 'quickstack': }
@@ -71,12 +74,24 @@ class quickstack::nova_network::controller (
           owner_id => 'mysql',
           group_id => 'mysql',
         }
+        certmonger::request_ipa_cert { 'horizon':
+          seclib => "openssl",
+          principal => "horizon/${controller_priv_ip}",
+          key => $horizon_key,
+          cert => $horizon_cert,
+          owner_id => 'httpd',
+          group_id => 'httpd',
+        }
       } else {
         if $mysql_ca == undef or $mysql_cert == undef or $mysql_key == undef {
           fail('The mysql CA, cert and key are all required.')
         }
         if $qpid_ca == undef or $qpid_cert == undef or $qpid_key == undef {
           fail('The qpid CA, cert and key are all required.')
+        }
+        if $horizon_ca == undef or $horizon_cert == undef or
+           $horizon_key == undef {
+          fail('The horizon CA, cert and key are all required.')
         }
       }
     } else {
@@ -249,6 +264,10 @@ class quickstack::nova_network::controller (
     class {'horizon':
         secret_key    => $horizon_secret_key,
         keystone_host => $controller_priv_ip,
+        listen_ssl    => str2bool($ssl),
+        horizon_cert  => $horizon_cert,
+        horizon_key   => $horizon_key,
+        horizon_ca    => $horizon_ca,
     }
 
     class {'memcached':}

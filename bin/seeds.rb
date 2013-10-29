@@ -273,6 +273,9 @@ params = {
   "qpid_ca"                      => "/etc/ipa/ca.crt",
   "qpid_cert"                    => "/etc/pki/tls/certs/PRIV_IP-qpid.crt",
   "qpid_key"                     => "/etc/pki/tls/private/PRIV_IP-qpid.key",
+  "horizon_ca"                   => "/etc/ipa/ca.crt",
+  "horizon_cert"                 => "/etc/pki/tls/certs/PRIV_IP-horizon.crt",
+  "horizon_key"                  => "/etc/pki/tls/private/PRIV_IP-horizon.key",
 }
 
 hostgroups = [
