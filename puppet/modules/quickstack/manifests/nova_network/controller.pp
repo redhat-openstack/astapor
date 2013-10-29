@@ -84,19 +84,19 @@ class quickstack::nova_network::controller (
         neutron_user_password   => "",
 
         public_address          => $controller_pub_floating_ip,
-        admin_address           => $controller_priv_floating_ip,
+        admin_address           => $controller_pub_floating_ip,
         internal_address        => $controller_priv_floating_ip,
 
         glance_public_address   => $controller_pub_floating_ip,
-        glance_admin_address    => $controller_priv_floating_ip,
+        glance_admin_address    => $controller_pub_floating_ip,
         glance_internal_address => $controller_priv_floating_ip,
 
         nova_public_address     => $controller_pub_floating_ip,
-        nova_admin_address      => $controller_priv_floating_ip,
+        nova_admin_address      => $controller_pub_floating_ip,
         nova_internal_address   => $controller_priv_floating_ip,
 
         cinder_public_address   => $controller_pub_floating_ip,
-        cinder_admin_address    => $controller_priv_floating_ip,
+        cinder_admin_address    => $controller_pub_floating_ip,
         cinder_internal_address => $controller_priv_floating_ip,
 
         neutron                 => false,
@@ -108,7 +108,7 @@ class quickstack::nova_network::controller (
         password         => $swift_admin_password,
         public_address   => $controller_pub_floating_ip,
         internal_address => $controller_priv_floating_ip,
-        admin_address    => $controller_priv_floating_ip,
+        admin_address    => $controller_pub_floating_ip,
     }
 
     class {'openstack::glance':

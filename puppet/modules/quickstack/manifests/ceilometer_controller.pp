@@ -10,7 +10,7 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer::keystone::auth':
         password => $ceilometer_user_password,
         public_address => $controller_pub_floating_ip,
-        admin_address => $controller_priv_floating_ip,
+        admin_address => $controller_pub_floating_ip,
         internal_address => $controller_priv_floating_ip,
     }
 

@@ -103,7 +103,7 @@ class quickstack::neutron::compute (
   class { '::nova::network::neutron':
       neutron_admin_password    => $neutron_user_password,
       neutron_url               => "http://${controller_priv_floating_ip}:9696",
-      neutron_admin_auth_url    => "http://${controller_priv_floating_ip}:35357/v2.0",
+      neutron_admin_auth_url    => "http://${controller_pub_floating_ip}:35357/v2.0",
   }
 
   firewall { '001 nova compute incoming':
