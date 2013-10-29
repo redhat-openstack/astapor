@@ -81,4 +81,7 @@ class quickstack::params {
   $qpid_ca                    = undef
   $qpid_cert                  = undef
   $qpid_key                   = undef
+  $horizon_ca                 = '/etc/ipa/ca.crt'
+  $horizon_cert               = undef
+  $horizon_key                = undef
 }
