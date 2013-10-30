@@ -7,6 +7,8 @@ class quickstack::neutron::compute (
   $floating_network_range      = $quickstack::params::floating_network_range,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
   $neutron_user_password       = $quickstack::params::neutron_user_password,
+  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
+  $tenant_network_type         = $quickstack::params::tenant_network_type,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $controller_adm_floating_ip  = $quickstack::params::controller_adm_floating_ip,
@@ -14,6 +16,8 @@ class quickstack::neutron::compute (
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
+  $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
+  $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
@@ -81,6 +85,7 @@ class quickstack::neutron::compute (
       allow_overlapping_ips => true,
       rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
       qpid_hostname         => $qpid_host,
+      core_plugin           => $neutron_core_plugin
   }
 
   neutron_config {
@@ -93,10 +98,12 @@ class quickstack::neutron::compute (
 
   class { '::neutron::plugins::ovs':
       sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
-      tenant_network_type => 'gre',
+      tenant_network_type => $tenant_network_type,
   }
 
   class { '::neutron::agents::ovs':
+      bridge_uplinks   => $ovs_bridge_uplinks,
+      bridge_mappings  => $ovs_bridge_mappings,
       local_ip         => getvar("ipaddress_${private_interface}"),
       enable_tunneling => true,
   }

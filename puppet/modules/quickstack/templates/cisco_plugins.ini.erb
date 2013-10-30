@@ -1,0 +1,81 @@
+[CISCO_PLUGINS]
+
+# (StrOpt) Period-separated module path to the plugin class to use for
+# the Cisco Nexus switches.
+#
+nexus_plugin=<%= @cisco_nexus_plugin %>
+
+# (StrOpt) Period-separated module path to the plugin class to use for
+# the virtual switches on compute nodes.
+#
+vswitch_plugin=<%= @cisco_vswitch_plugin %>
+
+[CISCO]
+# (StrOpt) A short prefix to prepend to the VLAN number when creating a
+# VLAN interface. For example, if an interface is being created for
+# VLAN 2001 it will be named 'q-2001' using the default prefix.
+#
+# vlan_name_prefix = q-
+# Example: vlan_name_prefix = vnet-
+
+# (StrOpt) A short prefix to prepend to the VLAN number when creating a
+# provider VLAN interface. For example, if an interface is being created
+# for provider VLAN 3003 it will be named 'p-3003' using the default prefix.
+#
+# provider_vlan_name_prefix = p-
+# Example: provider_vlan_name_prefix = PV-
+
+# (BoolOpt) A flag indicating whether Openstack networking should manage the
+# creation and removal of VLAN interfaces for provider networks on the Nexus
+# switches. If the flag is set to False then Openstack will not create or
+# remove VLAN interfaces for provider networks, and the administrator needs
+# to manage these interfaces manually or by external orchestration.
+#
+
+provider_vlan_auto_create = <%= @provider_vlan_auto_create %>
+
+# (BoolOpt) A flag indicating whether Openstack networking should manage
+# the adding and removing of provider VLANs from trunk ports on the Nexus
+# switches. If the flag is set to False then Openstack will not add or
+# remove provider VLANs from trunk ports, and the administrator needs to
+# manage these operations manually or by external orchestration.
+#
+
+provider_vlan_auto_trunk = <%= @provider_vlan_auto_trunk %>
+
+# (StrOpt) Period-separated module path to the model class to use for
+# the Cisco neutron plugin.
+#
+# model_class = neutron.plugins.cisco.models.virt_phy_sw_v2.VirtualPhysicalSwitchModelV2
+
+# (StrOpt) Period-separated module path to the driver class to use for
+# the Cisco Nexus switches.
+#
+# If no value is configured, a fake driver will be used.
+# nexus_driver = neutron.plugins.cisco.test.nexus.fake_nexus_driver.CiscoNEXUSFakeDriver
+# With real hardware, use the CiscoNEXUSDriver class:
+
+nexus_driver=neutron.plugins.cisco.nexus.cisco_nexus_network_driver_v2.CiscoNEXUSDriver
+
+# (BoolOpt) A flag to enable round robin scheduling of routers for SVI.
+# svi_round_robin = False
+
+
+# Cisco Nexus Switch configurations.
+# Each switch to be managed by Openstack Neutron must be configured here.
+#
+# Cisco Nexus Switch Format.
+[NEXUS_SWITCH]
+<% @nexus_config.each do |switch_ip, hosts| %>
+[[<%= switch_ip %>]]
+<% hosts.each do |host_name, ports| %>
+[[[<%=host_name%>]]]
+ports=<%=ports%>
+<% end %>
+[[[ssh_port]]]
+ssh_port=22
+<% end %>
+
+[DATABASE]
+sql_connection=mysql://neutron:<%= @neutron_db_password %>@<%= @mysql_host %>/neutron 
+
