@@ -3,6 +3,7 @@ class quickstack::heat_controller(
   $heat_cloudwatch,
   $heat_user_password,
   $heat_db_password,
+  $controller_adm_floating_ip,
   $controller_priv_floating_ip,
   $controller_pub_floating_ip,
   $mysql_host,
@@ -14,17 +15,17 @@ class quickstack::heat_controller(
     class {"heat::keystone::auth":
       password => $heat_user_password,
       heat_public_address => $controller_pub_floating_ip,
-      heat_admin_address => $controller_pub_floating_ip,
+      heat_admin_address => $controller_adm_floating_ip,
       heat_internal_address => $controller_priv_floating_ip,
       cfn_public_address => $controller_pub_floating_ip,
-      cfn_admin_address => $controller_pub_floating_ip,
+      cfn_admin_address => $controller_adm_floating_ip,
       cfn_internal_address => $controller_priv_floating_ip,
     }
   } else {
     class {"heat::keystone::auth":
       password => $heat_user_password,
       heat_public_address => $controller_pub_floating_ip,
-      heat_admin_address => $controller_pub_floating_ip,
+      heat_admin_address => $controller_adm_floating_ip,
       heat_internal_address => $controller_priv_floating_ip,
       cfn_auth_name => undef,
     }

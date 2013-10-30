@@ -21,6 +21,7 @@ class quickstack::nova_network::controller (
   $mysql_root_password         = $quickstack::params::mysql_root_password,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
+  $controller_adm_floating_ip  = $quickstack::params::controller_adm_floating_ip,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
@@ -84,19 +85,19 @@ class quickstack::nova_network::controller (
         neutron_user_password   => "",
 
         public_address          => $controller_pub_floating_ip,
-        admin_address           => $controller_pub_floating_ip,
+        admin_address           => $controller_adm_floating_ip,
         internal_address        => $controller_priv_floating_ip,
 
         glance_public_address   => $controller_pub_floating_ip,
-        glance_admin_address    => $controller_pub_floating_ip,
+        glance_admin_address    => $controller_adm_floating_ip,
         glance_internal_address => $controller_priv_floating_ip,
 
         nova_public_address     => $controller_pub_floating_ip,
-        nova_admin_address      => $controller_pub_floating_ip,
+        nova_admin_address      => $controller_adm_floating_ip,
         nova_internal_address   => $controller_priv_floating_ip,
 
         cinder_public_address   => $controller_pub_floating_ip,
-        cinder_admin_address    => $controller_pub_floating_ip,
+        cinder_admin_address    => $controller_adm_floating_ip,
         cinder_internal_address => $controller_priv_floating_ip,
 
         neutron                 => false,
@@ -108,7 +109,7 @@ class quickstack::nova_network::controller (
         password         => $swift_admin_password,
         public_address   => $controller_pub_floating_ip,
         internal_address => $controller_priv_floating_ip,
-        admin_address    => $controller_pub_floating_ip,
+        admin_address    => $controller_adm_floating_ip,
     }
 
     class {'openstack::glance':
