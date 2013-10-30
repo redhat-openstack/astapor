@@ -35,6 +35,7 @@ class quickstack::params {
   $mysql_host                    = 'PRIV_IP'
   $qpid_host                     = 'PRIV_IP'
   $metadata_proxy_shared_secret  = 'CHANGEME'
+  $configure_ovswitch            = 'true'
   $bridge_interface              = 'PRIV_IP'
   $enable_ovs_agent              = 'true'
   $tenant_network_type           = 'gre'
