@@ -179,7 +179,7 @@ EOM
 
 fi
 
-puppet apply --verbose installer.pp --modulepath=.
+puppet apply --verbose installer.pp --modulepath=modules
 popd
 
 # reset permissions
@@ -197,10 +197,10 @@ scl enable ruby193 "ruby foreman-setup.rb proxy"
 
 # install puppet modules
 mkdir -p /etc/puppet/environments/production/modules
-# copy ntp, quickstack
-cp -r ../puppet/modules/* /etc/puppet/environments/production/modules/
 # copy packstack
 cp -r $PACKSTACK_HOME/modules/* /etc/puppet/environments/production/modules/
+# copy ntp, quickstack
+cp -r ../puppet/modules/* /etc/puppet/environments/production/modules/
 # don't need this for puppet 3.1
 rm -rf /etc/puppet/environments/production/modules/create_resources
 # fix an error caused by ASCII encoded comment

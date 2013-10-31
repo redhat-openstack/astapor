@@ -231,6 +231,8 @@ end
 
 params = {
   "verbose"                      => "true",
+  "heat_cfn"                     => "false",
+  "heat_cloudwatch"              => "false",
   "admin_password"               => SecureRandom.hex,
   "ceilometer_metering_secret"   => SecureRandom.hex,
   "ceilometer_user_password"     => SecureRandom.hex,
@@ -254,8 +256,40 @@ params = {
   "floating_network_range"       => 'PUB_RANGE',
   "controller_priv_floating_ip"  => 'PRIV_IP',
   "controller_pub_floating_ip"   => 'PUB_IP',
+  "mysql_host"                   => 'PRIV_IP',
+  "mysql_virtual_ip"             => 'PRIV_IP',
+  "mysql_bind_address"           => '0.0.0.0',
+  "mysql_virt_ip_nic"            => 'eth2',
+  "mysql_virt_ip_cidr_mask"      =>  '24',  
+  "mysql_shared_storage_device"  => '192.168.200.200:/mnt/mysql',
+  "mysql_shared_storage_type"    => 'nfs',
+  "mysql_resource_group_name"    => 'mysqlgrp',
+  "mysql_clu_member_addrs"       => '192.168.200.11 192.168.200.12 192.168.200.13',
+  "qpid_host"                    => 'PRIV_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
+<<<<<<< HEAD
   "metadata_proxy_shared_secret" => SecureRandom.hex
+=======
+  "private_ip"                   => "$ipaddress_@#{private_int}",
+  "metadata_proxy_shared_secret" => SecureRandom.hex,
+ "bridge_interface"             => private_int,
+  "enable_ovs_agent"             => "true",
+  "ovs_vlan_ranges"              => '',
+  "ovs_bridge_mappings"          => [],
+  "ovs_bridge_uplinks"           => [],
+  "tenant_network_type"          => 'gre',
+  "neutron_core_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
+  "cisco_vswitch_plugin"         => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
+  "cisco_nexus_plugin"           => 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin',
+  "nexus_config"                 => {},
+  "nexus_credentials"            => [],
+  "provider_vlan_auto_create"    => "false",
+  "provider_vlan_auto_trunk"     => "false",
+  "lb_private_vip"               => '',
+  "lb_public_vip"                => '',
+  "lb_member_names"              => '',
+  "lb_member_addrs"              => '',
+>>>>>>> master
 }
 
 hostgroups = [
@@ -271,13 +305,29 @@ hostgroups = [
      :class=>"quickstack::neutron::networker"},
     {:name=>"OpenStack Block Storage",
      :class=>"quickstack::cinder_storage"},
+    {:name=>"OpenStack Load Balancer",
+     :class=>"quickstack::load_balancer"},
+    {:name=>"HA Mysql Node",
+     :class=>"quickstack::hamysql::node"},
 ]
+
+def get_key_type(value)
+  key_list = LookupKey::KEY_TYPES
+  value_type = value.class.to_s.downcase
+  if key_list.include?(value_type)
+   value_type
+  elsif [FalseClass, TrueClass].include? value.class
+    'boolean'
+  end
+  # If we need to handle actual number classes like Fixnum, add those here
+end
 
 hostgroups.each do |hg|
 pclass = Puppetclass.find_by_name hg[:class]
   params.each do |k,v|
     p = pclass.class_params.find_by_key(k)
     unless p.nil?
+      p.key_type = get_key_type(v)
       p.default_value = v
       p.override = true
       p.save

@@ -1,19 +1,23 @@
 class quickstack::cinder_controller(
+<<<<<<< HEAD
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $cinder_user_password        = $quickstack::params::cinder_user_password,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
+  $mysql_host                  = $quickstack::params::mysql_host,
+  $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
+
   cinder_config {
     'DEFAULT/glance_host': value => $controller_priv_floating_ip;
     'DEFAULT/notification_driver': value => 'cinder.openstack.common.notifier.rpc_notifier'
   }
-    
+
   class {'cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
-    qpid_hostname  => $controller_priv_floating_ip,
+    qpid_hostname  => $qpid_host,
     qpid_password  => 'guest',
-    sql_connection => "mysql://cinder:${cinder_db_password}@${controller_priv_floating_ip}/cinder",
+    sql_connection => "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder",
     verbose        => $verbose,
     require        => Class['openstack::db::mysql', 'qpid::server'],
   }

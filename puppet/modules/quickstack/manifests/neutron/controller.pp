@@ -3,6 +3,8 @@ class quickstack::neutron::controller (
   $admin_password               = $quickstack::params::admin_password,
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
+  $heat_cfn                     = $quickstack::params::heat_cfn,
+  $heat_cloudwatch              = $quickstack::params::heat_cloudwatch,
   $heat_user_password           = $quickstack::params::heat_user_password,
   $heat_db_password             = $quickstack::params::heat_db_password,
   $cinder_db_password           = $quickstack::params::cinder_db_password,
@@ -16,10 +18,23 @@ class quickstack::neutron::controller (
   $mysql_root_password          = $quickstack::params::mysql_root_password,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
+  $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
+  $tenant_network_type          = $quickstack::params::tenant_network_type,
+  $bridge_interface             = $quickstack::params::external_interface,
+  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  # cisco config
+  $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
+  $nexus_config                 = $quickstack::params::nexus_config,
+  $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
+  $nexus_credentials            = $quickstack::params::nexus_credentials,
+  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
+  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,  
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
+  $mysql_host                   = $quickstack::params::mysql_host,
+  $qpid_host                    = $quickstack::params::qpid_host,
   $verbose                      = $quickstack::params::verbose
 ) inherits quickstack::params {
 
@@ -47,45 +62,46 @@ class quickstack::neutron::controller (
     }
 
     class {'openstack::keystone':
-        db_host               => $controller_priv_floating_ip,
-        db_password           => $keystone_db_password,
-        admin_token           => $keystone_admin_token,
-        admin_email           => $admin_email,
-        admin_password        => $admin_password,
-        glance_user_password  => $glance_user_password,
-        nova_user_password    => $nova_user_password,
-        cinder_user_password  => $cinder_user_password,
-        neutron_user_password => $neutron_user_password,
-        public_address        => $controller_pub_floating_ip,
-        admin_address         => $controller_priv_floating_ip,
-        internal_address      => $controller_priv_floating_ip,
-        neutron               => false,
-        enabled               => true,
-        require               => Class['openstack::db::mysql'],
+        db_host                 => $mysql_host,
+        db_password             => $keystone_db_password,
+        admin_token             => $keystone_admin_token,
+        admin_email             => $admin_email,
+        admin_password          => $admin_password,
+        glance_user_password    => $glance_user_password,
+        nova_user_password      => $nova_user_password,
+        cinder_user_password    => $cinder_user_password,
+        neutron_user_password   => $neutron_user_password,
+
+        public_address          => $controller_pub_floating_ip,
+        admin_address           => $controller_priv_floating_ip,
+        internal_address        => $controller_priv_floating_ip,
+
+        glance_public_address   => $controller_pub_floating_ip,
+        glance_admin_address    => $controller_priv_floating_ip,
+        glance_internal_address => $controller_priv_floating_ip,
+
+        nova_public_address     => $controller_pub_floating_ip,
+        nova_admin_address      => $controller_priv_floating_ip,
+        nova_internal_address   => $controller_priv_floating_ip,
+
+        cinder_public_address   => $controller_pub_floating_ip,
+        cinder_admin_address    => $controller_priv_floating_ip,
+        cinder_internal_address => $controller_priv_floating_ip,
+
+        neutron                 => false,
+        enabled                 => true,
+        require                 => Class['openstack::db::mysql'],
     }
 
     class { 'swift::keystone::auth':
-        password => $swift_admin_password,
-        address  => $controller_priv_floating_ip,
-    }
-
-    class { 'ceilometer::keystone::auth':
-        password => $ceilometer_user_password,
-        public_address => $controller_priv_floating_ip,
-        admin_address => $controller_priv_floating_ip,
+        password         => $swift_admin_password,
+        public_address   => $controller_pub_floating_ip,
         internal_address => $controller_priv_floating_ip,
-    }
-
-    class {"heat::keystone::auth":
-        password => $heat_user_password,
-        heat_public_address => $controller_priv_floating_ip,
-        heat_admin_address => $controller_priv_floating_ip,
-        heat_internal_address => $controller_priv_floating_ip,
-        cfn_auth_name => undef,
+        admin_address    => $controller_priv_floating_ip,
     }
 
     class {'openstack::glance':
-        db_host        => $controller_priv_floating_ip,
+        db_host        => $mysql_host,
         user_password  => $glance_user_password,
         db_password    => $glance_db_password,
         require        => Class['openstack::db::mysql'],
@@ -93,7 +109,7 @@ class quickstack::neutron::controller (
 
     # Configure Nova
     class { 'nova':
-        sql_connection     => "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova",
+        sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
         image_service      => 'nova.image.glance.GlanceImageService',
         glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
         rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
@@ -128,74 +144,33 @@ class quickstack::neutron::controller (
         enabled => true,
     }
 
-    # Configure Ceilometer
-    class { 'mongodb':
-       enable_10gen => false,
-       port         => '27017',
-    }
-
-    class { 'ceilometer':
-        metering_secret => $ceilometer_metering_secret,
-        qpid_hostname   => $controller_priv_floating_ip,
-        rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
-        verbose         => $verbose,
-    }
-
-    class { 'ceilometer::db':
-        database_connection => 'mongodb://localhost:27017/ceilometer',
-        require             => Class['mongodb'],
-    }
-
-    class { 'ceilometer::collector':
-        require => Class['ceilometer::db'],
-    }
-
-    class { 'ceilometer::agent::central':
-        auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
-        auth_password => $ceilometer_user_password,
-    }
-
-    class { 'ceilometer::api':
-        keystone_host     => $controller_priv_floating_ip,
-        keystone_password => $ceilometer_user_password,
-        require           => Class['mongodb'],
-    }
-
-    class { 'heat':
-        keystone_host     => $controller_priv_floating_ip,
-        keystone_password => $heat_user_password,
-        auth_uri          => "http://${controller_priv_floating_ip}:35357/v2.0",
-        rpc_backend       => 'heat.openstack.common.rpc.impl_qpid',
-        qpid_hostname     => $controller_priv_floating_ip,
-        verbose           => $verbose,
-    }
-
-    class {'heat::db::mysql':
-        password => $heat_db_password,
-        allowed_hosts => "%%",
-    }
-
-    class {'heat::db':
-       sql_connection => "mysql://heat:${heat_db_password}@${controller_floating_ip}/heat"
-    }
-
-    class {'heat::api':
-    }
-
-    class {'heat::engine':
-        heat_metadata_server_url      => "http://${controller_priv_floating_ip}:8000",
-        heat_waitcondition_server_url => "http://${controller_priv_floating_ip}:8000/v1/waitcondition",
-        heat_watch_server_url         => "http://${controller_priv_floating_ip}:8003",
-    }
-
-    glance_api_config {
-        'DEFAULT/notifier_strategy': value => 'qpid'
+    class { 'quickstack::ceilometer_controller':
+      ceilometer_metering_secret  => $ceilometer_metering_secret,
+      ceilometer_user_password    => $ceilometer_user_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
+      qpid_host                   => $qpid_host,
+      verbose                     => $verbose,
     }
 
     class { 'quickstack::cinder_controller':
       cinder_db_password          => $cinder_db_password,
       cinder_user_password        => $cinder_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
+      verbose                     => $verbose,
+    }
+
+    class { 'quickstack::heat_controller':
+      heat_cfn                    => $heat_cfn,
+      heat_cloudwatch             => $heat_cloudwatch,
+      heat_user_password          => $heat_user_password,
+      heat_db_password            => $heat_db_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
@@ -222,11 +197,12 @@ class quickstack::neutron::controller (
         verbose               => true,
         allow_overlapping_ips => true,
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-        qpid_hostname         => $controller_priv_floating_ip,
+        qpid_hostname         => $qpid_host,
+        core_plugin           => $neutron_core_plugin
     }
 
     neutron_config {
-        'database/connection': value => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron";
+        'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
     }
 
     class { '::neutron::keystone::auth':
@@ -241,18 +217,37 @@ class quickstack::neutron::controller (
         auth_password    => $admin_password,
      }
 
-    neutron_plugin_ovs {
-        'OVS/enable_tunneling': value => 'True';
+    if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
 
-        'SECURITYGROUP/firewall_driver':
-        value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
+      neutron_plugin_ovs {
+          'OVS/enable_tunneling': value => 'True';
+          'SECURITYGROUP/firewall_driver':
+          value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
+      }
+
+      class { '::neutron::plugins::ovs':
+          sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
+          tenant_network_type => $tenant_network_type,
+      }
     }
 
-    class { '::neutron::plugins::ovs':
-        sql_connection      => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron",
-        tenant_network_type => 'gre',
+    if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
+        class { 'quickstack::neutron::plugins::cisco': 
+            neutron_db_password          => $neutron_db_password,
+            neutron_user_password        => $neutron_user_password,
+            bridge_interface             => $external_interface,
+            ovs_vlan_ranges              => $ovs_vlan_ranges,
+            cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+            nexus_config                 => $nexus_config,
+            cisco_nexus_plugin           => $cisco_nexus_plugin,
+            nexus_credentials            => $nexus_credentials,
+            provider_vlan_auto_create    => $provider_vlan_auto_create,
+            provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
+            mysql_host                   => $mysql_host,
+            tenant_network_type          => $tenant_network_type,
+        }
     }
-
+    
     class { '::nova::network::neutron':
         neutron_admin_password    => $neutron_user_password,
     }
@@ -272,3 +267,4 @@ class quickstack::neutron::controller (
       }
     }
 }
+
