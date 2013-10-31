@@ -50,6 +50,7 @@ class quickstack::params {
   # Networking - Common
   $private_interface             = 'PRIV_INTERFACE'
   $public_interface              = 'PUB_INTERFACE'
+  $controller_adm_floating_ip    = 'ADMIN_IP'
   $controller_priv_floating_ip   = 'PRIV_IP'
   $controller_pub_floating_ip    = 'PUB_IP'
 
