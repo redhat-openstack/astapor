@@ -254,6 +254,7 @@ params = {
   "public_interface"             => public_int,
   "fixed_network_range"          => 'PRIV_RANGE',
   "floating_network_range"       => 'PUB_RANGE',
+  "controller_adm_floating_ip"   => 'ADMIN_IP',
   "controller_priv_floating_ip"  => 'PRIV_IP',
   "controller_pub_floating_ip"   => 'PUB_IP',
   "mysql_host"                   => 'PRIV_IP',
@@ -267,6 +268,9 @@ params = {
   "mysql_clu_member_addrs"       => '192.168.200.11 192.168.200.12 192.168.200.13',
   "qpid_host"                    => 'PRIV_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
+<<<<<<< HEAD
+  "metadata_proxy_shared_secret" => SecureRandom.hex
+=======
   "private_ip"                   => "$ipaddress_@#{private_int}",
   "metadata_proxy_shared_secret" => SecureRandom.hex,
  "bridge_interface"             => private_int,
@@ -286,6 +290,11 @@ params = {
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+<<<<<<< HEAD
+>>>>>>> master
+=======
+  "configure_ovswitch"           => "true",
+>>>>>>> ovswitch
 }
 
 hostgroups = [

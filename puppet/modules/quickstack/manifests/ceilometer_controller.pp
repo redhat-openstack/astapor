@@ -1,6 +1,7 @@
 class quickstack::ceilometer_controller(
   $ceilometer_metering_secret,
   $ceilometer_user_password,
+  $controller_adm_floating_ip,
   $controller_priv_floating_ip,
   $controller_pub_floating_ip,
   $qpid_host,
@@ -10,7 +11,7 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer::keystone::auth':
         password => $ceilometer_user_password,
         public_address => $controller_pub_floating_ip,
-        admin_address => $controller_priv_floating_ip,
+        admin_address => $controller_adm_floating_ip,
         internal_address => $controller_priv_floating_ip,
     }
 

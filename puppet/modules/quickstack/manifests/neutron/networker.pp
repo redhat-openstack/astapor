@@ -1,7 +1,7 @@
 
 class quickstack::neutron::networker (
+  $configure_ovswitch           = $quickstack::params::configure_ovswitch,
   $fixed_network_range          = $quickstack::params::fixed_network_range,
-  $floating_network_range       = $quickstack::params::floating_network_range,
   $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $nova_db_password             = $quickstack::params::nova_db_password,
@@ -14,13 +14,28 @@ class quickstack::neutron::networker (
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+    if $configure_ovswitch == true {
+        vs_bridge { 'br-ex':
+            provider => ovs_redhat,
+            ensure   => present,
+        } ->
+        vs_port { 'external':
+            bridge    => 'br-ex',
+            interface => $public_interface,
+            keep_ip   => true,
+            sleep     => '30',
+            provider  => ovs_redhat,
+            ensure    => present,
+        }
+    }
+
     class { '::neutron':
         verbose               => true,
         allow_overlapping_ips => true,
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
         qpid_hostname         => $qpid_host,
     }
-    
+
     neutron_config {
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
 

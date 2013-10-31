@@ -11,6 +11,8 @@ class quickstack::neutron::compute (
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
+  $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
+  $controller_adm_floating_ip  = $quickstack::params::controller_adm_floating_ip,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
@@ -22,13 +24,15 @@ class quickstack::neutron::compute (
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+  class { 'gluster::client': }
+
   # Configure Nova
   nova_config{
-      'DEFAULT/libvirt_inject_partition':     value => '-1';
-      'keystone_authtoken/admin_tenant_name': value => 'admin';
-      'keystone_authtoken/admin_user':        value => 'admin';
-      'keystone_authtoken/admin_password':    value => $admin_password;
-      'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
+      'DEFAULT/libvirt_inject_partition':             value => '-1';
+      'keystone_authtoken/admin_tenant_name':         value => 'admin';
+      'keystone_authtoken/admin_user':                value => 'admin';
+      'keystone_authtoken/admin_password':            value => $admin_password;
+      'keystone_authtoken/auth_host':                 value => $controller_priv_floating_ip;
     }
 
   class { 'nova':
@@ -63,9 +67,10 @@ class quickstack::neutron::compute (
   }
 
   class { 'nova::api':
-      enabled           => true,
-      admin_password    => $nova_user_password,
-      auth_host         => $controller_priv_floating_ip,
+      enabled                              => true,
+      admin_password                       => $nova_user_password,
+      auth_host                            => $controller_priv_floating_ip,
+      neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
   }
 
   class { 'ceilometer':
@@ -110,7 +115,7 @@ class quickstack::neutron::compute (
   class { '::nova::network::neutron':
       neutron_admin_password    => $neutron_user_password,
       neutron_url               => "http://${controller_priv_floating_ip}:9696",
-      neutron_admin_auth_url    => "http://${controller_priv_floating_ip}:35357/v2.0",
+      neutron_admin_auth_url    => "http://${controller_adm_floating_ip}:35357/v2.0",
   }
 
   firewall { '001 nova compute incoming':
