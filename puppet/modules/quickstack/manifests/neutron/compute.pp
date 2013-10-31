@@ -24,6 +24,8 @@ class quickstack::neutron::compute (
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+  class { 'gluster::client': }
+
   # Configure Nova
   nova_config{
       'DEFAULT/libvirt_inject_partition':             value => '-1';
