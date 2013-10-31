@@ -1,4 +1,6 @@
 class quickstack::params {
+  # Logs
+  $admin_email                = "admin@${::domain}"
   $verbose                    = 'true'
 
   $heat_cfn                   = 'false'
@@ -12,10 +14,6 @@ class quickstack::params {
   $ceilometer_user_password   = 'CHANGEME'
   $heat_user_password         = 'CHANGEME'
   $heat_db_password           = 'CHANGEME'
-  $cinder_db_password         = 'CHANGEME'
-  $cinder_user_password       = 'CHANGEME'
-  $glance_db_password         = 'CHANGEME'
-  $glance_user_password       = 'CHANGEME'
   $horizon_secret_key         = 'CHANGEME'
   $keystone_admin_token       = 'CHANGEME'
   $keystone_db_password       = 'CHANGEME'
@@ -25,16 +23,42 @@ class quickstack::params {
   $nova_db_password           = 'CHANGEME'
   $nova_user_password         = 'CHANGEME'
 
-  # Networking
+  # Cinder
+  $cinder_db_password           = 'CHANGEME'
+  $cinder_user_password         = 'CHANGEME'
+  # Cinder backend - Several backends should be able to coexist
+  $cinder_backend_gluster       = true
+  $cinder_backend_iscsi         = false
+  # Cinder gluster
+  $cinder_gluster_volume        = 'cinder'
+  $cinder_gluster_path          = '/srv/gluster/cinder'
+  $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
+  $cinder_gluster_replica_count = '3'
+
+  # Glance
+  $glance_db_password           = 'CHANGEME'
+  $glance_user_password         = 'CHANGEME'
+  # Glance_Gluster
+  $glance_gluster_volume        = 'glance'
+  $glance_gluster_path          = '/srv/gluster/glance'
+  $glance_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
+  $glance_gluster_replica_count = '3'
+
+  # Networking - Common
   $private_interface             = 'PRIV_INTERFACE'
   $public_interface              = 'PUB_INTERFACE'
-  $fixed_network_range           = 'PRIV_RANGE'
-  $floating_network_range        = 'PUB_RANGE'
   $controller_priv_floating_ip   = 'PRIV_IP'
   $controller_pub_floating_ip    = 'PUB_IP'
+
+  # Nova-network specific
+  $fixed_network_range           = 'PRIV_RANGE'
+  $floating_network_range        = 'PUB_RANGE'
+
+  # Neutron specific
+  $metadata_proxy_shared_secret  = 'CHANGEME'
+
   $mysql_host                    = 'PRIV_IP'
   $qpid_host                     = 'PRIV_IP'
-  $metadata_proxy_shared_secret  = 'CHANGEME'
   $bridge_interface              = 'PRIV_IP'
   $enable_ovs_agent              = 'true'
   $tenant_network_type           = 'gre'

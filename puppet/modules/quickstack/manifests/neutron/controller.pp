@@ -28,7 +28,7 @@ class quickstack::neutron::controller (
   $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
   $nexus_credentials            = $quickstack::params::nexus_credentials,
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
-  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,  
+  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
@@ -132,7 +132,7 @@ class quickstack::neutron::controller (
         'keystone_authtoken/admin_tenant_name': value => 'admin';
         'keystone_authtoken/admin_user':        value => 'admin';
         'keystone_authtoken/admin_password':    value => $admin_password;
-        'keystone_authtoken/auth_host':         value => '127.0.0.1';  
+        'keystone_authtoken/auth_host':         value => '127.0.0.1';
     }
 
     class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
@@ -232,7 +232,7 @@ class quickstack::neutron::controller (
     }
 
     if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-        class { 'quickstack::neutron::plugins::cisco': 
+        class { 'quickstack::neutron::plugins::cisco':
             neutron_db_password          => $neutron_db_password,
             neutron_user_password        => $neutron_user_password,
             bridge_interface             => $external_interface,
@@ -247,14 +247,16 @@ class quickstack::neutron::controller (
             tenant_network_type          => $tenant_network_type,
         }
     }
-    
+
     class { '::nova::network::neutron':
         neutron_admin_password    => $neutron_user_password,
     }
 
+    class { 'quickstack::neutron::network_public': }
+
     firewall { '001 controller incoming':
         proto    => 'tcp',
-        dport    => ['80', '443', '3260', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080', '9696'],   
+        dport    => ['80', '443', '3260', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080', '9696'],
         action   => 'accept',
     }
 

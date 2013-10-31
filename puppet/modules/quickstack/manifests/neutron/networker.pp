@@ -1,7 +1,6 @@
 
 class quickstack::neutron::networker (
   $fixed_network_range          = $quickstack::params::fixed_network_range,
-  $floating_network_range       = $quickstack::params::floating_network_range,
   $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $nova_db_password             = $quickstack::params::nova_db_password,
@@ -20,7 +19,7 @@ class quickstack::neutron::networker (
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
         qpid_hostname         => $qpid_host,
     }
-    
+
     neutron_config {
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
 

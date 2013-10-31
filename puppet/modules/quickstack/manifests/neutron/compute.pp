@@ -1,5 +1,6 @@
 # Common quickstack configurations
 class quickstack::neutron::compute (
+  $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
   $admin_password              = $quickstack::params::admin_password,
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
@@ -22,13 +23,17 @@ class quickstack::neutron::compute (
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+  if $glance_backend_gluster == true {
+    class { 'gluster::client': }
+  }
+
   # Configure Nova
   nova_config{
-      'DEFAULT/libvirt_inject_partition':     value => '-1';
-      'keystone_authtoken/admin_tenant_name': value => 'admin';
-      'keystone_authtoken/admin_user':        value => 'admin';
-      'keystone_authtoken/admin_password':    value => $admin_password;
-      'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
+      'DEFAULT/libvirt_inject_partition':             value => '-1';
+      'keystone_authtoken/admin_tenant_name':         value => 'admin';
+      'keystone_authtoken/admin_user':                value => 'admin';
+      'keystone_authtoken/admin_password':            value => $admin_password;
+      'keystone_authtoken/auth_host':                 value => $controller_priv_floating_ip;
     }
 
   class { 'nova':
@@ -63,9 +68,10 @@ class quickstack::neutron::compute (
   }
 
   class { 'nova::api':
-      enabled           => true,
-      admin_password    => $nova_user_password,
-      auth_host         => $controller_priv_floating_ip,
+      enabled                              => true,
+      admin_password                       => $nova_user_password,
+      auth_host                            => $controller_priv_floating_ip,
+      neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
   }
 
   class { 'ceilometer':
