@@ -59,6 +59,7 @@ class quickstack::params {
 
   # Neutron specific
   $metadata_proxy_shared_secret  = 'CHANGEME'
+  $configure_ovswitch            = 'true'
 
   $bridge_interface              = 'PRIV_IP'
   $enable_ovs_agent              = 'true'

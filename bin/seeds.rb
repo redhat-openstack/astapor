@@ -289,7 +289,11 @@ params = {
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+<<<<<<< HEAD
 >>>>>>> master
+=======
+  "configure_ovswitch"           => "true",
+>>>>>>> ovswitch
 }
 
 hostgroups = [
