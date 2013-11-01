@@ -318,16 +318,15 @@ def get_key_type(value)
   # If we need to handle actual number classes like Fixnum, add those here
 end
 
-hostgroups.each do |hg|
-pclass = Puppetclass.find_by_name hg[:class]
-  params.each do |k,v|
-    p = pclass.class_params.find_by_key(k)
-    unless p.nil?
-      p.key_type = get_key_type(v)
-      p.default_value = v
-      p.override = true
-      p.save
-    end
+# Override parameters according to seeds
+pclass = Puppetclass.find_by_name "quickstack::params"
+params.each do |k,v|
+  p = pclass.class_params.find_by_key(k)
+  unless p.nil?
+    p.key_type = get_key_type(v)
+    p.default_value = v
+    p.override = true
+    p.save
   end
 end
 
@@ -335,7 +334,10 @@ end
 hostgroups.each do |hg|
   h=Hostgroup.find_or_create_by_name hg[:name]
   h.environment = Environment.find_by_name('production')
-  h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  h.puppetclasses = [
+    Puppetclass.find_by_name(hg[:class]),
+    Puppetclass.find_by_name("quickstack::params"),
+  ]
   h.save!
 end
 
