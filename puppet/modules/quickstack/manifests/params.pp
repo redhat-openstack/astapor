@@ -71,4 +71,17 @@ class quickstack::params {
   $mysql_resource_group_name     = 'mysqlgroup'
   # Logs
   $admin_email                = "admin@${::domain}"
+
+  # SSL
+  $ssl                        = false
+  $freeipa                    = false
+  $mysql_ca                   = '/etc/ipa/ca.crt'
+  $mysql_cert                 = undef
+  $mysql_key                  = undef
+  $qpid_ca                    = undef
+  $qpid_cert                  = undef
+  $qpid_key                   = undef
+  $horizon_ca                 = '/etc/ipa/ca.crt'
+  $horizon_cert               = undef
+  $horizon_key                = undef
 }

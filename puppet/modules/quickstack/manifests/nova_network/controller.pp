@@ -25,7 +25,18 @@ class quickstack::nova_network::controller (
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
-  $verbose                     = $quickstack::params::verbose
+  $verbose                     = $quickstack::params::verbose,
+  $ssl                         = $quickstack::params::ssl,
+  $freeipa                     = $quickstack::params::freeipa,
+  $mysql_ca                    = $quickstack::params::mysql_ca,
+  $mysql_cert                  = $quickstack::params::mysql_cert,
+  $mysql_key                   = $quickstack::params::mysql_key,
+  $qpid_ca                     = $quickstack::params::qpid_ca,
+  $qpid_cert                   = $quickstack::params::qpid_cert,
+  $qpid_key                    = $quickstack::params::qpid_key,
+  $horizon_ca                  = $quickstack::params::horizon_ca,
+  $horizon_cert                = $quickstack::params::horizon_cert,
+  $horizon_key                 = $quickstack::params::horizon_key,
 ) inherits quickstack::params {
 
     #controller::corosync { 'quickstack': }
@@ -49,6 +60,47 @@ class quickstack::nova_network::controller (
     #    hostlist => $ipmi_host_list,
     #}
 
+    if str2bool($ssl) == true {
+      $qpid_protocol = 'ssl'
+      $qpid_port = '5671'
+      $nova_sql_connection = "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova?ssl_ca=${mysql_ca}"
+
+      if str2bool($freeipa) == true {
+        certmonger::request_ipa_cert { 'mysql':
+          seclib => "openssl",
+          principal => "mysql/${controller_priv_floating_ip}",
+          key => $mysql_key,
+          cert => $mysql_cert,
+          owner_id => 'mysql',
+          group_id => 'mysql',
+        }
+        certmonger::request_ipa_cert { 'horizon':
+          seclib => "openssl",
+          principal => "horizon/${controller_priv_floating_ip}",
+          key => $horizon_key,
+          cert => $horizon_cert,
+          owner_id => 'httpd',
+          group_id => 'httpd',
+        }
+      } else {
+        if $mysql_ca == undef or $mysql_cert == undef or $mysql_key == undef {
+          fail('The mysql CA, cert and key are all required.')
+        }
+        if $qpid_ca == undef or $qpid_cert == undef or $qpid_key == undef {
+          fail('The qpid CA, cert and key are all required.')
+        }
+        if $horizon_ca == undef or $horizon_cert == undef or
+           $horizon_key == undef {
+          fail('The horizon CA, cert and key are all required.')
+        }
+      }
+    } else {
+        $qpid_protocol = 'tcp'
+        $qpid_port = '5672'
+        $nova_sql_connection = "mysql://nova:${nova_db_password}@${controller_priv_floating_ip}/nova"
+    }
+
+
     class {'openstack::db::mysql':
         mysql_root_password  => $mysql_root_password,
         keystone_db_password => $keystone_db_password,
@@ -60,6 +112,10 @@ class quickstack::nova_network::controller (
         # MySQL
         mysql_bind_address     => '0.0.0.0',
         mysql_account_security => true,
+        mysql_ssl              => str2bool($ssl),
+        mysql_ca               => $mysql_ca,
+        mysql_cert             => $mysql_cert,
+        mysql_key              => $mysql_key,
 
         # neutron
         neutron                => false,
@@ -69,12 +125,19 @@ class quickstack::nova_network::controller (
     }
 
     class {'qpid::server':
-        auth => "no"
+        auth => "no",
+        ssl      => str2bool($ssl),
+        freeipa  => str2bool($freeipa),
+        ssl_ca   => $qpid_ca,
+        ssl_cert => $qpid_cert,
+        ssl_key  => $qpid_key
     }
 
     class {'openstack::keystone':
         db_host                 => $mysql_host,
         db_password             => $keystone_db_password,
+        db_ssl                  => str2bool($ssl),
+        db_ssl_ca               => $mysql_ca,
         admin_token             => $keystone_admin_token,
         admin_email             => $admin_email,
         admin_password          => $admin_password,
@@ -113,8 +176,13 @@ class quickstack::nova_network::controller (
 
     class {'openstack::glance':
         db_host       => $mysql_host,
+        db_ssl        => str2bool($ssl),
+        db_ssl_ca     => $mysql_ca,
         user_password => $glance_user_password,
         db_password   => $glance_db_password,
+        qpid_protocol => $qpid_protocol,
+        qpid_port     => $qpid_port,
+        qpid_hostname => $controller_priv_floating_ip,
         require       => Class['openstack::db::mysql'],
     }
 
@@ -150,11 +218,14 @@ class quickstack::nova_network::controller (
 
     # Configure Nova
     class { 'nova':
-        sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
+        sql_connection     => $nova_sql_connection,
         image_service      => 'nova.image.glance.GlanceImageService',
         glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
         rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
         verbose            => $verbose,
+        qpid_protocol      => $qpid_protocol,
+        qpid_port          => $qpid_port,
+        qpid_hostname      => $controller_priv_floating_ip,
         require            => Class['openstack::db::mysql', 'qpid::server'],
     }
 
@@ -193,6 +264,10 @@ class quickstack::nova_network::controller (
     class {'horizon':
         secret_key    => $horizon_secret_key,
         keystone_host => $controller_priv_floating_ip,
+        listen_ssl    => str2bool($ssl),
+        horizon_cert  => $horizon_cert,
+        horizon_key   => $horizon_key,
+        horizon_ca    => $horizon_ca,
     }
 
     class {'memcached':}
