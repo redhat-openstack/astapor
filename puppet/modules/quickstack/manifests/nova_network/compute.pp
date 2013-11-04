@@ -6,7 +6,7 @@ class quickstack::nova_network::compute (
   $floating_network_range      = $quickstack::params::floating_network_range,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
-  $controller_priv_floating_ip = $quickstack::params::controller_floating_priv_ip,
+  $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
   $mysql_host                  = $quickstack::params::mysql_host,
