@@ -254,6 +254,7 @@ params = {
   "public_interface"             => public_int,
   "fixed_network_range"          => 'PRIV_RANGE',
   "floating_network_range"       => 'PUB_RANGE',
+  "controller_adm_floating_ip"   => 'ADMIN_IP',
   "controller_priv_floating_ip"  => 'PRIV_IP',
   "controller_pub_floating_ip"   => 'PUB_IP',
   "mysql_host"                   => 'PRIV_IP',
