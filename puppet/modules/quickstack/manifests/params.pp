@@ -44,7 +44,8 @@ class quickstack::params {
   $glance_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $glance_gluster_replica_count = '3'
 
-  # Networking - Common
+  # Networking
+  $neutron                       = 'false'
   $private_interface             = 'PRIV_INTERFACE'
   $public_interface              = 'PUB_INTERFACE'
   $controller_priv_floating_ip   = 'PRIV_IP'

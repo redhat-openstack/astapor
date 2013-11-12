@@ -268,7 +268,7 @@ params = {
   "mysql_virtual_ip"             => '192.168.200.220',
   "mysql_bind_address"           => '0.0.0.0',
   "mysql_virt_ip_nic"            => 'eth1',
-  "mysql_virt_ip_cidr_mask"      =>  '24',  
+  "mysql_virt_ip_cidr_mask"      =>  '24',
   "mysql_shared_storage_device"  => '192.168.203.200:/mnt/mysql',
   "mysql_shared_storage_type"    => 'nfs',
   "mysql_resource_group_name"    => 'mysqlgrp',
@@ -295,6 +295,7 @@ params = {
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
   "configure_ovswitch"           => "true",
+  "neutron"                      => "true",
 }
 
 hostgroups = [
