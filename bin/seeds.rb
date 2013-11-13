@@ -295,7 +295,7 @@ params = {
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
   "configure_ovswitch"           => "true",
-  "neutron"                      => "true",
+  "neutron"                      => "false",
 }
 
 hostgroups = [
