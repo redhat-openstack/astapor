@@ -300,13 +300,9 @@ params = {
 
 hostgroups = [
     {:name=>"OpenStack Controller",
-     :class=>"quickstack::nova_network::controller"},
-    {:name=>"OpenStack Nova Compute",
-     :class=>"quickstack::nova_network::compute"},
-    {:name=>"OpenStack Neutron Controller",
-     :class=>"quickstack::neutron::controller "},
-    {:name=>"OpenStack Neutron Compute",
-     :class=>"quickstack::neutron::compute"},
+     :class=>"quickstack::controller"},
+    {:name=>"OpenStack Compute",
+     :class=>"quickstack::compute"},
     {:name=>"OpenStack Neutron Networker",
      :class=>"quickstack::neutron::networker"},
     {:name=>"OpenStack Gluster Storage",
