@@ -6,6 +6,7 @@ class quickstack::nova_network::compute (
   $floating_network_range      = $quickstack::params::floating_network_range,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
+  $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
@@ -52,7 +53,7 @@ class quickstack::nova_network::compute (
 
     class {"nova::compute":
         enabled => true,
-        vncproxy_host => "$controller_priv_floating_ip",
+        vncproxy_host => "$controller_pub_floating_ip",
         vncserver_proxyclient_address => "$ipaddress",
     }
 

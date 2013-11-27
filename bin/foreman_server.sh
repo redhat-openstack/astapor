@@ -35,6 +35,7 @@ fi
 #PUBLIC_CONTROLLER_IP=10.9.9.10
 #PUBLIC_INTERFACE=eth2
 #PUBLIC_NETMASK=10.9.9.0/24
+#ADMIN_CONTROLLER_IP=10.8.8.10 (This is for admin endpoints)
 #FOREMAN_GATEWAY=10.0.0.1 (or false for no gateway)
 if [ "x$PRIVATE_CONTROLLER_IP" = "x" ]; then
   echo "You must define PRIVATE_CONTROLLER_IP before running this script"
@@ -58,6 +59,11 @@ if [ "x$PUBLIC_INTERFACE" = "x" ]; then
 fi
 if [ "x$PUBLIC_NETMASK" = "x" ]; then
   echo "You must define PUBLIC_NETMASK before running this script"
+  exit 1
+fi
+if [ "x$ADMIN_CONTROLLER_IP" = "x" ]; then
+  echo "You must define ADMIN_CONTROLLER_IP before running this script"
+  echo "Alternatively you can use either private or public IP"
   exit 1
 fi
 if [ "x$FOREMAN_GATEWAY" = "x" ]; then
@@ -206,6 +212,7 @@ sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#ADMIN_IP#$ADMIN_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
