@@ -12,8 +12,11 @@ class quickstack::nova_network::compute (
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
+  $ssl                         = $quickstack::params::ssl,
+  $mysql_ca                    = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
 
+    }
     # Configure Nova
     nova_config{
         'DEFAULT/auto_assign_floating_ip':  value => 'True';
@@ -25,12 +28,25 @@ class quickstack::nova_network::compute (
         "DEFAULT/multi_host":               value => "True";
     }
 
+    if str2bool($ssl) == true {
+      $qpid_protocol = 'ssl'
+      $qpid_port = '5671'
+      $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
+
+    } else {
+      $qpid_protocol = 'tcp'
+      $qpid_port = '5672'
+      $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
+    }
+
     class { 'nova':
-        sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
+        sql_connection     => $nova_sql_connection,
         image_service      => 'nova.image.glance.GlanceImageService',
         glance_api_servers => "http://$controller_priv_floating_ip:9292/v1",
         rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
         qpid_hostname      => $qpid_host,
+        qpid_protocol      => $qpid_protocol,
+        qpid_port          => $qpid_port,
         verbose            => $verbose,
     }
 

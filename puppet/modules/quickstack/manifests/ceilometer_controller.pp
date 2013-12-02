@@ -4,6 +4,8 @@ class quickstack::ceilometer_controller(
   $controller_priv_floating_ip,
   $controller_pub_floating_ip,
   $qpid_host,
+  $qpid_port = '5672',
+  $qpid_protocol = 'tcp',
   $verbose,
 ) {
 
@@ -48,7 +50,11 @@ class quickstack::ceilometer_controller(
         require           => Class['mongodb'],
     }
 
-    glance_api_config {
-        'DEFAULT/notifier_strategy': value => 'qpid'
+    class { 'glance::notify::qpid':
+        qpid_username => '',
+        qpid_password => '',
+        qpid_host     => $qpid_host,
+        qpid_port     => $qpid_port,
+        qpid_protocol => $qpid_protocol
     }
 }
