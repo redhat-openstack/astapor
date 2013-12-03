@@ -1,21 +1,27 @@
 # Quickstack compute node
 class quickstack::compute (
-  $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
+  $admin_password              = $quickstack::params::admin_password,
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
-  $neutron                     = $quickstack::params::neutron,
-  $nova_db_password            = $quickstack::params::nova_db_password,
-  $nova_user_password          = $quickstack::params::nova_user_password,
-  $mysql_host                  = $quickstack::params::mysql_host,
-  $qpid_host                   = $quickstack::params::qpid_host,
-  $verbose                     = $quickstack::params::verbose,
-
   $fixed_network_range         = $quickstack::params::fixed_network_range,
   $floating_network_range      = $quickstack::params::floating_network_range,
+  $mysql_host                  = $quickstack::params::mysql_host,
+  $neutron                     = $quickstack::params::neutron,
+  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
+  $neutron_db_password         = $quickstack::params::neutron_db_password,
+  $neutron_user_password       = $quickstack::params::neutron_user_password,
+  $nova_db_password            = $quickstack::params::nova_db_password,
+  $nova_user_password          = $quickstack::params::nova_user_password,
+  $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
+  $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
+  $qpid_host                   = $quickstack::params::qpid_host,
+  $tenant_network_type         = $quickstack::params::tenant_network_type,
+  $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   if str2bool($cinder_backend_gluster) == true {
@@ -80,10 +86,31 @@ class quickstack::compute (
   }
 
   if str2bool("$neutron") {
-    class { '::quickstack::neutron::compute': }
+    class { '::quickstack::neutron::compute':
+      admin_password              => $admin_password,
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
+      mysql_host                  => $mysql_host,
+      neutron_core_plugin         => $neutron_core_plugin,
+      neutron_db_password         => $neutron_db_password,
+      neutron_user_password       => $neutron_user_password,
+      ovs_bridge_mappings         => $ovs_bridge_mappings,
+      ovs_bridge_uplinks          => $ovs_bridge_uplinks,
+      private_interface           => $private_interface,
+      public_interface            => $public_interface,
+      qpid_host                   => $qpid_host,
+      tenant_network_type         => $tenant_network_type,
+    }
   }
   else {
-    class { '::quickstack::nova_network::compute': }
+    class { '::quickstack::nova_network::compute':
+      controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
+      fixed_network_range         => $fixed_network_range,
+      floating_network_range      => $floating_network_range,
+      private_interface           => $private_interface,
+      public_interface            => $public_interface,
+    }
   }
 
   firewall { '001 nova compute incoming':

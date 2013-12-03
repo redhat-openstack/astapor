@@ -4,15 +4,15 @@ class quickstack::neutron::compute (
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
+  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
   $neutron_user_password       = $quickstack::params::neutron_user_password,
-  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
+  $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
+  $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
   $qpid_host                   = $quickstack::params::qpid_host,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
-  $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
-  $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
 ) inherits quickstack::params {
 
   class { '::neutron':

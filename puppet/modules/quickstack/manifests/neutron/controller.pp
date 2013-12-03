@@ -2,24 +2,23 @@
 class quickstack::neutron::controller (
   $admin_email                  = $quickstack::params::admin_email,
   $admin_password               = $quickstack::params::admin_password,
-  $neutron_db_password          = $quickstack::params::neutron_db_password,
-  $neutron_user_password        = $quickstack::params::neutron_user_password,
-  $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
-  $tenant_network_type          = $quickstack::params::tenant_network_type,
   $bridge_interface             = $quickstack::params::bridge_interface,
-  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
-  # cisco config
-  $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
-  $nexus_config                 = $quickstack::params::nexus_config,
   $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
-  $nexus_credentials            = $quickstack::params::nexus_credentials,
-  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
-  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
+  $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                   = $quickstack::params::mysql_host,
+  $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
+  $neutron_db_password          = $quickstack::params::neutron_db_password,
+  $neutron_user_password        = $quickstack::params::neutron_user_password,
+  $nexus_config                 = $quickstack::params::nexus_config,
+  $nexus_credentials            = $quickstack::params::nexus_credentials,
+  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
+  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $qpid_host                    = $quickstack::params::qpid_host,
-  $verbose                      = $quickstack::params::verbose
+  $tenant_network_type          = $quickstack::params::tenant_network_type,
+  $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   nova_config {
