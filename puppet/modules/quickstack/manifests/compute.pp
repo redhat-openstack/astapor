@@ -80,10 +80,10 @@ class quickstack::compute (
   }
 
   if str2bool("$neutron") {
-    class { '::quickstack::neutron::compute' }
+    class { '::quickstack::neutron::compute': }
   }
   else {
-    class { '::quickstack::nova_network::compute' }
+    class { '::quickstack::nova_network::compute': }
   }
 
   firewall { '001 nova compute incoming':

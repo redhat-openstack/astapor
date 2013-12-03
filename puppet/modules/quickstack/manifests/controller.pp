@@ -30,7 +30,7 @@ class quickstack::controller (
   $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                   = $quickstack::params::mysql_host,
   $qpid_host                    = $quickstack::params::qpid_host,
-  $verbose                      = $quickstack::params::verbose
+  $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   class {'openstack::db::mysql':
@@ -181,10 +181,10 @@ class quickstack::controller (
   class {'memcached':}
 
   if str2bool("$neutron") {
-    class { '::quickstack::neutron::controller' }
+    class { '::quickstack::neutron::controller': }
   }
   else {
-    class { '::quickstack::nova_network::controller' }
+    class { '::quickstack::nova_network::controller': }
   }
 
   firewall { '001 controller incoming':
