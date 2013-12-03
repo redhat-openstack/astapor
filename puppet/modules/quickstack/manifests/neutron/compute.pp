@@ -1,6 +1,5 @@
 # Quickstack compute node configuration for neutron (OpenStack Networking)
 class quickstack::neutron::compute (
-  $admin_password              = $quickstack::params::admin_password,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $mysql_host                  = $quickstack::params::mysql_host,

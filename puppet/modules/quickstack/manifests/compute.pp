@@ -87,7 +87,6 @@ class quickstack::compute (
 
   if str2bool("$neutron") {
     class { '::quickstack::neutron::compute':
-      admin_password              => $admin_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
       mysql_host                  => $mysql_host,
