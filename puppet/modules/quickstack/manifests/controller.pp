@@ -58,7 +58,7 @@ class quickstack::controller (
     enabled                => true,
 
     # Networking
-    neutron                => $neutron,
+    neutron                => str2bool("$neutron"),
   }
 
   class {'qpid::server':
@@ -92,7 +92,11 @@ class quickstack::controller (
     cinder_admin_address    => $controller_priv_floating_ip,
     cinder_internal_address => $controller_priv_floating_ip,
 
-    neutron                 => $neutron,
+    neutron_public_address   => $controller_pub_floating_ip,
+    neutron_admin_address    => $controller_priv_floating_ip,
+    neutron_internal_address => $controller_priv_floating_ip,
+
+    neutron                 => str2bool("$neutron"),
     enabled                 => true,
     require                 => Class['openstack::db::mysql'],
   }

@@ -41,13 +41,6 @@ class quickstack::neutron::controller (
     'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
   }
 
-  class { '::neutron::keystone::auth':
-    password         => $neutron_user_password,
-    public_address   => $controller_pub_floating_ip,
-    admin_address    => $controller_priv_floating_ip,
-    internal_address => $controller_priv_floating_ip,
-  }
-
   class { '::neutron::server':
     auth_host        => $::ipaddress,
     auth_password    => $neutron_user_password,
