@@ -21,6 +21,8 @@ class quickstack::neutron::compute (
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges            = '1:1000',
   $verbose                     = $quickstack::params::verbose,
+  $ssl                         = $quickstack::params::ssl,
+  $mysql_ca                    = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
 
   # str2bool expects the string to already be downcased.  all-righty.
@@ -31,15 +33,27 @@ class quickstack::neutron::compute (
       default => str2bool("$enable_tunneling"),
   }
 
+  if str2bool($ssl) == true {
+    $qpid_protocol = 'ssl'
+    $qpid_port = '5671'
+    $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
+  } else {
+    $qpid_protocol = 'tcp'
+    $qpid_port = '5672'
+    $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
+  }
+
   class { '::neutron':
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
     qpid_hostname         => $qpid_host,
+    qpid_port             => $qpid_port,
+    qpid_protocol         => $qpid_protocol,
     core_plugin           => $neutron_core_plugin
   }
 
   neutron_config {
-    'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
+    'database/connection': value => $sql_connection;
     'keystone_authtoken/auth_host':         value => $controller_priv_host;
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
@@ -47,7 +61,7 @@ class quickstack::neutron::compute (
   }
 
   class { '::neutron::plugins::ovs':
-    sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
+    sql_connection      => $sql_connection,
     tenant_network_type => $tenant_network_type,
     network_vlan_ranges => $ovs_vlan_ranges,
     tunnel_id_ranges    => $tunnel_id_ranges,
@@ -79,5 +93,7 @@ class quickstack::neutron::compute (
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
     verbose                     => $verbose,
+    ssl                         => $ssl,
+    mysql_ca                    => $mysql_ca,
   }
 }
