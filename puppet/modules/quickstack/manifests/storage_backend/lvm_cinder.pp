@@ -6,13 +6,16 @@ class quickstack::storage_backend::lvm_cinder(
   $private_interface           = $quickstack::params::private_interface,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   class { 'cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $qpid_host,
-    qpid_password  => 'guest',
+    qpid_username  => $qpid_username,
+    qpid_password  => $qpid_password,
     sql_connection => "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder",
     verbose        => $verbose,
   }

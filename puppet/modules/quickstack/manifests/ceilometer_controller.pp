@@ -4,6 +4,8 @@ class quickstack::ceilometer_controller(
   $controller_priv_floating_ip,
   $controller_pub_floating_ip,
   $qpid_host,
+  $qpid_username,
+  $qpid_password,
   $verbose,
 ) {
 
@@ -22,6 +24,8 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer':
         metering_secret => $ceilometer_metering_secret,
         qpid_hostname   => $qpid_host,
+        qpid_username   => $qpid_username,
+        qpid_password   => $qpid_password,
         rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
         verbose         => $verbose,
     }

@@ -19,6 +19,8 @@ class quickstack::neutron::compute (
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges            = '1:1000',
   $verbose                     = $quickstack::params::verbose,
@@ -36,6 +38,8 @@ class quickstack::neutron::compute (
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
     qpid_hostname         => $qpid_host,
+    qpid_username         => $qpid_username,
+    qpid_password         => $qpid_password,
     core_plugin           => $neutron_core_plugin
   }
 
@@ -79,6 +83,8 @@ class quickstack::neutron::compute (
     nova_db_password            => $nova_db_password,
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 }

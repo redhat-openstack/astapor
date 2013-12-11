@@ -7,6 +7,8 @@ class quickstack::heat_controller(
   $controller_pub_floating_ip,
   $mysql_host,
   $qpid_host,
+  $qpid_username,
+  $qpid_password,
   $verbose,
 ) {
 
@@ -26,6 +28,8 @@ class quickstack::heat_controller(
       auth_uri          => "http://${controller_priv_floating_ip}:35357/v2.0",
       rpc_backend       => 'heat.openstack.common.rpc.impl_qpid',
       qpid_hostname     => $qpid_host,
+      qpid_username     => $qpid_username,
+      qpid_password     => $qpid_password,
       verbose           => $verbose,
   }
 

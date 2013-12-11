@@ -33,6 +33,8 @@ class quickstack::controller_common (
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $qpid_host                     = $quickstack::params::qpid_host,
+  $qpid_username                 = $quickstack::params::qpid_username,
+  $qpid_password                 = $quickstack::params::qpid_password,
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -56,7 +58,27 @@ class quickstack::controller_common (
   }
 
   class {'qpid::server':
-    auth => "no"
+    config_file => $::operatingsystem? {
+        'Fedora' => '/etc/qpid/qpidd.conf',
+        default  => '/etc/qpidd.conf',
+        },
+    auth => $qpid_username ? {
+      ''      => 'no',
+      default => 'yes',
+    },
+    clustered => false,
+  }
+
+  # quoth the puppet language reference,
+  # "Empty strings are false; all other strings are true."
+  if $qpid_username {
+    qpid_user { $qpid_username:
+      password  => $qpid_password,
+      file      => '/var/lib/qpidd/qpidd.sasldb',
+      realm     => 'QPID',
+      provider  => 'saslpasswd2',
+      require   => Class['qpid::server'],
+    }
   }
 
   class {'openstack::keystone':
@@ -115,6 +137,9 @@ class quickstack::controller_common (
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
+    qpid_hostname      => $qpid_host,
+    qpid_username      => $qpid_username,
+    qpid_password      => $qpid_password,
     verbose            => $verbose,
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
@@ -149,6 +174,8 @@ class quickstack::controller_common (
     controller_priv_floating_ip => $controller_priv_floating_ip,
     controller_pub_floating_ip  => $controller_pub_floating_ip,
     qpid_host                   => $qpid_host,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 
@@ -168,6 +195,8 @@ class quickstack::controller_common (
     controller_priv_floating_ip => $controller_priv_floating_ip,
     mysql_host                  => $mysql_host,
     qpid_host                   => $qpid_host,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 
@@ -180,6 +209,8 @@ class quickstack::controller_common (
     controller_pub_floating_ip  => $controller_pub_floating_ip,
     mysql_host                  => $mysql_host,
     qpid_host                   => $qpid_host,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 
