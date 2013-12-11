@@ -14,6 +14,8 @@ class quickstack::nova_network::compute (
   $private_interface            = $quickstack::params::private_interface,
   $public_interface             = $quickstack::params::public_interface,
   $qpid_host                    = $quickstack::params::qpid_host,
+  $qpid_username                = $quickstack::params::qpid_username,
+  $qpid_password                = $quickstack::params::qpid_password,
   $verbose                      = $quickstack::params::verbose,
 
   $auto_assign_floating_ip
@@ -53,6 +55,8 @@ class quickstack::nova_network::compute (
     nova_db_password            => $nova_db_password,
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 }

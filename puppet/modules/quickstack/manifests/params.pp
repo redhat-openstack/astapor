@@ -61,6 +61,8 @@ class quickstack::params {
 
   $mysql_host                    = 'PRIV_IP'
   $qpid_host                     = 'PRIV_IP'
+  $qpid_username                 = 'openstack'
+  $qpid_password                 = 'CHANGEME'
   $bridge_interface              = 'PRIV_IP'
   $enable_ovs_agent              = 'true'
   $tenant_network_type           = 'gre'

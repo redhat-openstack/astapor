@@ -12,6 +12,8 @@ class quickstack::neutron::networker (
   $public_interface              = $quickstack::params::public_interface,
   $mysql_host                    = $quickstack::params::mysql_host,
   $qpid_host                     = $quickstack::params::qpid_host,
+  $qpid_username                 = $quickstack::params::qpid_username,
+  $qpid_password                 = $quickstack::params::qpid_password,
   $bridge_name                   = 'br-ex',
   $bridge_keep_ip                = true,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
@@ -50,6 +52,8 @@ class quickstack::neutron::networker (
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
     qpid_hostname         => $qpid_host,
+    qpid_username         => $qpid_username,
+    qpid_password         => $qpid_password,
   }
 
   neutron_config {

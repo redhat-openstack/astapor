@@ -40,6 +40,8 @@ class quickstack::neutron::controller (
   $enable_tunneling              = $quickstack::params::enable_tunneling,
   $tunnel_id_ranges              = '1:1000',
   $qpid_host                     = $quickstack::params::qpid_host,
+  $qpid_username                 = $quickstack::params::qpid_username,
+  $qpid_password                 = $quickstack::params::qpid_password,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
@@ -59,6 +61,8 @@ class quickstack::neutron::controller (
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
     qpid_hostname         => $qpid_host,
+    qpid_username         => $qpid_username,
+    qpid_password         => $qpid_password,
     core_plugin           => $neutron_core_plugin
   }
 
@@ -146,6 +150,8 @@ class quickstack::neutron::controller (
     nova_db_password              => $nova_db_password,
     nova_user_password            => $nova_user_password,
     qpid_host                     => $qpid_host,
+    qpid_username                 => $qpid_username,
+    qpid_password                 => $qpid_password,
     swift_shared_secret           => $swift_shared_secret,
     swift_admin_password          => $swift_admin_password,
     verbose                       => $verbose,

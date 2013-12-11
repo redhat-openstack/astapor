@@ -10,6 +10,8 @@ class quickstack::compute_common (
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -31,6 +33,8 @@ class quickstack::compute_common (
     glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
     qpid_hostname      => $qpid_host,
+    qpid_username      => $qpid_username,
+    qpid_password      => $qpid_password,
     verbose            => $verbose,
   }
 
@@ -65,6 +69,8 @@ class quickstack::compute_common (
   class { 'ceilometer':
     metering_secret => $ceilometer_metering_secret,
     qpid_hostname   => $qpid_host,
+    qpid_username   => $qpid_username,
+    qpid_password   => $qpid_password,
     rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
     verbose         => $verbose,
   }
