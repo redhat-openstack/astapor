@@ -49,6 +49,13 @@ class quickstack::params {
   # Gluster
   $gluster_open_port_count      = '10'
 
+  # Nagios
+  $nagios                       = false
+  $nagios_server_ip             = '172.16.0.1'
+  $nagios_local_iface           = 'em1'
+  # Flag only used for filtering monitoring service (for now!)
+  $swift                        = false
+
   # Networking
   $neutron                       = 'false'
   $controller_admin_host         = '172.16.0.1'

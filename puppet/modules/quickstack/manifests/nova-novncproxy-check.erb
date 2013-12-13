@@ -1,0 +1,12 @@
+#!/bin/env bash
+
+data=$(/usr/bin/nc -z <%= @controller_ip %> 6080 2>&1)
+rv=$?
+
+if [ "$rv" != "0" ] ; then
+    echo $data
+    exit $rv
+fi
+
+echo "$data"
+exit 0
