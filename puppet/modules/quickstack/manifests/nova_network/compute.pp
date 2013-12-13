@@ -18,6 +18,9 @@ class quickstack::nova_network::compute (
   $glance_backend_rbd           = 'false',
   $glance_host                  = '127.0.0.1',
   $nova_host                    = '127.0.0.1',
+  $monitoring                   = $quickstack::params::monitoring,
+  $monitoring_host              = $quickstack::params::monitoring_host,
+  $monitoring_interface         = $quickstack::params::monitoring_interface,
   $mysql_host                   = $quickstack::params::mysql_host,
   $auto_assign_floating_ip      = 'True',
   $nova_multi_host              = 'True',
@@ -53,7 +56,6 @@ class quickstack::nova_network::compute (
   $private_iface                = '',
   $private_ip                   = '',
   $private_network              = '',
-
 ) inherits quickstack::params {
 
   # Configure Nova
@@ -129,5 +131,8 @@ class quickstack::nova_network::compute (
     private_iface                => $private_iface,
     private_ip                   => $private_ip,
     private_network              => $private_network,
+    monitoring                   => $monitoring,
+    monitoring_host              => $monitoring_host,
+    monitoring_interface         => $monitoring_interface,
   }
 }
