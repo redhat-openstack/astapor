@@ -16,6 +16,8 @@ class quickstack::neutron::networker (
   $ovs_bridge_uplinks            = $quickstack::params::ovs_bridge_uplinks,
   $ovs_vlan_ranges               = $quickstack::params::ovs_vlan_ranges,
   $tunnel_id_ranges              = '1:1000',
+  $vxlan_udp_port                = $quickstack::params::ovs_vxlan_udp_port,
+  $ovs_tunnel_types              = $quickstack::params::ovs_tunnel_types,
   $enable_tunneling              = $quickstack::params::enable_tunneling,
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
@@ -40,6 +42,7 @@ class quickstack::neutron::networker (
     tenant_network_type => $tenant_network_type,
     network_vlan_ranges => $ovs_vlan_ranges,
     tunnel_id_ranges    => $tunnel_id_ranges,
+    vxlan_udp_port      => $ovs_vxlan_udp_port,
   }
 
   class { '::neutron::agents::ovs':
@@ -47,6 +50,8 @@ class quickstack::neutron::networker (
     local_ip            => getvar(regsubst("ipaddress_${ovs_tunnel_iface}", '[.-]', '_', 'G')),
     bridge_mappings     => $ovs_bridge_mappings,
     enable_tunneling    => str2bool_i("$enable_tunneling"),
+    tunnel_types     => $ovs_tunnel_types,
+    vxlan_udp_port   => $ovs_vxlan_udp_port,
   }
 
   class { '::neutron::agents::dhcp': }
@@ -65,4 +70,8 @@ class quickstack::neutron::networker (
   #class { 'neutron::agents::lbaas': }
 
   #class { 'neutron::agents::fwaas': }
+
+  class {'quickstack::neutron::firewall::vxlan':
+    port => $vxlan_udp_port,
+  }
 }

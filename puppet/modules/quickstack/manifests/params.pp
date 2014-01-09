@@ -62,7 +62,7 @@ class quickstack::params {
   $auto_assign_floating_ip       = 'True'
 
   # Neutron specific
-  $neutron_metadata_proxy_secret  = 'CHANGEME'
+  $neutron_metadata_proxy_secret = 'CHANGEME'
 
   $mysql_host                    = '172.16.0.1'
   $qpid_host                     = '172.16.0.1'
@@ -73,6 +73,8 @@ class quickstack::params {
   $ovs_bridge_uplinks            = []
   $configure_ovswitch            = 'true'
   $enable_tunneling              = 'True'
+  $ovs_vxlan_udp_port            = '4789'
+  $ovs_tunnel_types              = []
 
   # neutron plugin config
   $neutron_core_plugin           = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'

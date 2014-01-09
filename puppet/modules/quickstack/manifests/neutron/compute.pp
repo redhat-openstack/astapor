@@ -21,6 +21,8 @@ class quickstack::neutron::compute (
   $qpid_host                   = $quickstack::params::qpid_host,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges            = '1:1000',
+  $ovs_vxlan_udp_port          = $quickstack::params::ovs_vxlan_udp_port,
+  $ovs_tunnel_types            = $quickstack::params::ovs_tunnel_types,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -44,6 +46,7 @@ class quickstack::neutron::compute (
     tenant_network_type => $tenant_network_type,
     network_vlan_ranges => $ovs_vlan_ranges,
     tunnel_id_ranges    => $tunnel_id_ranges,
+    vxlan_udp_port      => $ovs_vxlan_udp_port,
   }
 
   class { '::neutron::agents::ovs':
@@ -51,6 +54,8 @@ class quickstack::neutron::compute (
     bridge_mappings     => $ovs_bridge_mappings,
     local_ip            => getvar(regsubst("ipaddress_${ovs_tunnel_iface}", '[.-]', '_', 'G')),
     enable_tunneling    => str2bool_i("$enable_tunneling"),
+    tunnel_types     => $ovs_tunnel_types,
+    vxlan_udp_port   => $ovs_vxlan_udp_port,
   }
 
   class { '::nova::network::neutron':
@@ -72,5 +77,9 @@ class quickstack::neutron::compute (
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
     verbose                     => $verbose,
+  }
+
+  class {'quickstack::neutron::firewall::vxlan':
+    port => $vxlan_udp_port,
   }
 }
