@@ -25,17 +25,25 @@ class quickstack::neutron::plugins::cisco (
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
   $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $mysql_host                   = $quickstack::params::mysql_host,
+  $mysql_ca                     = $quickstack::params::mysql_ca,
   $enable_server                = true,
   $enable_ovs_agent             = false,
   $tenant_network_type          = 'vlan',
+  $ssl                          = $quickstack::params::ssl,
 ) inherits quickstack::params {
 
+
+  if str2bool($ssl) {
+    $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
+  } else {
+    $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
+  }
 
   if $cisco_vswitch_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
     # vswitch plugin is ovs, setup the ovs plugin
 
     class { '::neutron::plugins::ovs':
-      sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
+      sql_connection      => $sql_connection,
       tenant_network_type => $tenant_network_type,
       network_vlan_ranges => $ovs_vlan_ranges,
     }
