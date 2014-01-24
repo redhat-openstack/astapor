@@ -6,7 +6,11 @@ class quickstack::heat_controller(
   $controller_priv_host,
   $controller_pub_host,
   $mysql_host,
+  $mysql_ca,
+  $ssl,
   $qpid_host,
+  $qpid_port,
+  $qpid_protocol,
   $verbose,
 ) {
 
@@ -26,6 +30,8 @@ class quickstack::heat_controller(
       auth_uri          => "http://${controller_priv_host}:35357/v2.0",
       rpc_backend       => 'heat.openstack.common.rpc.impl_qpid',
       qpid_hostname     => $qpid_host,
+      qpid_port         => $qpid_port,
+      qpid_protocol     => $qpid_protocol,
       verbose           => $verbose,
   }
 
@@ -48,8 +54,14 @@ class quickstack::heat_controller(
       allowed_hosts => "%%",
   }
 
+  if str2bool($ssl) {
+    $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat?ssl_ca=${mysql_ca}"
+  } else {
+    $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat"
+  }
+
   class { 'heat::db':
-      sql_connection => "mysql://heat:${heat_db_password}@${mysql_host}/heat",
+      sql_connection => $sql_connection,
   }
 
   class { 'heat::api':

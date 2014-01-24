@@ -15,6 +15,8 @@ class quickstack::nova_network::compute (
   $nova_network_public_iface    = 'em2',
   $qpid_host                    = $quickstack::params::qpid_host,
   $verbose                      = $quickstack::params::verbose,
+  $ssl                          = $quickstack::params::ssl,
+  $mysql_ca                     = $quickstack::params::mysql_ca,
 
   $auto_assign_floating_ip
 ) inherits quickstack::params {
@@ -58,5 +60,7 @@ class quickstack::nova_network::compute (
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
     verbose                     => $verbose,
+    ssl                         => $ssl,
+    mysql_ca                    => $mysql_ca,
   }
 }
