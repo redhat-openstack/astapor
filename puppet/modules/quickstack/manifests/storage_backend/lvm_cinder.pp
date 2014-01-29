@@ -39,7 +39,7 @@ class quickstack::storage_backend::lvm_cinder(
 
   if str2bool($cinder_backend_iscsi) {
     class { 'cinder::volume::iscsi':
-      iscsi_ip_address => getvar("ipaddress_${cinder_iscsi_iface}"),
+      iscsi_ip_address => getvar(regsubst("ipaddress_${cinder_iscsi_iface}", '\.', '_', 'G')),
     }
 
     firewall { '010 cinder iscsi':

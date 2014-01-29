@@ -9,7 +9,7 @@ class quickstack::swift::storage (
 ) inherits quickstack::params {
 
   class { '::swift::storage::all':
-    storage_local_net_ip => getvar("ipaddress_${swift_local_interface}"),
+    storage_local_net_ip => getvar(regsubst("ipaddress_${swift_local_interface}", '\.', '_', 'G')),
     require => Class['swift'],
   }
 
