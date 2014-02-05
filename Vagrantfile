@@ -1,7 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.require_plugin 'vagrant-aws'
 Vagrant.configure('2') do |config|
 
   #
