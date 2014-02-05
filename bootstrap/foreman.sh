@@ -46,7 +46,7 @@ yum -y install ${RPMS}
 #
 chmod -R a+rX /vagrant
 cd /vagrant/bin
-export FOREMAN_PROVISIONING=true # Will foreman be used for provisioning? true or false
+export FOREMAN_PROVISIONING=false # Will foreman be used for provisioning? true or false
 export FOREMAN_GATEWAY=false      # The gateway set up for foreman provisioning
 echo "" | bash -x ./foreman_server.sh
 
