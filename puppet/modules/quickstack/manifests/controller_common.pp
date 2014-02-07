@@ -116,6 +116,7 @@ class quickstack::controller_common (
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_host}:9292/v1",
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
+    qpid_hostname      => $qpid_host,
     verbose            => $verbose,
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
