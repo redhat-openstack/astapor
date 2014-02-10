@@ -102,4 +102,8 @@ class quickstack::params {
   $mysql_shared_storage_type     = 'MYSQL_SHARED_STORAGE_TYPE'
   $mysql_clu_member_addrs        = 'SPACE_SEPARATED_IP_ADDRS'
   $mysql_resource_group_name     = 'mysqlgroup'
+
+  # Configure Memcached settings for Horizon
+  $cache_server_ip               = '127.0.0.1'
+  $cache_server_port             = '11211'
 }
