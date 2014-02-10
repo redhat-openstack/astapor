@@ -2,6 +2,8 @@
 class quickstack::neutron::controller (
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
+  $cache_server_ip               = $quickstack::params::cache_server_ip,
+  $cache_server_port             = $quickstack::params::cache_server_port,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password      = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster        = $quickstack::params::cinder_backend_gluster,
@@ -58,6 +60,8 @@ class quickstack::neutron::controller (
   class { 'quickstack::controller_common':
     admin_email                   => $admin_email,
     admin_password                => $admin_password,
+    cache_server_ip               => $cache_server_ip,
+    cache_server_port             => $cache_server_port,
     ceilometer_metering_secret    => $ceilometer_metering_secret,
     ceilometer_user_password      => $ceilometer_user_password,
     cinder_backend_gluster        => $cinder_backend_gluster,
