@@ -1,0 +1,42 @@
+---
+- :name: Controller (Nova Network)
+  :class: quickstack::nova_network::controller
+- :name: Compute (Nova Network)
+  :class: quickstack::nova_network::compute
+- :name: Controller (Neutron)
+  :class: quickstack::neutron::controller
+- :name: Compute (Neutron)
+  :class: quickstack::neutron::compute
+- :name: Neutron Networker
+  :class: quickstack::neutron::networker
+- :name: Cinder Block Storage
+  :class: quickstack::storage_backend::cinder
+- :name: Load Balancer
+  :class: quickstack::load_balancer
+- :name: HA Mysql Node
+  :class: quickstack::hamysql::node
+- :name: Swift Storage Node
+  :class: quickstack::swift::storage
+- :name: HA All In One Controller
+  :class:
+  - quickstack::openstack_common
+  - quickstack::pacemaker::common
+  - quickstack::pacemaker::params
+  - quickstack::pacemaker::keystone
+  - quickstack::pacemaker::swift
+  - quickstack::pacemaker::load_balancer
+  - quickstack::pacemaker::memcached
+  - quickstack::pacemaker::qpid
+  - quickstack::pacemaker::glance
+  - quickstack::pacemaker::nova
+  - quickstack::pacemaker::heat
+  - quickstack::pacemaker::cinder
+  - quickstack::pacemaker::horizon
+  - quickstack::pacemaker::mysql
+  - quickstack::pacemaker::neutron
+- :name: Gluster Server
+  :class:
+  - puppet::vardir
+  - quickstack::gluster::server
+- :name: Galera Server
+  :class: quickstack::galera::server

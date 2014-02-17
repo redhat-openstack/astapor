@@ -22,7 +22,7 @@ fi
 # FOREMAN_PROVISIONING determines whether configure foreman for bare
 # metal provisioning including installing dns and dhcp servers.
 if [ "x$FOREMAN_PROVISIONING" = "x" ]; then
-  FOREMAN_PROVISIONING=true
+  FOREMAN_PROVISIONING=$(ruby -r /usr/share/openstack-foreman-installer/lib/configuration -e "puts Setup.new('/usr/share/openstack-foreman-installer/config/install.yaml').foreman_provisioning")
 fi
 
 # FOREMAN_GATEWAY must be set when using foreman for provisioning
@@ -75,8 +75,8 @@ if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 
   PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')
   PRIMARY_PREFIX=$(facter network_${PRIMARY_INT} | cut -d. -f1-3)
- 
-  # If no provisioning interface specified, guess it's "the next one" 
+
+  # If no provisioning interface specified, guess it's "the next one"
   if [ "x$PROVISIONING_INTERFACE" = "x" ]; then
     PROVISIONING_INTERFACE=$(facter -p|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
   fi
@@ -90,7 +90,7 @@ if [ "$FOREMAN_PROVISIONING" = "true" ]; then
   if [ "x$PROVISIONING_PREFIX" = "x" ]; then
     echo "This installer can not determine the interface to provision over."
     exit 1
-  fi     
+  fi
   PROVISIONING_REVERSE=$(echo "$PROVISIONING_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
   FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
 fi
