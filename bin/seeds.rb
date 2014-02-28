@@ -340,6 +340,10 @@ hostgroups = [
      :class=>"quickstack::hamysql::node"},
     {:name=>"Swift Storage Node",
      :class=>"quickstack::swift::storage"},
+    {:name=>"Test Pacemaker Common",
+     :class=>"quickstack::pacemaker::common"},
+    {:name=>"Test Pacemaker Qpid",
+     :class=>"quickstack::pacemaker::qpid"},
 ]
 
 def get_key_type(value)
