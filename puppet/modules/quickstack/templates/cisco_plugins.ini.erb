@@ -60,21 +60,83 @@ nexus_driver=neutron.plugins.cisco.nexus.cisco_nexus_network_driver_v2.CiscoNEXU
 # (BoolOpt) A flag to enable round robin scheduling of routers for SVI.
 # svi_round_robin = False
 
-
 # Cisco Nexus Switch configurations.
 # Each switch to be managed by Openstack Neutron must be configured here.
 #
 # Cisco Nexus Switch Format.
-[NEXUS_SWITCH]
-<% @nexus_config.each do |switch_ip, hosts| %>
-[[<%= switch_ip %>]]
-<% hosts.each do |host_name, ports| %>
-[[[<%=host_name%>]]]
-ports=<%=ports%>
+# [NEXUS_SWITCH:<IP address of switch>]
+# <hostname>=<port>                 (1)
+# ssh_port=<ssh port>               (2)
+# username=<credential username>    (3)
+# password=<credential password>    (4)
+#
+# (1) For each host connected to a port on the switch, specify the hostname
+#     and the Nexus physical port (interface) it is connected to.
+# (2) The TCP port for connecting via SSH to manage the switch. This is
+#     port number 22 unless the switch has been configured otherwise.
+# (3) The username for logging into the switch to manage it.
+# (4) The password for logging into the switch to manage it.
+#
+# Example:
+# [NEXUS_SWITCH:1.1.1.1]
+# compute1=1/1
+# compute2=1/2
+# ssh_port=22
+# username=admin
+# password=mySecretPassword
+
+<% nexus_config.each do |switch_hostname, switch_data| %>
+[NEXUS_SWITCH:<%= switch_data['ip_address'] %>]
+<%- switch_data['servers'].each do|host_name, port| -%>
+<%=host_name-%>=<%= port %>
+<%- end -%>
+ssh_port=<%= switch_data['ssh_port'] %>
+username=<%= switch_data['username'] %>
+password=<%= switch_data['password'] %>
 <% end %>
-[[[ssh_port]]]
-ssh_port=22
-<% end %>
+
+#
+# N1KV Format.
+# [N1KV:<IP address of VSM>]
+# username=<credential username>
+# password=<credential password>
+#
+# Example:
+# [N1KV:2.2.2.2]
+# username=admin
+# password=mySecretPassword
+
+[cisco_n1k]
+
+# (StrOpt) Specify the name of the integration bridge to which the VIFs are
+# attached.
+#
+# integration_bridge = br-int
+
+# (StrOpt) Name of the policy profile to be associated with a port when no
+# policy profile is specified during port creates.
+#
+# default_policy_profile =
+# Example: default_policy_profile = service_profile
+
+# (StrOpt) Name of the policy profile to be associated with a port owned by
+# network node (dhcp, router).
+#
+# network_node_policy_profile =
+# Example: network_node_policy_profile = dhcp_pp
+
+# (StrOpt) Name of the network profile to be associated with a network when no
+# network profile is specified during network creates. Admin should pre-create
+# a network profile with this name.
+#
+# default_network_profile =
+# Example: default_network_profile = network_pool
+
+# (StrOpt) Time in seconds for which the plugin polls the VSM for updates in
+# policy profiles.
+#
+# poll_duration =
+# Example: poll_duration = 180
 
 [DATABASE]
 sql_connection=mysql://neutron:<%= @neutron_db_password %>@<%= @mysql_host %>/neutron 
