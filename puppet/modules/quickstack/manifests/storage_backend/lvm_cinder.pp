@@ -9,13 +9,26 @@ class quickstack::storage_backend::lvm_cinder(
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
+  $ssl                         = $quickstack::params::ssl,
+  $mysql_ca                    = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
 
+  if str2bool_i("$ssl") {
+    $qpid_protocol = 'ssl'
+    $qpid_port = '5671'
+    $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder?ssl_ca=${mysql_ca}"
+  } else {
+    $qpid_protocol = 'tcp'
+    $qpid_port = '5672'
+    $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder"
+  }
   class { 'cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $qpid_host,
+    qpid_port      => $qpid_port,
+    qpid_protocol  => $qpid_protocol,
     qpid_password  => 'guest',
-    sql_connection => "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder",
+    sql_connection => $sql_connection,
     verbose        => $verbose,
   }
 

@@ -15,24 +15,39 @@ class quickstack::neutron::compute (
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
-  $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
   $ovs_tunnel_iface            = 'em1',
   $qpid_host                   = $quickstack::params::qpid_host,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges            = '1:1000',
+  $ovs_vxlan_udp_port          = $quickstack::params::ovs_vxlan_udp_port,
+  $ovs_tunnel_types            = $quickstack::params::ovs_tunnel_types,
   $verbose                     = $quickstack::params::verbose,
+  $ssl                         = $quickstack::params::ssl,
+  $mysql_ca                    = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
+
+  if str2bool_i("$ssl") {
+    $qpid_protocol = 'ssl'
+    $qpid_port = '5671'
+    $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
+  } else {
+    $qpid_protocol = 'tcp'
+    $qpid_port = '5672'
+    $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
+  }
 
   class { '::neutron':
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
     qpid_hostname         => $qpid_host,
+    qpid_port             => $qpid_port,
+    qpid_protocol         => $qpid_protocol,
     core_plugin           => $neutron_core_plugin
   }
 
   neutron_config {
-    'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
+    'database/connection': value => $sql_connection;
     'keystone_authtoken/auth_host':         value => $controller_priv_host;
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
@@ -40,17 +55,19 @@ class quickstack::neutron::compute (
   }
 
   class { '::neutron::plugins::ovs':
-    sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
+    sql_connection      => $sql_connection,
     tenant_network_type => $tenant_network_type,
     network_vlan_ranges => $ovs_vlan_ranges,
     tunnel_id_ranges    => $tunnel_id_ranges,
+    vxlan_udp_port      => $ovs_vxlan_udp_port,
   }
 
   class { '::neutron::agents::ovs':
-    bridge_uplinks      => $ovs_bridge_uplinks,
     bridge_mappings     => $ovs_bridge_mappings,
     local_ip            => getvar(regsubst("ipaddress_${ovs_tunnel_iface}", '[.-]', '_', 'G')),
     enable_tunneling    => str2bool_i("$enable_tunneling"),
+    tunnel_types     => $ovs_tunnel_types,
+    vxlan_udp_port   => $ovs_vxlan_udp_port,
   }
 
   class { '::nova::network::neutron':
@@ -72,5 +89,11 @@ class quickstack::neutron::compute (
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
     verbose                     => $verbose,
+    ssl                         => $ssl,
+    mysql_ca                    => $mysql_ca,
+  }
+
+  class {'quickstack::neutron::firewall::vxlan':
+    port => $ovs_vxlan_udp_port,
   }
 }

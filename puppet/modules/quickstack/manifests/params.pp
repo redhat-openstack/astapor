@@ -55,6 +55,7 @@ class quickstack::params {
   $controller_admin_host         = '172.16.0.1'
   $controller_priv_host          = '172.16.0.1'
   $controller_pub_host           = '172.16.1.1'
+  $nova_default_floating_pool    = 'nova'
 
   # Nova-network specific
   $fixed_network_range           = '10.0.0.0/24'
@@ -62,7 +63,7 @@ class quickstack::params {
   $auto_assign_floating_ip       = 'True'
 
   # Neutron specific
-  $neutron_metadata_proxy_secret  = 'CHANGEME'
+  $neutron_metadata_proxy_secret = 'CHANGEME'
 
   $mysql_host                    = '172.16.0.1'
   $qpid_host                     = '172.16.0.1'
@@ -73,6 +74,8 @@ class quickstack::params {
   $ovs_bridge_uplinks            = []
   $configure_ovswitch            = 'true'
   $enable_tunneling              = 'True'
+  $ovs_vxlan_udp_port            = '4789'
+  $ovs_tunnel_types              = []
 
   # neutron plugin config
   $neutron_core_plugin           = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
@@ -100,4 +103,33 @@ class quickstack::params {
   $mysql_shared_storage_type     = 'MYSQL_SHARED_STORAGE_TYPE'
   $mysql_clu_member_addrs        = 'SPACE_SEPARATED_IP_ADDRS'
   $mysql_resource_group_name     = 'mysqlgroup'
+
+  # SSL
+  $ssl                           = 'false'
+  $freeipa                       = 'false'
+  $mysql_ca                      = '/etc/ipa/ca.crt'
+  $mysql_cert                    = undef
+  $mysql_key                     = undef
+  $qpid_ca                       = undef
+  $qpid_cert                     = undef
+  $qpid_key                      = undef
+  $horizon_ca                    = '/etc/ipa/ca.crt'
+  $horizon_cert                  = undef
+  $horizon_key                   = undef
+  $qpid_nssdb_password           = 'CHANGEME'
+
+  # Pacemaker
+  $pacemaker_cluster_name        = 'openstack'
+  $pacemaker_cluster_members     = ''
+  $ha_loadbalancer_public_vip    = '172.16.1.10'
+  $ha_loadbalancer_private_vip   = '172.16.2.10'
+  $ha_loadbalancer_group         = 'load_balancer'
+  $fencing_type                  = 'disabled'
+  $fence_xvm_clu_iface           = 'eth2'
+  $fence_xvm_manage_key_file     = false
+  $fence_xvm_key_file_password   = '12345678isTheSecret'
+  $fence_ipmilan_address         = '10.10.10.1'
+  $fence_ipmilan_username        = ''
+  $fence_ipmilan_password        = ''
+  $fence_ipmilan_interval        = '60s'
 }

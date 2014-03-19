@@ -1,16 +1,17 @@
 class quickstack::swift::storage (
   # an array, the storage nodes and proxy node(s)
-  $swift_all_ips                  = [],
+  $swift_all_ips                  = ['192.168.203.1', '192.168.203.2', '192.168.203.3', '192.168.203.4'],
   $swift_ext4_device              = '/dev/sdc2',
   $swift_local_interface          = 'eth3',
   $swift_loopback                 = true,
-  $swift_ring_server              = '',  # an ip addr
+  $swift_ring_server              = '192.168.203.1',  # an ip addr
   $swift_shared_secret            = '',
 ) inherits quickstack::params {
 
   class { '::swift::storage::all':
     storage_local_net_ip => getvar(regsubst("ipaddress_${swift_local_interface}", '[.-]', '_', 'G')),
     require => Class['swift'],
+    log_facility => 'LOG_LOCAL1',
   }
 
   if(!defined(File['/srv/node'])) {
@@ -50,7 +51,7 @@ class quickstack::swift::storage (
       seek         => '1048576',
     }
   } else {
-    swift::storage::ext4 { "swiftstorage":
+    swift::storage::ext4 { "device1":
       device => $swift_ext4_device,
     }
   }

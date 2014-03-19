@@ -72,16 +72,26 @@ if [ ! -f /etc/redhat-release ] || \
 fi
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
-  NUM_INT=$(facter -p|grep ipaddress_|grep -v _lo|wc -l)
-  if [[ $NUM_INT -lt 2 ]] ; then
-    echo "This installer needs 2 configured interfaces - only $NUM_INT detected"
-    exit 1
-  fi
+
   PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')
   PRIMARY_PREFIX=$(facter network_${PRIMARY_INT} | cut -d. -f1-3)
-  SECONDARY_INT=$(facter -p|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
-  SECONDARY_PREFIX=$(facter network_${SECONDARY_INT} | cut -d. -f1-3)
-  SECONDARY_REVERSE=$(echo "$SECONDARY_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
+ 
+  # If no provisioning interface specified, guess it's "the next one" 
+  if [ "x$PROVISIONING_INTERFACE" = "x" ]; then
+    PROVISIONING_INTERFACE=$(facter -p|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
+  fi
+
+  # the string for this interface that facter expects
+  FACTER_PROV_INTERFACE=$( echo ${PROVISIONING_INTERFACE} | tr '.' '_' | tr '-' '_' )
+
+  # Read the first three units of the IP network
+  PROVISIONING_PREFIX=$(facter network_${FACTER_PROV_INTERFACE} | cut -d. -f1-3)
+
+  if [ "x$PROVISIONING_PREFIX" = "x" ]; then
+    echo "This installer can not determine the interface to provision over."
+    exit 1
+  fi     
+  PROVISIONING_REVERSE=$(echo "$PROVISIONING_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
   FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
 fi
 
@@ -130,16 +140,16 @@ EOM
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 cat >> installer.pp << EOM
-  tftp_servername  => '$(facter ipaddress_${SECONDARY_INT})',
+  tftp_servername  => '$(facter ipaddress_${FACTER_PROV_INTERFACE})',
   dhcp             => true,
   dhcp_gateway     => '${FOREMAN_GATEWAY}',
-  dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
-  dhcp_interface   => '${SECONDARY_INT}',
+  dhcp_range       => '${PROVISIONING_PREFIX}.50 ${PROVISIONING_PREFIX}.100',
+  dhcp_interface   => '${FACTER_PROV_INTERFACE}',
 
   dns              => true,
-  dns_reverse      => '${SECONDARY_REVERSE}',
+  dns_reverse      => '${PROVISIONING_REVERSE}',
   dns_forwarders   => ['${FORWARDER}'],
-  dns_interface    => '${SECONDARY_INT}',
+  dns_interface    => '${FACTER_PROV_INTERFACE}',
 }
 EOM
 
@@ -154,6 +164,18 @@ EOM
 fi
 
 puppet apply --verbose installer.pp --modulepath=modules
+
+#
+#  YuUCK ....
+#
+# The foreman installer puppet modules don't handle interface names well, so
+#  we need to tweak this once again ...
+#
+# TODO fix this! But may require change to the foreman-installer puppet code itself.
+#
+sed -i "s#${FACTER_PROV_INTERFACE}#${PROVISIONING_INTERFACE}#" /etc/sysconfig/dhcpd
+service dhcpd restart
+
 popd
 
 # turn on certificate autosigning
@@ -165,7 +187,7 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 
 # Set params, and run the db:seed file to set class parameter defaults
 cp ./seeds.rb $FOREMAN_DIR/db/.
-sed -i "s#SECONDARY_INT#$SECONDARY_INT#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then

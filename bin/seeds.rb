@@ -11,7 +11,7 @@ require 'facter'
 require 'securerandom'
 
 # for the sub-network foreman owns
-secondary_int = 'SECONDARY_INT'
+secondary_int = 'PROVISIONING_INTERFACE'
 
 # Changes from upstream:
 #  - EPEL removed
@@ -242,6 +242,7 @@ params = {
   "cinder_gluster_peers"          => [],
   "cinder_gluster_volume"         => "cinder",
   "cinder_gluster_replica_count"  => '3',
+  "cinder_gluster_servers"        => [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ],
   "glance_db_password"            => SecureRandom.hex,
   "glance_user_password"          => SecureRandom.hex,
   "glance_gluster_peers"          => [],
@@ -258,13 +259,14 @@ params = {
   "neutron_user_password"         => SecureRandom.hex,
   "nova_db_password"              => SecureRandom.hex,
   "nova_user_password"            => SecureRandom.hex,
+  "nova_default_floating_pool"    => 'nova',
   "swift_admin_password"          => SecureRandom.hex,
   "swift_shared_secret"           => SecureRandom.hex,
-  "swift_all_ips"                 => [],
+  "swift_all_ips"                 => ['192.168.203.1', '192.168.203.2', '192.168.203.3', '192.168.203.4'],
   "swift_ext4_device"             => '/dev/sdc2',
   "swift_local_interface"         => 'eth3',
   "swift_loopback"                => true,
-  "swift_ring_server"             => '172.16.0.1',
+  "swift_ring_server"             => '192.168.203.1',
   "fixed_network_range"           => '10.0.0.0/24',
   "floating_network_range"        => '10.0.1.0/24',
   "controller_admin_host"         => '172.16.0.1',
@@ -288,6 +290,8 @@ params = {
   "ovs_bridge_uplinks"            => [],
   "tenant_network_type"           => 'gre',
   "enable_tunneling"              => 'True',
+  "ovs_vxlan_udp_port"            => '4789',
+  "ovs_tunnel_types"              => [],
   "auto_assign_floating_ip"       => 'True',
   "neutron_core_plugin"           => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   "cisco_vswitch_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
@@ -300,6 +304,31 @@ params = {
   "backend_server_addrs"          => [],
   "configure_ovswitch"            => "true",
   "neutron"                       => "false",
+  "ssl"                           => "false",
+  "freeipa"                       => "false",
+  "mysql_ca"                      => "/etc/ipa/ca.crt",
+  "mysql_cert"                    => "/etc/pki/tls/certs/PRIV_HOST-mysql.crt",
+  "mysql_key"                     => "/etc/pki/tls/private/PRIV_HOST-mysql.key",
+  "qpid_ca"                       => "/etc/ipa/ca.crt",
+  "qpid_cert"                     => "/etc/pki/tls/certs/PRIV_HOST-qpid.crt",
+  "qpid_key"                      => "/etc/pki/tls/private/PRIV_HOST-qpid.key",
+  "horizon_ca"                    => "/etc/ipa/ca.crt",
+  "horizon_cert"                  => "/etc/pki/tls/certs/PUB_HOST-horizon.crt",
+  "horizon_key"                   => "/etc/pki/tls/private/PUB_HOST-horizon.key",
+  "qpid_nssdb_password"           => SecureRandom.hex,
+  "pacemaker_cluster_name"        => "openstack",
+  "pacemaker_cluster_members"     => "192.168.200.10 192.168.200.11 192.168.200.12",
+  "ha_loadbalancer_public_vip"    => "192.168.200.50",
+  "ha_loadbalancer_private_vip"   => "192.168.201.50",
+  "ha_loadbalancer_group"         => "load_balancer",
+  "fencing_type"                  => "disabled",
+  "fence_xvm_clu_iface"           => "eth2",
+  "fence_xvm_manage_key_file"     => "false",
+  "fence_xvm_key_file_password"   => "12345678isTheSecret",
+  "fence_ipmilan_address"         => "10.10.10.1",
+  "fence_ipmilan_username"        => "",
+  "fence_ipmilan_password"        => "",
+  "fence_ipmilan_interval"        => "60s",
 }
 
 hostgroups = [
@@ -321,6 +350,13 @@ hostgroups = [
      :class=>"quickstack::hamysql::node"},
     {:name=>"Swift Storage Node",
      :class=>"quickstack::swift::storage"},
+    {:name=>"HA All In One Controller",
+     :class=>["quickstack::pacemaker::common",
+              "quickstack::pacemaker::load_balancer",
+              "quickstack::pacemaker::qpid",
+              "quickstack::load_balancer",
+              "qpid::server",
+             ]},
 ]
 
 def get_key_type(value)
@@ -334,15 +370,29 @@ def get_key_type(value)
   # If we need to handle actual number classes like Fixnum, add those here
 end
 
-hostgroups.each do |hg|
-  pclass = Puppetclass.find_by_name hg[:class]
-  pclass.class_params.each do |p|
-    if params.include?(p.key)
-      p.key_type = get_key_type(params[p.key])
-      p.default_value = params[p.key]
+def set_all_params_override
+  pclasses = Puppetclass.find :all
+  pclasses.each do |pclass|
+    pclass.class_params.each do |p|
+      p.override = true
+      p.save
     end
-    p.override = true
-    p.save
+  end
+end
+
+set_all_params_override
+
+hostgroups.each do |hg|
+  pclassnames = hg[:class].kind_of?(Array) ? hg[:class] : [ hg[:class] ]
+  pclassnames.each do |pclassname|
+    pclass = Puppetclass.find_by_name pclassname
+    pclass.class_params.each do |p|
+      if params.include?(p.key)
+        p.key_type = get_key_type(params[p.key])
+        p.default_value = params[p.key]
+      end
+      p.save
+    end
   end
 end
 
@@ -350,7 +400,15 @@ end
 hostgroups.each do |hg|
   h=Hostgroup.find_or_create_by_name hg[:name]
   h.environment = Environment.find_by_name('production')
-  h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  if hg[:class].kind_of?(Array) then
+    pclass_ary = Array.new
+    hg[:class].each do |pclassname| 
+      pclass_ary.push (Puppetclass.find_by_name(pclassname)) 
+    end
+    h.puppetclasses = pclass_ary
+  else
+    h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  end
   h.save!
 end
 

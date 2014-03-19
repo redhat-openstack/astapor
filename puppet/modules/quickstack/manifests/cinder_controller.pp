@@ -7,7 +7,11 @@ class quickstack::cinder_controller(
   $cinder_user_password        = $quickstack::params::cinder_user_password,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $mysql_host                  = $quickstack::params::mysql_host,
+  $mysql_ca                    = $quickstack::params::mysql_ca,
+  $ssl                         = $quickstack::params::ssl,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_port                   = "5672",
+  $qpid_protocol               = "tcp",
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -16,11 +20,19 @@ class quickstack::cinder_controller(
     'DEFAULT/notification_driver': value => 'cinder.openstack.common.notifier.rpc_notifier'
   }
 
+  if str2bool_i("$ssl") {
+    $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder?ssl_ca=${mysql_ca}"
+  } else {
+    $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder"
+  }
+
   class {'cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $qpid_host,
+    qpid_protocol  => $qpid_protocol,
+    qpid_port      => $qpid_port,
     qpid_password  => 'guest',
-    sql_connection => "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder",
+    sql_connection => $sql_connection,
     verbose        => $verbose,
     require        => Class['openstack::db::mysql', 'qpid::server'],
   }
@@ -49,6 +61,20 @@ class quickstack::cinder_controller(
     class { 'cinder::volume::glusterfs':
       glusterfs_mount_point_base => '/var/lib/cinder/volumes',
       glusterfs_shares           => suffix($cinder_gluster_servers, ":/${cinder_gluster_volume}")
+    }
+  }
+
+  if !str2bool_i("$cinder_backend_gluster") and !str2bool_i("$cinder_backend_iscsi") {
+    class { 'cinder::volume': }
+
+    class { 'cinder::volume::iscsi':
+      iscsi_ip_address => $controller_priv_host,
+    }
+
+    firewall { '010 cinder iscsi':
+      proto  => 'tcp',
+      dport  => ['3260'],
+      action => 'accept',
     }
   }
 }
