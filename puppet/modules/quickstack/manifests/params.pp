@@ -37,6 +37,7 @@ class quickstack::params {
   $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $cinder_gluster_replica_count = '3'
   $cinder_gluster_servers       = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
+  $nova_libgfapi				= 'false'
 
   # Glance
   $glance_db_password           = 'CHANGEME'
@@ -52,6 +53,7 @@ class quickstack::params {
 
   # Networking
   $neutron                       = 'false'
+  $neutron_isolated_metadata     = 'false'
   $controller_admin_host         = '172.16.0.1'
   $controller_priv_host          = '172.16.0.1'
   $controller_pub_host           = '172.16.1.1'

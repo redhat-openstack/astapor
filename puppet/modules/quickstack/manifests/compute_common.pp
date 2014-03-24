@@ -4,6 +4,7 @@ class quickstack::compute_common (
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
+  $nova_libgfapi			   = $quickstack::params::nova_libgfapi,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $controller_pub_host         = $quickstack::params::controller_pub_host,
   $mysql_host                  = $quickstack::params::mysql_host,
@@ -17,6 +18,12 @@ class quickstack::compute_common (
 
   if str2bool_i("$cinder_backend_gluster") {
     class { 'gluster::client': }
+
+  if str2bool_i("$nova_libgfapi") {
+	   nova_config{
+	   	"DEFAULT/qemu_allowed_storage_drivers": value => "gluster";
+	   }
+  }
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
