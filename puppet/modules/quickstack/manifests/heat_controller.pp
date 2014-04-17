@@ -17,17 +17,21 @@ class quickstack::heat_controller(
   $verbose,
 ) {
 
-  class {"heat::keystone::auth":
-      password => $heat_user_password,
-      heat_public_address => $controller_pub_host,
-      heat_admin_address => $controller_admin_host,
-      heat_internal_address => $controller_priv_host,
-      cfn_public_address => $controller_pub_host,
-      cfn_admin_address => $controller_admin_host,
-      cfn_internal_address => $controller_priv_host,
+  class {"::heat::keystone::auth":
+      password         => $heat_user_password,
+      public_address   => $controller_pub_host,
+      admin_address    => $controller_priv_host,
+      internal_address => $controller_priv_host,
   }
 
-  class { 'heat':
+  class {"::heat::keystone::auth_cfn":
+      password         => $heat_user_password,
+      public_address   => $controller_pub_host,
+      admin_address    => $controller_priv_host,
+      internal_address => $controller_priv_host,
+  }
+
+  class { '::heat':
       keystone_host     => $controller_priv_host,
       keystone_password => $heat_user_password,
       auth_uri          => "http://${controller_priv_host}:35357/v2.0",
@@ -40,21 +44,21 @@ class quickstack::heat_controller(
       verbose           => $verbose,
   }
 
-  class { 'heat::api_cfn':
+  class { '::heat::api_cfn':
       enabled => str2bool_i("$heat_cfn"),
   }
 
-  class { 'heat::api_cloudwatch':
+  class { '::heat::api_cloudwatch':
       enabled => str2bool_i("$heat_cloudwatch"),
   }
 
-  class { 'heat::engine':
+  class { '::heat::engine':
       heat_metadata_server_url      => "http://${controller_priv_host}:8000",
       heat_waitcondition_server_url => "http://${controller_priv_host}:8000/v1/waitcondition",
       heat_watch_server_url         => "http://${controller_priv_host}:8003",
   }
 
-  class { 'heat::db::mysql':
+  class { '::heat::db::mysql':
       password => $heat_db_password,
       allowed_hosts => "%%",
   }
@@ -69,6 +73,6 @@ class quickstack::heat_controller(
       sql_connection => $sql_connection,
   }
 
-  class { 'heat::api':
+  class { '::heat::api':
   }
 }

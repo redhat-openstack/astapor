@@ -327,7 +327,7 @@ class quickstack::controller_common (
   }~>
   package {'python-netaddr':
     ensure => installed,
-    notify => Class['horizon'],
+    notify => Class['::horizon'],
   }
 
   file {'/etc/httpd/conf.d/rootredirect.conf':
@@ -336,7 +336,7 @@ class quickstack::controller_common (
     notify  => File['/etc/httpd/conf.d/openstack-dashboard.conf'],
   }
 
-  class {'horizon':
+  class {'::horizon':
     secret_key            => $horizon_secret_key,
     keystone_default_role => '_member_',
     keystone_host         => $controller_priv_host,
