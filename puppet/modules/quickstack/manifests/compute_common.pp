@@ -11,6 +11,7 @@ class quickstack::compute_common (
   $mysql_host                  = $quickstack::params::mysql_host,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
+  $ntp_servers                 = ['0.pool.ntp.org','1.pool.ntp.org','2.pool.ntp.org'],
   $qpid_host                   = $quickstack::params::qpid_host,
   $qpid_username               = $quickstack::params::qpid_username,
   $qpid_password               = $quickstack::params::qpid_password,
@@ -20,7 +21,9 @@ class quickstack::compute_common (
   $use_qemu_for_poc            = $quickstack::params::use_qemu_for_poc,
 ) inherits quickstack::params {
 
-  class {'quickstack::openstack_common': }
+  class {'quickstack::openstack_common':
+    ntp_servers => $ntp_servers,
+  }
 
   if str2bool_i("$cinder_backend_gluster") {
     class { 'gluster::client': }

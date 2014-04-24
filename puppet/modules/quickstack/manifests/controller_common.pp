@@ -34,6 +34,7 @@ class quickstack::controller_common (
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
   $nova_default_floating_pool    = $quickstack::params::nova_default_floating_pool,
+  $ntp_servers                   = ['0.pool.ntp.org','1.pool.ntp.org','2.pool.ntp.org'],
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $swift_ringserver_ip           = '192.168.203.1',
@@ -57,7 +58,9 @@ class quickstack::controller_common (
   $qpid_nssdb_password           = $quickstack::params::qpid_nssdb_password,
 ) inherits quickstack::params {
 
-  class {'quickstack::openstack_common': }
+  class {'quickstack::openstack_common':
+    ntp_servers => $ntp_servers,
+  }
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'

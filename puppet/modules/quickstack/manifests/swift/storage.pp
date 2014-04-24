@@ -1,5 +1,6 @@
 class quickstack::swift::storage (
   # an array, the storage nodes and proxy node(s)
+  $ntp_servers                    = ['0.pool.ntp.org','1.pool.ntp.org','2.pool.ntp.org'],
   $swift_all_ips                  = ['192.168.203.1', '192.168.203.2', '192.168.203.3', '192.168.203.4'],
   $swift_ext4_device              = '/dev/sdc2',
   $swift_local_interface          = 'eth3',
@@ -9,7 +10,9 @@ class quickstack::swift::storage (
   $swift_shared_secret            = '',
 ) inherits quickstack::params {
 
-  class {'quickstack::openstack_common': }
+  class {'quickstack::openstack_common':
+    ntp_servers => $ntp_servers,
+  }
 
   $storage_local_net_ip = find_ip("$swift_local_network",
                                   "$swift_local_interface",
