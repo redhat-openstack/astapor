@@ -125,7 +125,7 @@ class { 'puppet':
     '$OPENSTACK_PUPPET_HOME/modules',
   ],
 }
-include passenger
+
 class { 'foreman':
   db_type => 'mysql',
   custom_repo => true
@@ -186,8 +186,8 @@ echo '*' >> /etc/puppet/autosign.conf
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # Set params, and run the db:seed file to set class parameter defaults
-cp ./seeds.rb $FOREMAN_DIR/db/.
-sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+cp ./seeds.rb $FOREMAN_DIR/db/seeds.d/99-ofi.rb
+sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.d/99-ofi.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
