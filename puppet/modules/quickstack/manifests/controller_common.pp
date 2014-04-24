@@ -74,6 +74,7 @@ class quickstack::controller_common (
   $amqp_password                 = $quickstack::params::amqp_password,
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
+  $support_profile               = 'None',
   $freeipa                       = $quickstack::params::freeipa,
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $mysql_cert                    = $quickstack::params::mysql_cert,
@@ -417,15 +418,25 @@ class quickstack::controller_common (
     notify  => File['/etc/httpd/conf.d/openstack-dashboard.conf'],
   }
 
-  class {'::horizon':
-    secret_key            => $horizon_secret_key,
-    keystone_default_role => '_member_',
-    keystone_host         => $controller_priv_host,
-    fqdn                  => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
-    listen_ssl            => str2bool_i("$ssl"),
-    horizon_cert          => $horizon_cert,
-    horizon_key           => $horizon_key,
-    horizon_ca            => $horizon_ca,
+  class {'horizon':
+    secret_key    => $horizon_secret_key,
+    keystone_host => $controller_priv_host,
+    fqdn          => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
+    listen_ssl    => str2bool_i("$ssl"),
+    horizon_cert  => $horizon_cert,
+    horizon_key   => $horizon_key,
+    horizon_ca    => $horizon_ca,
+    support_profile => $support_profile,
+  }
+  # patch our horizon/apache config to avoid duplicate port 80
+  # directive.  TODO: remove this once puppet-horizon/apache can
+  # handle it.
+  file_line { 'undo_httpd_listen_on_bind_address_80':
+    path    => $::horizon::params::httpd_listen_config_file,
+    match   => '^.*Listen 0.0.0.0:?80$',
+    line    => "#Listen 0.0.0.0:80",
+    require => Package['horizon'],
+    notify  => Service[$::horizon::params::http_service],
   }
 
   class {'memcached':}

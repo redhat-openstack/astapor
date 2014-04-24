@@ -122,6 +122,9 @@ class quickstack::params {
   $cisco_vswitch_plugin          = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
   # If using the Cisco plugin, Nexus hardware can be used for l2
   $cisco_nexus_plugin            = 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
+  $n1kv_vsm_ip                   = '0.0.0.0'
+  $n1kv_vsm_password             = 'abc123'
+  $n1kv_source                  = 'None'
 
   # If using the nexus sub plugin, specify the hardware layout by
   # using the following syntax:

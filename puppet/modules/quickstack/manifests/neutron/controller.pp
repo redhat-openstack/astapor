@@ -41,6 +41,9 @@ class quickstack::neutron::controller (
   $controller_admin_host         = $quickstack::params::controller_admin_host,
   $controller_priv_host          = $quickstack::params::controller_priv_host,
   $controller_pub_host           = $quickstack::params::controller_pub_host,
+  $n1kv_vsm_ip                   = $quickstack::params::n1kv_vsm_ip,
+  $n1kv_vsm_password             = $quickstack::params::n1kv_vsm_password,
+  $n1kv_source                   = $quickstack::params::n1kv_source,
   $glance_db_password            = $quickstack::params::glance_db_password,
   $glance_user_password          = $quickstack::params::glance_user_password,
   $glance_backend                = $quickstack::params::glance_backend,
@@ -274,19 +277,41 @@ class quickstack::neutron::controller (
   }
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-    class { 'quickstack::neutron::plugins::cisco':
-      neutron_db_password          => $neutron_db_password,
-      neutron_user_password        => $neutron_user_password,
-      ovs_vlan_ranges              => $ovs_vlan_ranges,
-      cisco_vswitch_plugin         => $cisco_vswitch_plugin,
-      nexus_config                 => $nexus_config,
-      cisco_nexus_plugin           => $cisco_nexus_plugin,
-      nexus_credentials            => $nexus_credentials,
-      provider_vlan_auto_create    => $provider_vlan_auto_create,
-      provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
-      mysql_host                   => $mysql_host,
-      mysql_ca                     => $mysql_ca,
-      tenant_network_type          => $tenant_network_type,
+    if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
+      if (!defined(Package['neutron-plugin-ovs'])) {
+        package { 'neutron-plugin-ovs':
+          ensure => present,
+          name   => $::neutron::params::ovs_server_package,
+        }
+      }
+
+      class { 'quickstack::neutron::plugins::cisco':
+        neutron_db_password          => $neutron_db_password,
+        neutron_user_password        => $neutron_user_password,
+        cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+        mysql_host                   => $mysql_host,
+        mysql_ca                     => $mysql_ca,
+        n1kv_vsm_ip                  => $n1kv_vsm_ip,
+        n1kv_vsm_password            => $n1kv_vsm_password,
+        n1kv_source                => $n1kv_source,
+        controller_priv_host         => $controller_priv_host,
+        controller_pub_host          => $controller_pub_host,
+      }
+    } else {
+      class { 'quickstack::neutron::plugins::cisco':
+        neutron_db_password          => $neutron_db_password,
+        neutron_user_password        => $neutron_user_password,
+        ovs_vlan_ranges              => $ovs_vlan_ranges,
+        cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+        nexus_config                 => $nexus_config,
+        cisco_nexus_plugin           => $cisco_nexus_plugin,
+        nexus_credentials            => $nexus_credentials,
+        provider_vlan_auto_create    => $provider_vlan_auto_create,
+        provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
+        mysql_host                   => $mysql_host,
+        mysql_ca                     => $mysql_ca,
+        tenant_network_type          => $tenant_network_type,
+      }
     }
   }
 
