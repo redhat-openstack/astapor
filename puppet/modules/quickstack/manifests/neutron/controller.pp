@@ -293,7 +293,7 @@ class quickstack::neutron::controller (
         mysql_ca                     => $mysql_ca,
         n1kv_vsm_ip                  => $n1kv_vsm_ip,
         n1kv_vsm_password            => $n1kv_vsm_password,
-        n1kv_source                => $n1kv_source,
+        n1kv_source                  => $n1kv_source,
         controller_priv_host         => $controller_priv_host,
         controller_pub_host          => $controller_pub_host,
       }
