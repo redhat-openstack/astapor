@@ -19,9 +19,15 @@ class quickstack::ceilometer_controller(
         internal_address => $controller_priv_host,
     }
 
-    class { 'mongodb':
-       enable_10gen => false,
-       port         => '27017',
+    class { 'mongodb::server':
+        port       => '27017',
+        smallfiles => true,
+    }
+    ->
+    # FIXME: passwordless connection is insecure, also we might use a
+    # way to run mongo on a different host in the future
+    class { 'ceilometer::db':
+        database_connection => 'mongodb://localhost:27017/ceilometer',
     }
 
     class { 'ceilometer':
@@ -33,13 +39,6 @@ class quickstack::ceilometer_controller(
         qpid_password   => $qpid_password,
         rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
         verbose         => $verbose,
-    }
-
-    # FIXME: passwordless connection is insecure, also we might use a
-    # way to run mongo on a different host in the future
-    class { 'ceilometer::db':
-        database_connection => 'mongodb://localhost:27017/ceilometer',
-        require             => Class['mongodb'],
     }
 
     class { 'ceilometer::collector':
@@ -58,6 +57,6 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer::api':
         keystone_host     => $controller_priv_host,
         keystone_password => $ceilometer_user_password,
-        require           => Class['mongodb'],
+        require           => Class['ceilometer::db'],
     }
 }
