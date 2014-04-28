@@ -40,8 +40,8 @@ class quickstack::pacemaker::swift (
       timeout   => 3600,
       tries     => 360,
       try_sleep => 10,
-      command   => "/tmp/ha-all-in-one-util.bash i_am_vip $swift_public_vip || /tmp/ha-all-in-one-util.bash property_exists swift",
-      unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $swift_public_vip || /tmp/ha-all-in-one-util.bash property_exists swift",
+      command   => "/tmp/ha-all-in-one-util.bash i_am_vip $swift_internal_vip || /tmp/ha-all-in-one-util.bash property_exists swift",
+      unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $swift_internal_vip || /tmp/ha-all-in-one-util.bash property_exists swift",
     }
     ->
     quickstack::pacemaker::rsync::get { '/etc/swift':
@@ -88,6 +88,7 @@ class quickstack::pacemaker::swift (
     exec {"set-object-expirer-concurrency":
       command => "/usr/bin/openstack-config --set /etc/swift/object-expirer.conf object-expirer concurrency 100",
     } ->
+    #Exec['restart-xinetd-swift_server'] ->
     exec {"pcs-swift-server-set-up":
       command => "/usr/sbin/pcs property set swift=running --force",
     } ->
