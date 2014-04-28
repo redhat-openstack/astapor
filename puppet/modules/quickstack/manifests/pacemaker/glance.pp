@@ -60,7 +60,7 @@ class quickstack::pacemaker::glance (
       }
     } elsif ($backend == 'file') {
       if str2bool_i("$pcmk_fs_manage") {
-        Class['::quickstack::pacemaker::common']
+        Exec['stonith-setup-complete']
         ->
         pacemaker::resource::filesystem { "glance fs":
           device => $pcmk_fs_device,
@@ -71,6 +71,9 @@ class quickstack::pacemaker::glance (
         }
         ->
         Class['::quickstack::glance']
+
+        Class['::quickstack::pacemaker::common'] ->
+        Pacemaker::Resource::Filesystem["glance fs"]
       }
     }
 
