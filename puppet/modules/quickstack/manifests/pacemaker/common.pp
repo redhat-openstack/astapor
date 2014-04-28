@@ -27,6 +27,7 @@
 #
 # [*fence_xvm_key_file_password*]
 #
+# TODO: expose params fence_ipmilan_lanplus, fence_ipmilan_lanplus_options
 
 class quickstack::pacemaker::common (
   $pacemaker_cluster_name         = "openstack",
@@ -36,13 +37,12 @@ class quickstack::pacemaker::common (
   $fence_ipmilan_username         = "",
   $fence_ipmilan_password         = "",
   $fence_ipmilan_interval         = "60s",
+  $fence_ipmilan_hostlist         = "",
   $fence_xvm_clu_iface            = "eth2",
   $fence_xvm_clu_network          = "",
   $fence_xvm_manage_key_file      = "false",
   $fence_xvm_key_file_password    = "",
-
 ) {
-
   include quickstack::pacemaker::params
 
   class {'pacemaker::corosync':
@@ -51,26 +51,28 @@ class quickstack::pacemaker::common (
   }
 
   if $fencing_type =~ /(?i-mx:^disabled$)/ {
+    $fencing = false
     class {'pacemaker::stonith':
       disable => true,
     }
     Class['pacemaker::corosync'] -> Class['pacemaker::stonith']
   }
   elsif $fencing_type =~ /(?i-mx:^fence_ipmilan$)/ {
+    $fencing = true
     class {'pacemaker::stonith':
       disable => false,
     }
-    class {'pacemaker::stonith::ipmilan':
+    class {'quickstack::pacemaker::stonith::ipmilan':
       address        => $fence_ipmilan_address,
       username       => $fence_ipmilan_username,
       password       => $fence_ipmilan_password,
       interval       => $fence_ipmilan_interval,
-      pcmk_host_list => $pacemaker_cluster_members,
+      pcmk_host_list => $fence_ipmilan_hostlist,
+      lanplus        => true,
     }
-    Class['pacemaker::corosync'] -> Class['pacemaker::stonith'] ->
-    Class['pacemaker::stonith::ipmilan']
   }
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
+    $fencing = true
     $clu_ip_address = find_ip("$fence_xvm_clu_network",
                               "$fence_xvm_clu_iface",
                               "")
@@ -82,10 +84,35 @@ class quickstack::pacemaker::common (
       manage_key_file   => str2bool_i("$fence_xvm_manage_key_file"),
       key_file_password => $fence_xvm_key_file_password,
       port              => "$::hostname",    # the name of the vm
-      pcmk_host         => $clu_ip_address,  # the hostname or IP that pacemaker uses
     }
-    Class['pacemaker::corosync'] -> Class['pacemaker::stonith'] ->
-    Class['pacemaker::stonith::fence_xvm']
+  }
+  else {
+    $fencing = false
+    notify{"Unexpected value for parameter fencing_type: $fencing_type:.  Expect one of disabled, fence_ipmilan, or fence_xvm":
+      loglevel => alert,
+    }
+  }
+  exec { 'stonith-setup-complete': command => '/bin/true'}
+
+  if $fencing {
+    exec { "all-nodes-joined-cluster":
+      # wait for all nodes to join, rather just a quorum.  this is so
+      # fencing doesn't prematurely fence a node that hasn't joined
+      # yet.
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      path => '/usr/bin:/usr/sbin:/bin',
+      command => 'test $(crm_node -q) == 1 && test "$(crm_node -p | sort)" == "$(crm_node -l | sort)"',
+    }
+    Class['pacemaker::corosync'] -> Exec['all-nodes-joined-cluster'] ->
+    Class['pacemaker::stonith']
+    if ($fencing_type == "fence_ipmilan") {
+      Class['pacemaker::stonith'] -> Class['quickstack::pacemaker::stonith::ipmilan'] -> Exec['stonith-setup-complete']
+    }
+    elsif ($fencing_type == "fence_xvm") {
+      Class['pacemaker::stonith'] -> Class['pacemaker::stonith::fence_xvm'] -> Exec['stonith-setup-complete']
+    }
   }
 
   file { "ha-all-in-one-util-bash-tests":

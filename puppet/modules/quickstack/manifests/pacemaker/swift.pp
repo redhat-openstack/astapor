@@ -88,7 +88,6 @@ class quickstack::pacemaker::swift (
     exec {"set-object-expirer-concurrency":
       command => "/usr/bin/openstack-config --set /etc/swift/object-expirer.conf object-expirer concurrency 100",
     } ->
-    #Exec['restart-xinetd-swift_server'] ->
     exec {"pcs-swift-server-set-up":
       command => "/usr/sbin/pcs property set swift=running --force",
     } ->

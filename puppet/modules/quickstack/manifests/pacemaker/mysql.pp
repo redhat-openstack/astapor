@@ -7,8 +7,6 @@ class quickstack::pacemaker::mysql (
   include quickstack::pacemaker::common
 
   if (map_params('include_mysql') == 'true') {
-    Class['::quickstack::pacemaker::common']
-    ->
     class {'quickstack::hamysql::node':
       mysql_root_password          => $mysql_root_password,
       keystone_db_password         => map_params("keystone_db_password"),
@@ -40,5 +38,6 @@ class quickstack::pacemaker::mysql (
         Exec["pcs-mysql-server-set-up"] -> Exec["mysql-has-users"]
       }
     }
+    Exec['stonith-setup-complete'] -> Pacemaker::Resource::Filesystem['mysql-clu-fs']
   }
 }
