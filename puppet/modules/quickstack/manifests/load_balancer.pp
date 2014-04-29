@@ -7,7 +7,12 @@ class quickstack::load_balancer (
   $neutron,
   $heat_cfn,
   $heat_cloudwatch,
+  $ntp_servers = ['0.pool.ntp.org','1.pool.ntp.org','2.pool.ntp.org'],
 ) inherits quickstack::params {
+
+  class { '::ntp':
+    servers => $ntp_servers,
+  }
 
   class { 'haproxy':
     global_options => {

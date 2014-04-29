@@ -10,6 +10,7 @@ class quickstack::neutron::networker (
   $ovs_tunnel_iface              = 'eth1',
   $ovs_tunnel_network            = '',
   $mysql_host                    = $quickstack::params::mysql_host,
+  $ntp_servers                   = ['0.pool.ntp.org','1.pool.ntp.org','2.pool.ntp.org'],
   $qpid_host                     = $quickstack::params::qpid_host,
   $external_network_bridge       = 'br-ex',
   $qpid_username                 = $quickstack::params::qpid_username,
@@ -27,7 +28,9 @@ class quickstack::neutron::networker (
   $mysql_ca                      = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
 
-  class {'quickstack::openstack_common': }
+  class {'quickstack::openstack_common':
+    ntp_servers => $ntp_servers,
+  }
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'

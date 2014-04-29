@@ -23,9 +23,14 @@ class quickstack::hamysql::node (
   $mysql_resource_group_name    = $quickstack::params::mysql_resource_group_name,
   $mysql_clu_member_addrs       = $quickstack::params::mysql_clu_member_addrs,
   $corosync_setup               = true,
+  $ntp_servers                 = ['0.pool.ntp.org','1.pool.ntp.org','2.pool.ntp.org'],
 ) inherits quickstack::params {
 
     include mysql::python
+
+    class { '::ntp':
+      servers => $ntp_servers,
+    }
 
     package { 'mysql-server':
       ensure => installed,
