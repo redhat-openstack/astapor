@@ -58,7 +58,7 @@ class quickstack::cinder_controller(
   if str2bool_i("$cinder_backend_gluster") {
     class { '::cinder::volume': }
 
-    class { 'gluster::client': }
+    class { 'quickstack::gluster::client': }
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
