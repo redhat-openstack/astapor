@@ -49,21 +49,21 @@
 # [*qpid_heartbeat*]
 #   (optional) Seconds between connection keepalive heartbeats
 #   Defaults to '60'.
-# [*qpid_hostname*]
-#   (optional) Location of qpid server
+# [*amqp_hostname*]
+#   (optional) Location of amqp server
 #   Defaults to 'localhost'
-# [*qpid_port*]
-#   (optional) Port for qpid server
+# [*amqp_port*]
+#   (optional) Port for amqp server
 #   Defaults to '5672'
-# [*qpid_username*]
-#   (optional) qpid username
-#   Defaults to '' for qpid no auth.
-# [*qpid_password*]
-#   (optional) qpid password
+# [*amqp_username*]
+#   (optional) amqp username
+#   Defaults to '' for amqp no auth.
+# [*amqp_password*]
+#   (optional) amqp password
 #   Defaults to ''.
 # [*rpc_backend*]
 #   (optional) The rpc backend implementation to use.
-#   Defaults to 'nova.openstack.common.rpc.impl_qpid'.
+#   Defaults to 'nova.openstack.common.rpc.impl_kombu'.
 # [*verbose*]
 #   (optional) Set log output to verbose output.
 #   Defaults to 'false'.
@@ -87,11 +87,11 @@ class quickstack::nova (
   $neutron            = 'false',
   $neutron_metadata_proxy_secret,
   $qpid_heartbeat     = '60',
-  $qpid_hostname      = 'localhost',
-  $qpid_port          = '5672',
-  $qpid_username      = '',
-  $qpid_password      = '',
-  $rpc_backend        = 'nova.openstack.common.rpc.impl_qpid',
+  $amqp_hostname      = 'localhost',
+  $amqp_port          = '5672',
+  $amqp_username      = '',
+  $amqp_password      = '',
+  $rpc_backend        = 'nova.openstack.common.rpc.impl_kombu',
   $verbose            = 'false',
 ) {
 
@@ -107,11 +107,15 @@ class quickstack::nova (
       memcached_servers  => $memcached_servers,
       rpc_backend        => $rpc_backend,
       verbose            => $verbose,
-      qpid_port          => $qpid_port,
-      qpid_hostname      => $qpid_hostname,
+      qpid_port          => $amqp_port,
+      qpid_hostname      => $amqp_hostname,
       qpid_heartbeat     => $qpid_heartbeat,
-      qpid_username      => $qpid_username,
-      qpid_password      => $qpid_password,
+      qpid_username      => $amqp_username,
+      qpid_password      => $amqp_password,
+      rabbit_port        => $amqp_port,
+      rabbit_host        => $amqp_hostname,
+      rabbit_userid      => $amqp_username,
+      rabbit_password    => $amqp_password,
     }
 
     nova_config { 'DEFAULT/default_floating_pool':

@@ -9,18 +9,19 @@ class quickstack::cinder_controller(
   $mysql_host                  = $quickstack::params::mysql_host,
   $mysql_ca                    = $quickstack::params::mysql_ca,
   $ssl                         = $quickstack::params::ssl,
-  $qpid_host                   = $quickstack::params::qpid_host,
-  $qpid_port                   = "5672",
+  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_host                   = $quickstack::params::amqp_host,
+  $amqp_port                   = "5672",
   $qpid_protocol               = "tcp",
-  $qpid_username               = $quickstack::params::qpid_username,
-  $qpid_password               = $quickstack::params::qpid_password,
+  $amqp_username               = $quickstack::params::amqp_username,
+  $amqp_password               = $quickstack::params::amqp_password,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
-  $qpid_password_safe_for_cinder = $qpid_password ? {
+  $amqp_password_safe_for_cinder = $amqp_password ? {
     ''      => 'guest',
     false   => 'guest',
-    default => $qpid_password,
+    default => $amqp_password,
   }
 
   cinder_config {
@@ -35,15 +36,19 @@ class quickstack::cinder_controller(
   }
 
   class {'::cinder':
-    rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
-    qpid_hostname  => $qpid_host,
+    rpc_backend    => amqp_backend('cinder', $amqp_server),
+    qpid_hostname  => $amqp_host,
     qpid_protocol  => $qpid_protocol,
-    qpid_port      => $qpid_port,
-    qpid_username  => $qpid_username,
-    qpid_password  => $qpid_password_safe_for_cinder,
+    qpid_port      => $amqp_port,
+    qpid_username  => $amqp_username,
+    qpid_password  => $amqp_password_safe_for_cinder,
+    rabbit_host     => $amqp_host,
+    rabbit_port     => $amqp_port,
+    rabbit_userid   => $amqp_username,
+    rabbit_password => $amqp_password_safe_for_cinder,
     sql_connection => $sql_connection,
     verbose        => $verbose,
-    require        => Class['quickstack::db::mysql', 'qpid::server'],
+    require        => Class['quickstack::db::mysql', 'quickstack::amqp::server'],
   }
 
   class {'::cinder::api':

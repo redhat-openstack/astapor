@@ -22,11 +22,12 @@ class quickstack::neutron::compute (
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
   $ovs_tunnel_iface            = 'eth1',
   $ovs_tunnel_network          = '',
-  $qpid_host                   = $quickstack::params::qpid_host,
-  $qpid_port                   = '5672',
-  $qpid_ssl_port               = '5671',
-  $qpid_username               = $quickstack::params::qpid_username,
-  $qpid_password               = $quickstack::params::qpid_password,
+  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_host                   = $quickstack::params::amqp_host,
+  $amqp_port                   = '5672',
+  $amqp_ssl_port               = '5671',
+  $amqp_username               = $quickstack::params::amqp_username,
+  $amqp_password               = $quickstack::params::amqp_password,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges            = '1:1000',
   $ovs_vxlan_udp_port          = $quickstack::params::ovs_vxlan_udp_port,
@@ -39,22 +40,26 @@ class quickstack::neutron::compute (
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $real_qpid_port = $qpid_ssl_port
+    $real_amqp_port = $amqp_ssl_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $real_qpid_port = $qpid_port
+    $real_amqp_port = $amqp_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
   class { '::neutron':
     allow_overlapping_ips => true,
-    rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-    qpid_hostname         => $qpid_host,
-    qpid_port             => $real_qpid_port,
+    rpc_backend           => amqp_backend('neutron', $amqp_server),
+    qpid_hostname         => $amqp_host,
+    qpid_port             => $real_amqp_port,
     qpid_protocol         => $qpid_protocol,
-    qpid_username         => $qpid_username,
-    qpid_password         => $qpid_password,
+    qpid_username         => $amqp_username,
+    qpid_password         => $amqp_password,
+    rabbit_host           => $amqp_host,
+    rabbit_port           => $real_amqp_port,
+    rabbit_user           => $amqp_username,
+    rabbit_password       => $amqp_password,
     core_plugin           => $neutron_core_plugin
   }
 
@@ -103,11 +108,11 @@ class quickstack::neutron::compute (
     nova_db_password           => $nova_db_password,
     nova_host                  => $nova_host,
     nova_user_password         => $nova_user_password,
-    qpid_host                  => $qpid_host,
-    qpid_port                  => $qpid_port,
-    qpid_ssl_port              => $qpid_ssl_port,
-    qpid_username              => $qpid_username,
-    qpid_password              => $qpid_password,
+    amqp_host                  => $amqp_host,
+    amqp_port                  => $amqp_port,
+    amqp_ssl_port              => $amqp_ssl_port,
+    amqp_username              => $amqp_username,
+    amqp_password              => $amqp_password,
     verbose                    => $verbose,
     ssl                        => $ssl,
     mysql_ca                   => $mysql_ca,

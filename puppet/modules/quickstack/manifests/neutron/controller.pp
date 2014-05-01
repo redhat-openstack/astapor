@@ -52,9 +52,10 @@ class quickstack::neutron::controller (
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
   $ml2_security_group            = 'dummy',
-  $qpid_host                     = $quickstack::params::qpid_host,
-  $qpid_username                 = $quickstack::params::qpid_username,
-  $qpid_password                 = $quickstack::params::qpid_password,
+  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_host                     = $quickstack::params::amqp_host,
+  $amqp_username                 = $quickstack::params::amqp_username,
+  $amqp_password                 = $quickstack::params::amqp_password,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $swift_ringserver_ip           = '192.168.203.1',
@@ -67,22 +68,22 @@ class quickstack::neutron::controller (
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $mysql_cert                    = $quickstack::params::mysql_cert,
   $mysql_key                     = $quickstack::params::mysql_key,
-  $qpid_ca                       = $quickstack::params::qpid_ca,
-  $qpid_cert                     = $quickstack::params::qpid_cert,
-  $qpid_key                      = $quickstack::params::qpid_key,
+  $amqp_ca                       = $quickstack::params::amqp_ca,
+  $amqp_cert                     = $quickstack::params::amqp_cert,
+  $amqp_key                      = $quickstack::params::amqp_key,
   $horizon_ca                    = $quickstack::params::horizon_ca,
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
-  $qpid_nssdb_password           = $quickstack::params::qpid_nssdb_password,
+  $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $qpid_port = '5671'
+    $amqp_port = '5671'
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $qpid_port = '5672'
+    $amqp_port = '5672'
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
@@ -121,9 +122,9 @@ class quickstack::neutron::controller (
     nova_db_password              => $nova_db_password,
     nova_user_password            => $nova_user_password,
     nova_default_floating_pool    => $nova_default_floating_pool,
-    qpid_host                     => $qpid_host,
-    qpid_username                 => $qpid_username,
-    qpid_password                 => $qpid_password,
+    amqp_host                     => $amqp_host,
+    amqp_username                 => $amqp_username,
+    amqp_password                 => $amqp_password,
     swift_shared_secret           => $swift_shared_secret,
     swift_admin_password          => $swift_admin_password,
     swift_ringserver_ip           => $swift_ringserver_ip,
@@ -135,25 +136,29 @@ class quickstack::neutron::controller (
     mysql_ca                      => $mysql_ca,
     mysql_cert                    => $mysql_cert,
     mysql_key                     => $mysql_key,
-    qpid_ca                       => $qpid_ca,
-    qpid_cert                     => $qpid_cert,
-    qpid_key                      => $qpid_key,
+    amqp_ca                       => $amqp_ca,
+    amqp_cert                     => $amqp_cert,
+    amqp_key                      => $amqp_key,
     horizon_ca                    => $horizon_ca,
     horizon_cert                  => $horizon_cert,
     horizon_key                   => $horizon_key,
-    qpid_nssdb_password           => $qpid_nssdb_password,
+    amqp_nssdb_password           => $amqp_nssdb_password,
   }
   ->
   class { '::neutron':
     enabled               => true,
     verbose               => $verbose,
     allow_overlapping_ips => true,
-    rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-    qpid_hostname         => $qpid_host,
-    qpid_port             => $qpid_port,
+    rpc_backend           => amqp_backend('neutron', $amqp_server),
+    qpid_hostname         => $amqp_host,
+    qpid_port             => $amqp_port,
     qpid_protocol         => $qpid_protocol,
-    qpid_username         => $qpid_username,
-    qpid_password         => $qpid_password,
+    qpid_username         => $amqp_username,
+    qpid_password         => $amqp_password,
+    rabbit_host           => $amqp_host,
+    rabbit_port           => $amqp_port,
+    rabbit_user           => $amqp_username,
+    rabbit_password       => $amqp_password,
     core_plugin           => $neutron_core_plugin
   }
   ->

@@ -39,29 +39,30 @@ class quickstack::controller_common (
   $swift_ringserver_ip           = '192.168.203.1',
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
-  $qpid_host                     = $quickstack::params::qpid_host,
-  $qpid_username                 = $quickstack::params::qpid_username,
-  $qpid_password                 = $quickstack::params::qpid_password,
+  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_host                     = $quickstack::params::amqp_host,
+  $amqp_username                 = $quickstack::params::amqp_username,
+  $amqp_password                 = $quickstack::params::amqp_password,
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
   $freeipa                       = $quickstack::params::freeipa,
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $mysql_cert                    = $quickstack::params::mysql_cert,
   $mysql_key                     = $quickstack::params::mysql_key,
-  $qpid_ca                       = $quickstack::params::qpid_ca,
-  $qpid_cert                     = $quickstack::params::qpid_cert,
-  $qpid_key                      = $quickstack::params::qpid_key,
+  $amqp_ca                       = $quickstack::params::amqp_ca,
+  $amqp_cert                     = $quickstack::params::amqp_cert,
+  $amqp_key                      = $quickstack::params::amqp_key,
   $horizon_ca                    = $quickstack::params::horizon_ca,
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
-  $qpid_nssdb_password           = $quickstack::params::qpid_nssdb_password,
+  $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $qpid_port = '5671'
+    $amqp_port = '5671'
     $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
 
     if str2bool_i("$freeipa") {
@@ -82,12 +83,22 @@ class quickstack::controller_common (
         group_id => 'apache',
         hostname => $controller_pub_host,
       }
+      if $amqp_server == 'rabbitmq' {
+        certmonger::request_ipa_cert { 'amqp':
+          seclib => "openssl",
+          principal => "amqp/${controller_priv_host}",
+          key => $amqp_key,
+          cert => $amqp_cert,
+          owner_id => 'rabbitmq',
+          group_id => 'rabbitmq',
+        }
+      }
     } else {
       if $mysql_ca == undef or $mysql_cert == undef or $mysql_key == undef {
         fail('The mysql CA, cert and key are all required.')
       }
-      if $qpid_ca == undef or $qpid_cert == undef or $qpid_key == undef {
-        fail('The qpid CA, cert and key are all required.')
+      if $amqp_ca == undef or $amqp_cert == undef or $amqp_key == undef {
+        fail('The amqp CA, cert and key are all required.')
       }
       if $horizon_ca == undef or $horizon_cert == undef or
         $horizon_key == undef {
@@ -96,7 +107,7 @@ class quickstack::controller_common (
     }
   } else {
       $qpid_protocol = 'tcp'
-      $qpid_port = '5672'
+      $amqp_port = '5672'
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
   }
 
@@ -123,34 +134,17 @@ class quickstack::controller_common (
     neutron                => str2bool_i("$neutron"),
   }
 
-  class {'qpid::server':
-    ssl      => str2bool_i("$ssl"),
-    freeipa  => str2bool_i("$freeipa"),
-    ssl_ca   => $qpid_ca,
-    ssl_cert => $qpid_cert,
-    ssl_key  => $qpid_key,
-    ssl_database_password => $qpid_nssdb_password,
-    config_file => $::operatingsystem ? {
-        'Fedora' => '/etc/qpid/qpidd.conf',
-        default  => '/etc/qpidd.conf',
-        },
-    auth => $qpid_username ? {
-      ''      => 'no',
-      default => 'yes',
-    },
-    clustered => false,
-  }
-
-  # quoth the puppet language reference,
-  # "Empty strings are false; all other strings are true."
-  if $qpid_username {
-    qpid_user { $qpid_username:
-      password  => $qpid_password,
-      file      => '/var/lib/qpidd/qpidd.sasldb',
-      realm     => 'QPID',
-      provider  => 'saslpasswd2',
-      require   => Class['qpid::server'],
-    }
+  class {'quickstack::amqp::server':
+    amqp_server   => $amqp_server,
+    amqp_host     => $amqp_host,
+    amqp_port     => $amqp_port,
+    amqp_username => $amqp_username,
+    amqp_password => $amqp_password,
+    amqp_ca       => $amqp_ca,
+    amqp_cert     => $amqp_cert,
+    amqp_key      => $amqp_key,
+    ssl           => $ssl,
+    freeipa       => $freeipa,
   }
 
   class {'openstack::keystone':
@@ -207,12 +201,14 @@ class quickstack::controller_common (
     db_password    => $glance_db_password,
     require        => Class['quickstack::db::mysql'],
   }
-  class { 'glance::notify::qpid':
-    qpid_password => $qpid_password,
-    qpid_username => $qpid_username,
-    qpid_hostname => $qpid_host,
-    qpid_port     => $qpid_port,
-    qpid_protocol => 'tcp',
+  if $amqp_server == 'qpid' {
+    class { 'glance::notify::qpid':
+      qpid_password => $amqp_password,
+      qpid_username => $amqp_username,
+      qpid_hostname => $amqp_host,
+      qpid_port     => $amqp_port,
+      qpid_protocol => 'tcp',
+    }
   }
 
 
@@ -221,14 +217,18 @@ class quickstack::controller_common (
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_host}:9292/v1",
-    rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
-    qpid_hostname      => $qpid_host,
-    qpid_username      => $qpid_username,
-    qpid_password      => $qpid_password,
+    rpc_backend        => amqp_backend('nova', $amqp_server),
+    qpid_hostname      => $amqp_host,
+    qpid_username      => $amqp_username,
+    qpid_password      => $amqp_password,
+    rabbit_host        => $amqp_host,
+    rabbit_userid      => $amqp_username,
+    rabbit_password    => $amqp_password,
+    rabbit_port        => $amqp_port,
     verbose            => $verbose,
     qpid_protocol      => $qpid_protocol,
-    qpid_port          => $qpid_port,
-    require            => Class['quickstack::db::mysql', 'qpid::server'],
+    qpid_port          => $amqp_port,
+    require            => Class['quickstack::db::mysql', 'quickstack::amqp::server'],
   }
 
   nova_config {
@@ -265,11 +265,12 @@ class quickstack::controller_common (
     controller_admin_host       => $controller_admin_host,
     controller_priv_host        => $controller_priv_host,
     controller_pub_host         => $controller_pub_host,
-    qpid_host                   => $qpid_host,
+    amqp_server                 => $amqp_server,
+    amqp_host                   => $amqp_host,
     qpid_protocol               => $qpid_protocol,
-    qpid_port                   => $qpid_port,
-    qpid_username               => $qpid_username,
-    qpid_password               => $qpid_password,
+    amqp_port                   => $amqp_port,
+    amqp_username               => $amqp_username,
+    amqp_password               => $amqp_password,
     verbose                     => $verbose,
   }
 
@@ -295,11 +296,12 @@ class quickstack::controller_common (
     mysql_host                  => $mysql_host,
     mysql_ca                    => $mysql_ca,
     ssl                         => $ssl,
-    qpid_host                   => $qpid_host,
-    qpid_port                   => $qpid_port,
+    amqp_server                 => $amqp_server,
+    amqp_host                   => $amqp_host,
+    amqp_port                   => $amqp_port,
     qpid_protocol               => $qpid_protocol,
-    qpid_username               => $qpid_username,
-    qpid_password               => $qpid_password,
+    amqp_username               => $amqp_username,
+    amqp_password               => $amqp_password,
     verbose                     => $verbose,
   }
 
@@ -315,11 +317,12 @@ class quickstack::controller_common (
     mysql_host                  => $mysql_host,
     mysql_ca                    => $mysql_ca,
     ssl                         => $ssl,
-    qpid_host                   => $qpid_host,
-    qpid_port                   => $qpid_port,
+    amqp_server                 => $amqp_server,
+    amqp_host                   => $amqp_host,
+    amqp_port                   => $amqp_port,
     qpid_protocol               => $qpid_protocol,
-    qpid_username               => $qpid_username,
-    qpid_password               => $qpid_password,
+    amqp_username               => $amqp_username,
+    amqp_password               => $amqp_password,
     verbose                     => $verbose,
   }
 
@@ -377,7 +380,7 @@ class quickstack::controller_common (
   if $ssl {
     firewall { '002 ssl controller incoming':
       proto    => 'tcp',
-      dport    => ['443',],
+      dport    => ['443', '5671',],
       action   => 'accept',
     }
   }

@@ -4,11 +4,12 @@ class quickstack::ceilometer_controller(
   $controller_admin_host,
   $controller_priv_host,
   $controller_pub_host,
-  $qpid_host,
-  $qpid_port = '5672',
+  $amqp_server,
+  $amqp_host,
+  $amqp_port = '5672',
   $qpid_protocol = 'tcp',
-  $qpid_username,
-  $qpid_password,
+  $amqp_username,
+  $amqp_password,
   $verbose,
 ) {
 
@@ -31,12 +32,16 @@ class quickstack::ceilometer_controller(
 
     class { 'ceilometer':
         metering_secret => $ceilometer_metering_secret,
-        qpid_hostname   => $qpid_host,
-        qpid_port       => $qpid_port,
+        qpid_hostname   => $amqp_host,
+        qpid_port       => $amqp_port,
         qpid_protocol   => $qpid_protocol,
-        qpid_username   => $qpid_username,
-        qpid_password   => $qpid_password,
-        rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
+        qpid_username   => $amqp_username,
+        qpid_password   => $amqp_password,
+        rabbit_host     => $amqp_host,
+        rabbit_port     => $amqp_port,
+        rabbit_userid   => $amqp_username,
+        rabbit_password => $amqp_password,
+        rpc_backend     => amqp_backend('ceilometer', $amqp_server),
         verbose         => $verbose,
     }
 

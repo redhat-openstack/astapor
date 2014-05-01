@@ -8,9 +8,10 @@ class quickstack::storage_backend::lvm_cinder(
   $cinder_iscsi_iface          = 'eth1',
   $cinder_iscsi_network        = '',
   $mysql_host                  = $quickstack::params::mysql_host,
-  $qpid_host                   = $quickstack::params::qpid_host,
-  $qpid_username               = $quickstack::params::qpid_username,
-  $qpid_password               = $quickstack::params::qpid_password,
+  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_host                   = $quickstack::params::amqp_host,
+  $amqp_username               = $quickstack::params::amqp_username,
+  $amqp_password               = $quickstack::params::amqp_password,
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
@@ -20,20 +21,24 @@ class quickstack::storage_backend::lvm_cinder(
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $qpid_port = '5671'
+    $amqp_port = '5671'
     $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $qpid_port = '5672'
+    $amqp_port = '5672'
     $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder"
   }
   class { '::cinder':
-    rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
-    qpid_hostname  => $qpid_host,
-    qpid_port      => $qpid_port,
+    rpc_backend    => amqp_backend('cinder', $amqp_server),
+    qpid_hostname  => $amqp_host,
+    qpid_port      => $amqp_port,
     qpid_protocol  => $qpid_protocol,
-    qpid_username  => $qpid_username,
-    qpid_password  => $qpid_password,
+    qpid_username  => $amqp_username,
+    qpid_password  => $amqp_password,
+    rabbit_host    => $amqp_host,
+    rabbit_port    => $amqp_port,
+    rabbit_userid  => $amqp_username,
+    rabbit_password=> $amqp_password,
     sql_connection => $sql_connection,
     verbose        => $verbose,
   }

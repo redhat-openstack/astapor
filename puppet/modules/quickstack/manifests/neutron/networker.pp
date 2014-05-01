@@ -10,10 +10,11 @@ class quickstack::neutron::networker (
   $ovs_tunnel_iface              = 'eth1',
   $ovs_tunnel_network            = '',
   $mysql_host                    = $quickstack::params::mysql_host,
-  $qpid_host                     = $quickstack::params::qpid_host,
+  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_host                     = $quickstack::params::amqp_host,
   $external_network_bridge       = 'br-ex',
-  $qpid_username                 = $quickstack::params::qpid_username,
-  $qpid_password                 = $quickstack::params::qpid_password,
+  $amqp_username                 = $quickstack::params::amqp_username,
+  $amqp_password                 = $quickstack::params::amqp_password,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
   $ovs_bridge_mappings           = $quickstack::params::ovs_bridge_mappings,
   $ovs_bridge_uplinks            = $quickstack::params::ovs_bridge_uplinks,
@@ -31,23 +32,27 @@ class quickstack::neutron::networker (
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $qpid_port = '5671'
+    $amqp_port = '5671'
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $qpid_port = '5672'
+    $amqp_port = '5672'
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
   class { '::neutron':
     verbose               => true,
     allow_overlapping_ips => true,
-    rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-    qpid_hostname         => $qpid_host,
+    rpc_backend           => amqp_backend('neutron', $amqp_server),
+    qpid_hostname         => $amqp_host,
     qpid_protocol         => $qpid_protocol,
-    qpid_port             => $qpid_port,
-    qpid_username         => $qpid_username,
-    qpid_password         => $qpid_password,
+    qpid_port             => $amqp_port,
+    qpid_username         => $amqp_username,
+    qpid_password         => $amqp_password,
+    rabbit_host           => $amqp_host,
+    rabbit_port           => $amqp_port,
+    rabbit_user           => $amqp_username,
+    rabbit_password       => $amqp_password,
   }
 
   class { '::neutron::plugins::ovs':

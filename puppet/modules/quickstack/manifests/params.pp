@@ -65,9 +65,10 @@ class quickstack::params {
   $neutron_metadata_proxy_secret = 'CHANGEME'
 
   $mysql_host                    = '172.16.0.1'
-  $qpid_host                     = '172.16.0.1'
-  $qpid_username                 = 'openstack'
-  $qpid_password                 = 'CHANGEME'
+  $amqp_server                   = 'rabbitmq'
+  $amqp_host                     = '172.16.0.1'
+  $amqp_username                 = 'openstack'
+  $amqp_password                 = 'CHANGEME'
   $enable_ovs_agent              = 'true'
   $tenant_network_type           = 'gre'
   $ovs_vlan_ranges               = undef
@@ -112,13 +113,13 @@ class quickstack::params {
   $mysql_ca                      = '/etc/ipa/ca.crt'
   $mysql_cert                    = undef
   $mysql_key                     = undef
-  $qpid_ca                       = undef
-  $qpid_cert                     = undef
-  $qpid_key                      = undef
+  $amqp_ca                       = undef
+  $amqp_cert                     = undef
+  $amqp_key                      = undef
   $horizon_ca                    = '/etc/ipa/ca.crt'
   $horizon_cert                  = undef
   $horizon_key                   = undef
-  $qpid_nssdb_password           = 'CHANGEME'
+  $amqp_nssdb_password           = 'CHANGEME'
 
   # Pacemaker
   $pacemaker_cluster_name        = 'openstack'

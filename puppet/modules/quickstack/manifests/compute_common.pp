@@ -12,11 +12,12 @@ class quickstack::compute_common (
   $nova_host                   = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
-  $qpid_host                   = $quickstack::params::qpid_host,
-  $qpid_port                   = '5672',
-  $qpid_ssl_port               = '5671',
-  $qpid_username               = $quickstack::params::qpid_username,
-  $qpid_password               = $quickstack::params::qpid_password,
+  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_host                   = $quickstack::params::amqp_host,
+  $amqp_port                   = '5672',
+  $amqp_ssl_port               = '5671',
+  $amqp_username               = $quickstack::params::amqp_username,
+  $amqp_password               = $quickstack::params::amqp_password,
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
@@ -55,12 +56,12 @@ class quickstack::compute_common (
 
     if str2bool_i("$ssl") {
       $qpid_protocol = 'ssl'
-      $real_qpid_port = $qpid_ssl_port
+      $real_amqp_port = $amqp_ssl_port
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
 
     } else {
       $qpid_protocol = 'tcp'
-      $real_qpid_port = $qpid_port
+      $real_amqp_port = $amqp_port
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
     }
 
@@ -68,12 +69,16 @@ class quickstack::compute_common (
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${glance_host}:9292/v1",
-    rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
-    qpid_hostname      => $qpid_host,
+    rpc_backend        => amqp_backend('nova', $amqp_server),
+    qpid_hostname      => $amqp_host,
     qpid_protocol      => $qpid_protocol,
-    qpid_port          => $real_qpid_port,
-    qpid_username      => $qpid_username,
-    qpid_password      => $qpid_password,
+    qpid_port          => $real_amqp_port,
+    qpid_username      => $amqp_username,
+    qpid_password      => $amqp_password,
+    rabbit_host        => $amqp_host,
+    rabbit_port        => $real_amqp_port,
+    rabbit_userid      => $amqp_username,
+    rabbit_password    => $amqp_password,
     verbose            => $verbose,
   }
 
@@ -97,12 +102,14 @@ class quickstack::compute_common (
   if str2bool_i("$ceilometer") {
     class { 'ceilometer':
       metering_secret => $ceilometer_metering_secret,
-      qpid_hostname   => $qpid_host,
-      qpid_port       => $real_qpid_port,
       qpid_protocol   => $qpid_protocol,
-      qpid_username   => $qpid_username,
-      qpid_password   => $qpid_password,
-      rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
+      qpid_username   => $amqp_username,
+      qpid_password   => $amqp_password,
+      rabbit_host     => $amqp_host,
+      rabbit_port     => $real_amqp_port,
+      rabbit_userid   => $amqp_username,
+      rabbit_password => $amqp_password,
+      rpc_backend     => amqp_backend('ceilometer', $amqp_server),
       verbose         => $verbose,
     }
 
