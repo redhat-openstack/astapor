@@ -6,6 +6,7 @@ class quickstack::neutron::networker (
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
+  $neutron_isolated_metadata     = $quickstack::params::neutron_isolated_metadata,
   $controller_priv_host          = $quickstack::params::controller_priv_host,
   $ovs_tunnel_iface              = 'eth1',
   $ovs_tunnel_network            = '',
@@ -56,6 +57,7 @@ class quickstack::neutron::networker (
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
     'keystone_authtoken/auth_host':         value => $controller_priv_host;
+	'enable_isolated_metadata':             value => $neutron_isolated_metadata;
   }
 
   class { '::neutron::plugins::ovs':
