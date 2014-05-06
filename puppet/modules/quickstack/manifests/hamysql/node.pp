@@ -30,10 +30,20 @@ class quickstack::hamysql::node (
 
     $mysql_virtual_ip_managed_bool = str2bool_i("$mysql_virtual_ip_managed")
 
-    package { 'mysql-server':
-      ensure => installed,
+    if ($::osfamily == 'RedHat' and
+      $::operatingsystem != 'Fedora' and
+      $::operatingsystemrelease =~ /^6\..*$/) {
+      package { 'mysql-server':
+        ensure => installed,
+      }
+      Package['mysql-server'] -> Class['quickstack::hamysql::mysql::config']
+    } else {
+      package { 'mariadb-galera-server':
+        ensure => installed,
+      }
+      Package['mariadb-galera-server'] -> Class['quickstack::hamysql::mysql::config']
     }
-    ->
+
     class {'quickstack::hamysql::mysql::config':
       bind_address =>  $mysql_bind_address,
       socket => '/var/run/mysqld/mysql.sock',
