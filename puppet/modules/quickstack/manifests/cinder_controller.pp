@@ -1,9 +1,19 @@
 class quickstack::cinder_controller(
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_eqlx         = $quickstack::params::cinder_backend_eqlx,
   $cinder_backend_iscsi        = $quickstack::params::cinder_backend_iscsi,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
   $cinder_gluster_servers      = $quickstack::params::cinder_gluster_servers,
+  $cinder_san_ip               = $quickstack::params::cinder_san_ip,
+  $cinder_san_login            = $quickstack::params::cinder_san_login,
+  $cinder_san_password         = $quickstack::params::cinder_san_password,
+  $cinder_san_thin_provision   = $quickstack::params::cinder_san_thin_provision,
+  $cinder_eqlx_group_name      = $quickstack::params::cinder_eqlx_group_name,
+  $cinder_eqlx_pool            = $quickstack::params::cinder_eqlx_pool,
+  $cinder_eqlx_use_chap        = $quickstack::params::cinder_eqlx_use_chap,
+  $cinder_eqlx_chap_login      = $quickstack::params::cinder_eqlx_chap_login,
+  $cinder_eqlx_chap_password   = $quickstack::params::cinder_eqlx_chap_password,
   $cinder_user_password        = $quickstack::params::cinder_user_password,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $mysql_host                  = $quickstack::params::mysql_host,
@@ -77,7 +87,23 @@ class quickstack::cinder_controller(
     }
   }
 
-  if !str2bool_i("$cinder_backend_gluster") and !str2bool_i("$cinder_backend_iscsi") {
+  if str2bool_i("$cinder_backend_eqlx") {
+    class { '::cinder::volume': }
+
+    class { '::cinder::volume::eqlx':
+      san_ip             => $cinder_san_ip,
+      san_login          => $cinder_san_login,
+      san_password       => $cinder_san_password,
+      san_thin_provision => $cinder_san_thin_provision,
+      eqlx_group_name    => $cinder_eqlx_group_name,
+      eqlx_pool          => $cinder_eqlx_pool,
+      eqlx_use_chap      => $cinder_eqlx_use_chap,
+      eqlx_chap_login    => $cinder_eqlx_chap_login,
+      eqlx_chap_password => $cinder_eqlx_chap_password,
+    }
+  }
+
+  if !str2bool_i("$cinder_backend_gluster") and !str2bool_i("$cinder_backend_eqlx") and !str2bool_i("$cinder_backend_iscsi") {
     class { '::cinder::volume': }
 
     class { '::cinder::volume::iscsi':
