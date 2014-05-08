@@ -51,7 +51,7 @@ class quickstack::neutron::plugins::cisco (
   $api_result_limit             = 1000,
   $log_level                    = 'DEBUG',
   $horizon_app_links            = false,
-  $support_profile                    = 'cisco',
+  $support_profile              = 'cisco',
   $controller_pub_host          = $quickstack::params::controller_pub_host,
 ) inherits quickstack::params {
 
@@ -76,21 +76,21 @@ class quickstack::neutron::plugins::cisco (
     }
   }
 
-  if $cisco_nexus_plugin == 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin' {
-    if $cisco_vswitch_plugin != 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-      # nexus plugin, setup necessary dependencies and config files"
-      package { 'python-ncclient':
-        ensure => installed,
-      } ~> Service['neutron-server']
+#  if $cisco_nexus_plugin == 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin' {
+#    if $cisco_vswitch_plugin != 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
+#      # nexus plugin, setup necessary dependencies and config files"
+#      package { 'python-ncclient':
+#        ensure => installed,
+#      } ~> Service['neutron-server']
 
-      Neutron_plugin_cisco<||> ->
-      file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
-        owner => 'root',
-        group => 'root',
-        content => template('quickstack/cisco_plugins.ini.erb')
-      } ~> Service['neutron-server']
-    }
-  }
+#      Neutron_plugin_cisco<||> ->
+#      file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
+#        owner => 'root',
+#        group => 'root',
+#        content => template('quickstack/cisco_plugins.ini.erb')
+#      } ~> Service['neutron-server']
+#    }
+#  }
 
   if $nexus_credentials {
     file {'/var/lib/neutron/.ssh':
@@ -119,6 +119,21 @@ class quickstack::neutron::plugins::cisco (
       }
     }
 
+    if inline_template("<%=n1kv_source.include?('file')%>") == "true" {
+      package { 'yum-plugin-priorities':
+        name      => 'yum-plugin-priorities',
+        ensure    => "installed"
+      }
+
+      yumrepo { "cisco-os":
+        baseurl   => $n1kv_source,
+        descr     => "Internal repo for Foreman",
+        enabled   => 1,
+        priority  => 90,
+        gpgcheck  => 0,
+      }
+    }
+
     class { '::neutron::plugins::cisco':
       database_user     => $neutron_db_user,
       database_pass     => $neutron_db_password,
@@ -127,17 +142,6 @@ class quickstack::neutron::plugins::cisco (
       keystone_auth_url => "http://${controller_priv_host}:35357/v2.0/",
       vswitch_plugin    => $cisco_vswitch_plugin,
     }
-
-    package { 'python-ncclient':
-      ensure => installed,
-    } ~> Service['neutron-server']
-
-    Neutron_plugin_cisco<||> ->
-    file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
-      owner => 'root',
-      group => 'root',
-      content => template('quickstack/cisco_plugins.ini.erb')
-    } ~> Service['neutron-server']
 
     $listen_ssl    = str2bool_i("$ssl")
     $secret_key    = $horizon_secret_key
@@ -158,6 +162,17 @@ class quickstack::neutron::plugins::cisco (
       nexus_plugin      => $cisco_nexus_plugin
     }
   }
+
+  package { 'python-ncclient':
+    ensure => installed,
+  } ~> Service['neutron-server']
+
+  Neutron_plugin_cisco<||> ->
+  file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
+    owner => 'root',
+    group => 'root',
+    content => template('quickstack/cisco_plugins.ini.erb')
+  } ~> Service['neutron-server']
 
 }
 

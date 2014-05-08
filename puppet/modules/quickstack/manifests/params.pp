@@ -123,8 +123,15 @@ class quickstack::params {
   # If using the Cisco plugin, Nexus hardware can be used for l2
   $cisco_nexus_plugin            = 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
   $n1kv_vsm_ip                   = '0.0.0.0'
-  $n1kv_vsm_password             = 'abc123'
-  $n1kv_source                  = 'None'
+  $n1kv_vsm_password             =  undef
+  $n1kv_source                   = 'None'
+#  $additional_params             = {default_quota => 'default',
+#                                    quota_network => 'default',
+#                                    quota_subnet => 'default',
+#                                    quota_port  => 'default',
+#                                    quota_security_group => 'default',
+#                                    quota_security_group_rule => 'default',
+#                                    },
 
   # If using the nexus sub plugin, specify the hardware layout by
   # using the following syntax:

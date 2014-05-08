@@ -1,5 +1,13 @@
 # Quickstart controller class for nova neutron (OpenStack Networking)
 class quickstack::neutron::controller (
+#  $additional_params             = $quickstack::params::additional_params,
+  $additional_params             = {default_quota => 'default',
+                                    quota_network => 'default',
+                                    quota_subnet => 'default',
+                                    quota_port  => 'default',
+                                    quota_security_group => 'default',
+                                    quota_security_group_rule => 'default',
+                                    },
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
@@ -41,9 +49,6 @@ class quickstack::neutron::controller (
   $controller_admin_host         = $quickstack::params::controller_admin_host,
   $controller_priv_host          = $quickstack::params::controller_priv_host,
   $controller_pub_host           = $quickstack::params::controller_pub_host,
-  $n1kv_vsm_ip                   = $quickstack::params::n1kv_vsm_ip,
-  $n1kv_vsm_password             = $quickstack::params::n1kv_vsm_password,
-  $n1kv_source                   = $quickstack::params::n1kv_source,
   $glance_db_password            = $quickstack::params::glance_db_password,
   $glance_user_password          = $quickstack::params::glance_user_password,
   $glance_backend                = $quickstack::params::glance_backend,
@@ -62,6 +67,9 @@ class quickstack::neutron::controller (
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
+  $n1kv_vsm_ip                   = $quickstack::params::n1kv_vsm_ip,
+  $n1kv_vsm_password             = $quickstack::params::n1kv_vsm_password,
+  $n1kv_source                   = $quickstack::params::n1kv_source,
   $neutron_db_password           = $quickstack::params::neutron_db_password,
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nexus_config                  = $quickstack::params::nexus_config,
@@ -276,8 +284,103 @@ class quickstack::neutron::controller (
     }
   }
 
+<<<<<<< HEAD
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
+=======
+  if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
+    neutron_plugin_ovs {
+      'OVS/enable_tunneling': value => $enable_tunneling;
+      'SECURITYGROUP/firewall_driver':
+      value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
+    }
+
+    class { '::neutron::plugins::ovs':
+      sql_connection      => $sql_connection,
+      tenant_network_type => $tenant_network_type,
+      network_vlan_ranges => $ovs_vlan_ranges,
+      tunnel_id_ranges    => $tunnel_id_ranges,
+    }
+  }
+
+  if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
+    if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
+      neutron_config {
+        'DEFAULT/api_extensions_path':          value => $api_extensions_path;
+      }
+
+      if $additional_params[default_quota] != 'default' {
+        neutron_config {
+          'quotas/default_quota':          value => $additional_params[default_quota];
+        }
+      }
+
+      if $additional_params[quota_network] != 'default' {
+        neutron_config {
+          'quotas/quota_network':          value => $additional_params[quota_network];
+        }
+      }
+
+      if $additional_params[quota_subnet] != 'default' {
+        neutron_config {
+          'quotas/quota_subnet':          value => $additional_params[quota_subnet];
+        }      
+      }
+
+      if $additional_params[quota_port] != 'default' {
+        neutron_config {
+          'quotas/quota_port':          value => $additional_params[quota_port];
+        }
+      }
+
+      if $additional_params[quota_security_group] != 'default' {
+        neutron_config {
+          'quotas/quota_security_group':          value => $additional_params[quota_security_group];
+        }      
+      }
+
+      if $neutron_conf_additional_params[quota_security_group_rule] != 'default' {
+        neutron_config {
+          'quotas/quota_security_group_rule':      value => $neutron_conf_additional_params[quota_security_group_rule];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_instances] != 'default' {
+        nova_config {
+          'DEFAULT/quota_instances':      value => $nova_conf_additional_params[quota_instances];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_cores] != 'default' {
+        nova_config {
+          'DEFAULT/quota_cores':      value => $nova_conf_additional_params[quota_cores];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_ram] != 'default' {
+        nova_config {
+          'DEFAULT/quota_ram':      value => $nova_conf_additional_params[quota_ram];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_floating_ips] != 'default' {
+        nova_config {
+          'DEFAULT/quota_floating_ips':      value => $nova_conf_additional_params[quota_floating_ips];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_fixed_ips] != 'default' {
+        nova_config {
+          'DEFAULT/quota_fixed_ips':      value => $nova_conf_additional_params[quota_fixed_ips];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_driver] != 'default' {
+        nova_config {
+          'DEFAULT/quota_driver':      value => $nova_conf_additional_params[quota_driver];
+        }
+      }
+
       if (!defined(Package['neutron-plugin-ovs'])) {
         package { 'neutron-plugin-ovs':
           ensure => present,
@@ -285,6 +388,7 @@ class quickstack::neutron::controller (
         }
       }
 
+      Package['neutron-plugin-ovs'] ->
       class { 'quickstack::neutron::plugins::cisco':
         neutron_db_password          => $neutron_db_password,
         neutron_user_password        => $neutron_user_password,
