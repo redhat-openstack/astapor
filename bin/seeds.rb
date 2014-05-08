@@ -352,6 +352,7 @@ params = {
   "n1kv_vsm_ip"                   => '0.0.0.0',
   "n1kv_vsm_password"             => '',
   "n1kv_source"                   => 'None',
+<<<<<<< HEAD
 #  "additional_params"             => {default_quota => 'default',
 #                                     quota_network => 'default',
 #                                     quota_subnet => 'default',
@@ -359,6 +360,15 @@ params = {
 #                                     quota_security_group => 'default',
 #                                     quota_security_group_rule => 'default',
 #                                     },
+=======
+  "additional_params"             => {'default_quota' => 'default',
+                                     'quota_network' => 'default',
+                                     'quota_subnet' => 'default',
+                                     'quota_port'  => 'default',
+                                     'quota_security_group' => 'default',
+                                     'quota_security_group_rule' => 'default',
+                                     },
+>>>>>>> adding additiona_params to seeds.rb
   "nexus_config"                  => {},
   "nexus_credentials"             => [],
   "provider_vlan_auto_create"     => "false",

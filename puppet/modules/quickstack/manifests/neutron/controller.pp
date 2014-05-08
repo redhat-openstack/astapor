@@ -1,5 +1,6 @@
 # Quickstart controller class for nova neutron (OpenStack Networking)
 class quickstack::neutron::controller (
+<<<<<<< HEAD
 #  $additional_params             = $quickstack::params::additional_params,
   $additional_params             = {default_quota => 'default',
                                     quota_network => 'default',
@@ -8,6 +9,9 @@ class quickstack::neutron::controller (
                                     quota_security_group => 'default',
                                     quota_security_group_rule => 'default',
                                     },
+=======
+  $additional_params             = $quickstack::params::additional_params,
+>>>>>>> adding additiona_params to seeds.rb
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
