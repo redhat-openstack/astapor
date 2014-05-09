@@ -29,15 +29,30 @@ class quickstack::params {
   $cinder_db_password           = 'CHANGEME'
   $cinder_user_password         = 'CHANGEME'
   # Cinder backend - Several backends should be able to coexist
+  $cinder_enabled_backends      = false
   $cinder_backend_gluster       = false
+  $cinder_backend_gluster_name  = 'gluster_backend'
+  $cinder_backend_eqlx          = false
+  $cinder_backend_eqlx_name     = 'eqlx_backend'
   $cinder_backend_iscsi         = false
+  $cinder_backend_iscsi_name    = 'iscsi_backend'
   # Cinder gluster
   $cinder_gluster_volume        = 'cinder'
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $cinder_gluster_replica_count = '3'
   $cinder_gluster_servers       = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
-
+  # Cinder Dell EqualLogic
+  $cinder_san_ip                = '192.168.124.11'
+  $cinder_san_login             = 'grpadmin'
+  $cinder_san_password          = 'CHANGEME'
+  $cinder_san_thin_provision    = false
+  $cinder_eqlx_group_name       = 'group-0'
+  $cinder_eqlx_pool             = 'default'
+  $cinder_eqlx_use_chap         = false
+  $cinder_eqlx_chap_login       = 'chapadmin'
+  $cinder_eqlx_chap_password    = 'CHANGEME'
+  
   # Glance
   $glance_db_password           = 'CHANGEME'
   $glance_user_password         = 'CHANGEME'
