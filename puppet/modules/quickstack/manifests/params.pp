@@ -36,7 +36,6 @@ class quickstack::params {
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $cinder_gluster_replica_count = '3'
-  $cinder_gluster_servers       = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
 
   # Glance
   $glance_db_password           = 'CHANGEME'

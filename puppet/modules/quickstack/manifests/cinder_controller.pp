@@ -3,7 +3,7 @@ class quickstack::cinder_controller(
   $cinder_backend_iscsi        = $quickstack::params::cinder_backend_iscsi,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
-  $cinder_gluster_servers      = $quickstack::params::cinder_gluster_servers,
+  $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
   $cinder_user_password        = $quickstack::params::cinder_user_password,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $mysql_host                  = $quickstack::params::mysql_host,
@@ -69,7 +69,7 @@ class quickstack::cinder_controller(
 
     class { '::cinder::volume::glusterfs':
       glusterfs_mount_point_base => '/var/lib/cinder/volumes',
-      glusterfs_shares           => suffix($cinder_gluster_servers, ":/${cinder_gluster_volume}")
+      glusterfs_shares           => suffix($cinder_gluster_peers, ":/${cinder_gluster_volume}")
     }
   }
 
