@@ -26,7 +26,12 @@ class quickstack::compute_common (
   class {'quickstack::openstack_common': }
 
   if str2bool_i("$cinder_backend_gluster") {
-    class { 'gluster::client': }
+    if defined('gluster::client') {
+      class { 'gluster::client': }
+    } else {
+      class { 'gluster::mount::base': repo => false }
+    }
+
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
