@@ -43,7 +43,8 @@ class quickstack::params {
   # Cinder gluster
   $cinder_gluster_volume        = 'cinder'
   $cinder_gluster_path          = '/srv/gluster/cinder'
-  $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
+  # Must be FQDN
+  $cinder_gluster_peers         = {'server1.example.com' => 'e27f2849-6f69-4900-b348-d7b0ae497509', 'server2.example.com' => '746dc27e-b9bd-46d7-a1a6-7b8957528f4c', 'server3.example.com' => '5fe22c7d-dc85-4d81-8c8b-468876852566'}
   $cinder_gluster_replica_count = '3'
   $cinder_glusterfs_shares      = [ '192.168.0.4:/cinder -o backup-volfile-servers=192.168.0.5' ]
   # Cinder nfs
@@ -68,6 +69,8 @@ class quickstack::params {
   $cinder_rbd_user              = 'cinder'
   $cinder_rbd_secret_uuid       = ''
 
+  # Cinder - Gluster (new module)
+  $cinder_gluster_device        = '/dev/vdb'
   # Glance
   $glance_db_password           = 'CHANGEME'
   $glance_user_password         = 'CHANGEME'
@@ -80,11 +83,23 @@ class quickstack::params {
   # Glance_Gluster
   $glance_gluster_volume        = 'glance'
   $glance_gluster_path          = '/srv/gluster/glance'
-  $glance_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
+  # Must be FQDN
+  $glance_gluster_peers         = {'server1.example.com' => 'e27f2849-6f69-4900-b348-d7b0ae497509', 'server2.example.com' => '746dc27e-b9bd-46d7-a1a6-7b8957528f4c', 'server3.example.com' => '5fe22c7d-dc85-4d81-8c8b-468876852566'}
   $glance_gluster_replica_count = '3'
+  # Gluster (new module)
+  $glance_gluster_device        = '/dev/vdc'
 
-  # Gluster
-  $gluster_open_port_count      = '10'
+  # Gluster - 1 port for each brick in a volume
+  $gluster_open_port_count      = '9'
+
+  # Swift Gluster
+  $swift_gluster_volume         = 'swift'
+  $swift_gluster_path           = '/srv/gluster/swift'
+  # Must be FQDN
+  $swift_gluster_peers         = {'server1.example.com' => 'e27f2849-6f69-4900-b348-d7b0ae497509', 'server2.example.com' => '746dc27e-b9bd-46d7-a1a6-7b8957528f4c', 'server3.example.com' => '5fe22c7d-dc85-4d81-8c8b-468876852566'}
+  $swift_gluster_replica_count  = '3'
+  # Gluster (new module)
+  $swift_gluster_device         = '/dev/vdd'
 
   # Networking
   $neutron                       = 'false'
