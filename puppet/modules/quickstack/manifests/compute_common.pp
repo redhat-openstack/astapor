@@ -9,6 +9,9 @@ class quickstack::compute_common (
   $cinder_backend_nfs          = 'false',
   $glance_host                 = '127.0.0.1',
   $mysql_host                  = $quickstack::params::mysql_host,
+  $nagios                      = $quickstack::params::nagios,
+  $nagios_local_iface          = $quickstack::params::nagios_local_iface,
+  $nagios_server_ip            = $quickstack::params::nagios_server_ip,
   $nova_host                   = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
@@ -126,5 +129,12 @@ class quickstack::compute_common (
     proto  => 'tcp',
     dport  => '5900-5999',
     action => 'accept',
+  }
+
+  if str2bool_i("$nagios"){
+    class {'quickstack::monitor::nagios::client':
+      host_ip          => getvar("ipaddress_${nagios_local_iface}"),
+      nagios_server_ip => $nagios_server_ip,
+    }
   }
 }

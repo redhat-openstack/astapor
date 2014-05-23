@@ -10,6 +10,9 @@ class quickstack::neutron::networker (
   $ovs_tunnel_iface              = 'eth1',
   $ovs_tunnel_network            = '',
   $mysql_host                    = $quickstack::params::mysql_host,
+  $nagios                        = $quickstack::params::nagios,
+  $nagios_local_iface            = $quickstack::params::nagios_local_iface,
+  $nagios_server_ip              = $quickstack::params::nagios_server_ip,
   $qpid_host                     = $quickstack::params::qpid_host,
   $external_network_bridge       = 'br-ex',
   $qpid_username                 = $quickstack::params::qpid_username,
@@ -105,5 +108,12 @@ class quickstack::neutron::networker (
 
   class {'quickstack::neutron::firewall::vxlan':
     port => $ovs_vxlan_udp_port,
+  }
+
+  if str2bool_i("$nagios"){
+    class {'quickstack::monitor::nagios::client':
+      host_ip          => getvar("ipaddress_${nagios_local_iface}"),
+      nagios_server_ip => $nagios_server_ip,
+    }
   }
 }

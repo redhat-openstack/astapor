@@ -10,6 +10,9 @@ class quickstack::nova_network::compute (
   $glance_host                  = '127.0.0.1',
   $nova_host                    = '127.0.0.1',
   $mysql_host                   = $quickstack::params::mysql_host,
+  $nagios                       = $quickstack::params::nagios,
+  $nagios_local_iface           = $quickstack::params::nagios_local_iface,
+  $nagios_server_ip             = $quickstack::params::nagios_server_ip,
   $auto_assign_floating_ip      = 'True',
   $nova_multi_host              = 'True',
   $nova_db_password             = $quickstack::params::nova_db_password,
@@ -90,5 +93,8 @@ class quickstack::nova_network::compute (
     ssl                        => $ssl,
     mysql_ca                   => $mysql_ca,
     use_qemu_for_poc           => $use_qemu_for_poc,
+    nagios                     => $nagios,
+    nagios_local_iface         => $nagios_local_iface,
+    nagios_server_ip           => $nagios_server_ip,
   }
 }

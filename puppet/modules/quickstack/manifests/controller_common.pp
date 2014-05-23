@@ -27,6 +27,9 @@ class quickstack::controller_common (
   $neutron_metadata_proxy_secret = $quickstack::params::neutron_metadata_proxy_secret,
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
+  $nagios                        = $quickstack::params::nagios,
+  $nagios_local_iface            = $quickstack::params::nagios_local_iface,
+  $nagios_server_ip              = $quickstack::params::nagios_server_ip,
   $neutron                       = $quickstack::params::neutron,
   $neutron_core_plugin           = $quickstack::params::neutron_core_plugin,
   $neutron_db_password           = $quickstack::params::neutron_db_password,
@@ -404,4 +407,10 @@ class quickstack::controller_common (
     }
   }
 
+  if str2bool_i("$nagios"){
+    class {'quickstack::monitor::nagios::client':
+      host_ip          => getvar("ipaddress_${nagios_local_iface}"),
+      nagios_server_ip => $nagios_server_ip,
+    }
+  }
 }
