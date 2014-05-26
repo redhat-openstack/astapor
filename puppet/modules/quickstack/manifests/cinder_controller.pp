@@ -151,6 +151,7 @@ class quickstack::cinder_controller(
         glusterfs_shares           => suffix($cinder_gluster_peers, ":/${cinder_gluster_volume}")
       }
     }
+
     if str2bool_i("$cinder_backend_eqlx") {
 
       $e_backend =["eqlx"]
@@ -167,6 +168,7 @@ class quickstack::cinder_controller(
         eqlx_chap_password  => $cinder_eqlx_chap_password,
       }
     }
+
     # ISCSI Backend
     if str2bool_i("$cinder_backend_iscsi")  or ( !str2bool_i("$cinder_backend_glusterfs") and !str2bool_i("$cinder_backend_eqlx")) {
 
@@ -185,7 +187,7 @@ class quickstack::cinder_controller(
 
     # Enable the backends
     class { 'cinder::backends':
-      enabled_backends => split(inline_template("<%= (g_backend+e_backend+i_backend).join(',')%>"),',')
+      enabled_backends => join_arrays_if_exist('g_backend', 'e_backend', 'i_backend'),
     }
   }
 }
