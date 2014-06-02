@@ -45,6 +45,11 @@ class quickstack::glance (
     $sql_connection = "mysql://${db_user}:${db_password}@${db_host}/${db_name}"
   }
 
+  $available_store = $backend ? {
+    'file' => "glance.store.filesystem.Store",
+    default => "glance.store.$backend.Store",
+  }
+
   # Install and configure glance-api
   class { 'glance::api':
     verbose           => $verbose,
@@ -62,6 +67,7 @@ class quickstack::glance (
     use_syslog        => $use_syslog,
     log_facility      => $log_facility,
     enabled           => $enabled,
+    known_stores      => ["$available_store"],
   }
 
   # Install and configure glance-registry
