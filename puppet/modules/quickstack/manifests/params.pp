@@ -36,7 +36,6 @@ class quickstack::params {
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $cinder_gluster_replica_count = '3'
-  $cinder_gluster_servers       = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
 
   # Glance
   $glance_db_password           = 'CHANGEME'
@@ -137,4 +136,30 @@ class quickstack::params {
 
   # Nova Compute
   $use_qemu_for_poc              = 'false'
+
+  # Gluster Servers
+  $gluster_device1       = '/dev/vdb'
+  $gluster_device2       = '/dev/vdc'
+  $gluster_device3       = '/dev/vdd'
+  $gluster_fqdn1         = 'gluster-server1.example.com'
+  $gluster_fqdn2         = 'gluster-server2.example.com'
+  $gluster_fqdn3         = 'gluster-server3.example.com'
+  # One port for each brick in a volume
+  $gluster_port_count    = '9'
+  $gluster_replica_count = '3'
+  $gluster_uuid1         = 'e27f2849-6f69-4900-b348-d7b0ae497509'
+  $gluster_uuid2         = '746dc27e-b9bd-46d7-a1a6-7b8957528f4c'
+  $gluster_uuid3         = '5fe22c7d-dc85-4d81-8c8b-468876852566'
+  $gluster_volume1_gid   = '165'
+  $gluster_volume1_name  = 'cinder'
+  $gluster_volume1_path  = '/cinder'
+  $gluster_volume1_uid   = '165'
+  $gluster_volume2_gid   = '161'
+  $gluster_volume2_name  = 'glance'
+  $gluster_volume2_path  = '/glance'
+  $gluster_volume2_uid   = '161'
+  $gluster_volume3_gid   = '160'
+  $gluster_volume3_name  = 'swift'
+  $gluster_volume3_path  = '/swift'
+  $gluster_volume3_uid   = '160'
 }
