@@ -418,9 +418,7 @@ hostgroups = [
               "quickstack::pacemaker::neutron",
              ]},
     {:name=>"Gluster Server",
-     :class=>["puppet::vardir",
-              "quickstack::gluster::server",
-             ]},
+     :class=>"quickstack::gluster::server"},
     {:name=>"Galera Server",
      :class=>"quickstack::galera::server"}
 ]

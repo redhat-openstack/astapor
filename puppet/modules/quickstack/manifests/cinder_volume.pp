@@ -13,6 +13,8 @@ class quickstack::cinder_volume(
       ->
       Class['::cinder::volume']
     } else {
+      class { 'puppet::vardir': }
+      ->
       class { 'gluster::mount::base': repo => false }
       ->
       Class['::cinder::volume']

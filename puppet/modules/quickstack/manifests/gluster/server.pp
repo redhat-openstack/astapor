@@ -30,6 +30,8 @@ class quickstack::gluster::server (
   $volume3_uid   = $quickstack::params::gluster_volume3_uid,
 ) {
 
+  include puppet::vardir
+
   $vip  = ''
   $vrrp =  false
 
