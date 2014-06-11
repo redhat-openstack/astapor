@@ -49,6 +49,7 @@ class quickstack::storage_backend::cinder(
     if defined('gluster::client') {
       class { 'gluster::client': }
     } else {
+      class { 'puppet::vardir': }
       class { 'gluster::mount::base': repo => false }
     }
 
