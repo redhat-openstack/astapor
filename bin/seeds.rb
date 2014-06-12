@@ -8,10 +8,12 @@
 
 # Libs
 require 'facter'
-require 'securerandom'
+require '/usr/share/openstack-foreman-installer/lib/configuration'
+
+config = Setup.new('/usr/share/openstack-foreman-installer/config/install.yaml')
 
 # for the sub-network foreman owns
-secondary_int = 'PROVISIONING_INTERFACE'
+secondary_int = config.secondary_int
 
 # Changes from upstream:
 #  - EPEL removed
@@ -174,7 +176,7 @@ a=Architecture.find_or_create_by_name "x86_64"
 a.operatingsystems << os
 a.save!
 
-if ENV["FOREMAN_PROVISIONING"] == "true" then
+if config.foreman_provisioning == true then
   # Domains
   d=Domain.find_or_create_by_name Facter.value(:domain)
   d.fullname="OpenStack: #{Facter.value(:domain)}"
@@ -243,187 +245,8 @@ if ENV["FOREMAN_PROVISIONING"] == "true" then
   secondary_prefix=sec_int_hash[1].split('.')[0..2].join('.')
 end
 
-params = {
-  "verbose"                       => "true",
-  "heat_cfn"                      => "true",
-  "heat_cloudwatch"               => "false",
-  "admin_password"                => SecureRandom.hex,
-  "ceilometer_metering_secret"    => SecureRandom.hex,
-  "ceilometer_user_password"      => SecureRandom.hex,
-  "cinder_db_password"            => SecureRandom.hex,
-  "cinder_user_password"          => SecureRandom.hex,
-  "cinder_backend_gluster"        => "false",
-  "cinder_backend_iscsi"          => "false",
-  "cinder_gluster_peers"          => [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ],
-  "cinder_gluster_volume"         => "cinder",
-  "cinder_gluster_replica_count"  => '3',
-  "glance_db_password"            => SecureRandom.hex,
-  "glance_user_password"          => SecureRandom.hex,
-  "glance_gluster_peers"          => [],
-  "glance_gluster_volume"         => "glance",
-  "glance_gluster_replica_count"  => '3',
-  "gluster_open_port_count"       => '10',
-  "heat_auth_encryption_key"      => SecureRandom.hex,
-  "heat_db_password"              => SecureRandom.hex,
-  "heat_user_password"            => SecureRandom.hex,
-  "heat_cfn_user_password"        => SecureRandom.hex,
-  "heat_auth_encrypt_key"         => SecureRandom.hex,
-  "horizon_secret_key"            => SecureRandom.hex,
-  "keystone_admin_token"          => SecureRandom.hex,
-  "keystone_db_password"          => SecureRandom.hex,
-  "keystone_user_password"        => SecureRandom.hex,
-  "mysql_root_password"           => SecureRandom.hex,
-  "neutron_db_password"           => SecureRandom.hex,
-  "neutron_user_password"         => SecureRandom.hex,
-  "nova_db_password"              => SecureRandom.hex,
-  "nova_user_password"            => SecureRandom.hex,
-  "nova_default_floating_pool"    => 'nova',
-  "swift_admin_password"          => SecureRandom.hex,
-  "swift_shared_secret"           => SecureRandom.hex,
-  "swift_user_password"           => SecureRandom.hex,
-  "swift_all_ips"                 => ['192.168.203.1', '192.168.203.2', '192.168.203.3', '192.168.203.4'],
-  "swift_ext4_device"             => '/dev/sdc2',
-  "swift_local_interface"         => 'eth3',
-  "swift_loopback"                => true,
-  "swift_ring_server"             => '192.168.203.1',
-  "fixed_network_range"           => '10.0.0.0/24',
-  "floating_network_range"        => '10.0.1.0/24',
-  "controller_admin_host"         => '172.16.0.1',
-  "controller_priv_host"          => '172.16.0.1',
-  "controller_pub_host"           => '172.16.1.1',
-  "mysql_host"                    => '172.16.0.1',
-  "mysql_virtual_ip"              => '192.168.200.220',
-  "mysql_bind_address"            => '0.0.0.0',
-  "mysql_virt_ip_nic"             => 'eth1',
-  "mysql_virt_ip_cidr_mask"       =>  '24',
-  "mysql_shared_storage_device"   => '192.168.203.200:/mnt/mysql',
-  "mysql_shared_storage_type"     => 'nfs',
-  "mysql_shared_storage_options"  => '',
-  "mysql_resource_group_name"     => 'mysqlgrp',
-  "mysql_clu_member_addrs"        => '192.168.203.11 192.168.203.12 192.168.203.13',
-  "amqp_server"                   => 'rabbitmq',
-  "amqp_host"                     => '172.16.0.1',
-  "amqp_username"                 => 'openstack',
-  "amqp_password"                 => SecureRandom.hex,
-  "admin_email"                   => "admin@#{Facter.value(:domain)}",
-  "neutron_metadata_proxy_secret" => SecureRandom.hex,
-  "enable_ovs_agent"              => "true",
-  "ovs_vlan_ranges"               => '',
-  "ovs_bridge_mappings"           => [],
-  "ovs_bridge_uplinks"            => [],
-  "tenant_network_type"           => 'gre',
-  "enable_tunneling"              => 'True',
-  "ovs_vxlan_udp_port"            => '4789',
-  "ovs_tunnel_types"              => [],
-  "auto_assign_floating_ip"       => 'True',
-  "neutron_core_plugin"           => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
-  "cisco_vswitch_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
-  "cisco_nexus_plugin"            => 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin',
-  "nexus_config"                  => {},
-  "nexus_credentials"             => [],
-  "provider_vlan_auto_create"     => "false",
-  "provider_vlan_auto_trunk"      => "false",
-  "backend_server_names"          => [],
-  "backend_server_addrs"          => [],
-  "lb_backend_server_names"       => [],
-  "lb_backend_server_addrs"       => [],
-  "configure_ovswitch"            => "true",
-  "neutron"                       => "false",
-  "ssl"                           => "false",
-  "freeipa"                       => "false",
-  "mysql_ca"                      => "/etc/ipa/ca.crt",
-  "mysql_cert"                    => "/etc/pki/tls/certs/PRIV_HOST-mysql.crt",
-  "mysql_key"                     => "/etc/pki/tls/private/PRIV_HOST-mysql.key",
-  "amqp_ca"                       => "/etc/ipa/ca.crt",
-  "amqp_cert"                     => "/etc/pki/tls/certs/PRIV_HOST-amqp.crt",
-  "amqp_key"                      => "/etc/pki/tls/private/PRIV_HOST-amqp.key",
-  "horizon_ca"                    => "/etc/ipa/ca.crt",
-  "horizon_cert"                  => "/etc/pki/tls/certs/PUB_HOST-horizon.crt",
-  "horizon_key"                   => "/etc/pki/tls/private/PUB_HOST-horizon.key",
-  "amqp_nssdb_password"           => SecureRandom.hex,
-  "fence_xvm_key_file_password"   => SecureRandom.hex,
-  "use_qemu_for_poc"              => "false",
-  "secret_key"                    => SecureRandom.hex,
-  "admin_token"                   => SecureRandom.hex,
-  "gluster_device1"               => '/dev/vdb',
-  "gluster_device2"               => '/dev/vdc',
-  "gluster_device3"               => '/dev/vdd',
-  "gluster_fqdn1"                 => 'gluster-server1.example.com',
-  "gluster_fqdn2"                 => 'gluster-server2.example.com',
-  "gluster_fqdn3"                 => 'gluster-server3.example.com',
-  "gluster_port_count"            => '9',
-  "gluster_replica_count"         => '3',
-  "gluster_uuid1"                 => 'e27f2849-6f69-4900-b348-d7b0ae497509',
-  "gluster_uuid2"                 => '746dc27e-b9bd-46d7-a1a6-7b8957528f4c',
-  "gluster_uuid3"                 => '5fe22c7d-dc85-4d81-8c8b-468876852566',
-  "gluster_volume1_gid"           => '165',
-  "gluster_volume1_name"          => 'cinder',
-  "gluster_volume1_path"          => '/cinder',
-  "gluster_volume1_uid"           => '165',
-  "gluster_volume2_gid"           => '161',
-  "gluster_volume2_name"          => 'glance',
-  "gluster_volume2_path"          => '/glance',
-  "gluster_volume2_uid"           => '161',
-  "gluster_volume3_gid"           => '160',
-  "gluster_volume3_name"          => 'swift',
-  "gluster_volume3_path"          => '/swift',
-  "gluster_volume3_uid"           => '160',
-  "galera_bootstrap"              => false,
-  "galera_monitor_username"       => "monitor_user",
-  "galera_monitor_password"       => SecureRandom.hex,
-  "wsrep_cluster_name"            => "galera_cluster",
-  "wsrep_cluster_members"         => ['192.168.203.11', '192.168.203.12', '192.168.203.13'],
-  "wsrep_sst_method"              => "rsync",
-  "wsrep_sst_username"            => "sst_user",
-  "wsrep_sst_password"            => SecureRandom.hex,
-  "wsrep_ssl"                     => true,
-  "wsrep_ssl_key"                 => "/etc/pki/galera/galera.key",
-  "wsrep_ssl_cert"                => "/etc/pki/galera/galera.crt",
-}
-
-hostgroups = [
-    {:name=>"Controller (Nova Network)",
-     :class=>"quickstack::nova_network::controller"},
-    {:name=>"Compute (Nova Network)",
-     :class=>"quickstack::nova_network::compute"},
-    {:name=>"Controller (Neutron)",
-     :class=>"quickstack::neutron::controller"},
-    {:name=>"Compute (Neutron)",
-     :class=>"quickstack::neutron::compute"},
-    {:name=>"Neutron Networker",
-     :class=>"quickstack::neutron::networker"},
-    {:name=>"Cinder Block Storage",
-     :class=>"quickstack::storage_backend::cinder"},
-    {:name=>"Load Balancer",
-     :class=>"quickstack::load_balancer"},
-    {:name=>"HA Mysql Node",
-     :class=>"quickstack::hamysql::node"},
-    {:name=>"Swift Storage Node",
-     :class=>"quickstack::swift::storage"},
-    {:name=>"HA All In One Controller",
-     :class=>["quickstack::openstack_common",
-              "quickstack::pacemaker::common",
-              "quickstack::pacemaker::params",
-              "quickstack::pacemaker::keystone",
-              "quickstack::pacemaker::swift",
-              "quickstack::pacemaker::load_balancer",
-              "quickstack::pacemaker::memcached",
-              "quickstack::pacemaker::qpid",
-              "quickstack::pacemaker::glance",
-              "quickstack::pacemaker::nova",
-              "quickstack::pacemaker::heat",
-              "quickstack::pacemaker::cinder",
-              "quickstack::pacemaker::horizon",
-              "quickstack::pacemaker::mysql",
-              "quickstack::pacemaker::neutron",
-             ]},
-    {:name=>"Gluster Server",
-     :class=>["puppet::vardir",
-              "quickstack::gluster::server",
-             ]},
-    {:name=>"Galera Server",
-     :class=>"quickstack::galera::server"}
-]
+params = Quickstack.new(config.quickstack).get
+hostgroups = Hostgroups.new(config.hostgroups).get
 
 def get_key_type(value)
   key_list = LookupKey::KEY_TYPES
@@ -478,7 +301,7 @@ hostgroups.each do |hg|
   h.save!
 end
 
-if ENV["FOREMAN_PROVISIONING"] == "true" then
+if config.foreman_provisioning == true then
   hostgroups.each do |hg|
     h=Hostgroup.find_by_name hg[:name]
     h.puppet_proxy    = Feature.find_by_name("Puppet").smart_proxies.first
