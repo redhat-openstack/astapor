@@ -102,7 +102,7 @@ class quickstack::pacemaker::qpid (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include qpid",
     } ->
-    quickstack::pacemaker::resource::service { 'qpidd':
+    quickstack::pacemaker::resource::lsb { 'qpidd':
       clone   => true,
     }
   }

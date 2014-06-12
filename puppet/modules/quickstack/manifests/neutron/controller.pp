@@ -1,17 +1,6 @@
 # Quickstart controller class for nova neutron (OpenStack Networking)
 class quickstack::neutron::controller (
-<<<<<<< HEAD
-#  $additional_params             = $quickstack::params::additional_params,
-  $additional_params             = {default_quota => 'default',
-                                    quota_network => 'default',
-                                    quota_subnet => 'default',
-                                    quota_port  => 'default',
-                                    quota_security_group => 'default',
-                                    quota_security_group_rule => 'default',
-                                    },
-=======
   $additional_params             = $quickstack::params::additional_params,
->>>>>>> adding additiona_params to seeds.rb
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
@@ -90,7 +79,7 @@ class quickstack::neutron::controller (
   $ml2_tenant_network_types      = ['vxlan', 'flat'],
   $ml2_mechanism_drivers         = ['openvswitch','l2population'],
   $ml2_flat_networks             = ['*'],
-  $ml2_network_vlan_ranges       = ['physnet1:1000:2999'],
+  $ml2_network_vlan_ranges       = ['10:50'],
   $ml2_tunnel_id_ranges          = ['20:100'],
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
@@ -238,7 +227,7 @@ class quickstack::neutron::controller (
   class { '::nova::network::neutron':
     neutron_admin_password => $neutron_user_password,
   }
-  ->
+
   class { '::neutron::server::notifications':
     notify_nova_on_port_status_changes => true,
     notify_nova_on_port_data_changes   => true,
@@ -283,8 +272,7 @@ class quickstack::neutron::controller (
       tunnel_id_ranges      => $ml2_tunnel_id_ranges,
       vxlan_group           => $ml2_vxlan_group,
       vni_ranges            => $ml2_vni_ranges,
-      enable_security_group => str2bool_i("$ml2_security_group"),
-      firewall_driver       => $ml2_firewall_driver,
+      enable_security_group => $ml2_security_group,
     }
   }
 
@@ -309,10 +297,6 @@ class quickstack::neutron::controller (
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-      neutron_config {
-        'DEFAULT/api_extensions_path':          value => $api_extensions_path;
-      }
-
       if $additional_params[default_quota] != 'default' {
         neutron_config {
           'quotas/default_quota':          value => $additional_params[default_quota];

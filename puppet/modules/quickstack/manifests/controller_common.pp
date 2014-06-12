@@ -68,13 +68,13 @@ class quickstack::controller_common (
   $swift_ringserver_ip           = '192.168.203.1',
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
-  $amqp_provider                 = $quickstack::params::amqp_provider,
+  $support_profile               = $quickstack::params::support_profile,
+  $amqp_server                   = $quickstack::params::amqp_server,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
   $amqp_password                 = $quickstack::params::amqp_password,
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
-  $support_profile               = 'None',
   $freeipa                       = $quickstack::params::freeipa,
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $mysql_cert                    = $quickstack::params::mysql_cert,
@@ -94,7 +94,6 @@ class quickstack::controller_common (
     $qpid_protocol = 'ssl'
     $amqp_port = '5671'
     $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
-    apache::listen { '443': }
 
     if str2bool_i("$freeipa") {
       certmonger::request_ipa_cert { 'mysql':
@@ -418,8 +417,9 @@ class quickstack::controller_common (
     notify  => File['/etc/httpd/conf.d/openstack-dashboard.conf'],
   }
 
-  class {'horizon':
+  class {'::horizon':
     secret_key    => $horizon_secret_key,
+    keystone_default_role => '_member_',
     keystone_host => $controller_priv_host,
     fqdn          => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
     listen_ssl    => str2bool_i("$ssl"),
@@ -438,6 +438,7 @@ class quickstack::controller_common (
     require => Package['horizon'],
     notify  => Service[$::horizon::params::http_service],
   }
+  File_line['httpd_listen_on_bind_address_80'] -> File_line['undo_httpd_listen_on_bind_address_80']
 
   class {'memcached':}
 

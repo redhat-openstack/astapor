@@ -15,7 +15,12 @@ class quickstack::pacemaker::memcached {
     try_sleep => 10,
     command   => "/tmp/ha-all-in-one-util.bash all_members_include memcached",
   } ->
+<<<<<<< HEAD
   quickstack::pacemaker::resource::service { 'memcached':
+=======
+  quickstack::pacemaker::resource::lsb { 'memcached':
+    group   => 'openstack_memcached',
+>>>>>>> Updating astapor for ICE HOUSE
     clone   => true,
     options => 'start-delay=10s',
   }

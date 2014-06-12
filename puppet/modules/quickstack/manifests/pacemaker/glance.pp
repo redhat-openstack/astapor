@@ -145,11 +145,16 @@ class quickstack::pacemaker::glance (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
+<<<<<<< HEAD
     quickstack::pacemaker::resource::service {'openstack-glance-registry':
       clone => true,
       options => 'start-delay=10s',
     } ->
     quickstack::pacemaker::resource::service {'openstack-glance-api':
+=======
+    quickstack::pacemaker::resource::lsb {'openstack-glance-api':
+      group => "$pcmk_glance_group",
+>>>>>>> Updating astapor for ICE HOUSE
       clone => true,
       options => 'start-delay=10s',
     }
@@ -176,6 +181,7 @@ class quickstack::pacemaker::glance (
 
     Quickstack::Pacemaker::Resource::Service['openstack-glance-api']
     ->
+<<<<<<< HEAD
     quickstack::pacemaker::constraint::base { 'glance-registry-api-constr' :
       constraint_type => "order",
       first_resource  => "openstack-glance-registry-clone",
@@ -188,6 +194,11 @@ class quickstack::pacemaker::glance (
       source => "openstack-glance-api-clone",
       target => "openstack-glance-registry-clone",
       score => "INFINITY",
+=======
+    quickstack::pacemaker::resource::lsb {'openstack-glance-registry':
+      group => "$pcmk_glance_group",
+      clone => true,
+>>>>>>> Updating astapor for ICE HOUSE
     }
   }
 }

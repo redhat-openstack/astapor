@@ -40,18 +40,17 @@ class quickstack::neutron::plugins::cisco (
   $horizon_cert                 = $quickstack::params::horizon_cert,
   $horizon_key                  = $quickstack::params::horizon_key,
   $controller_priv_host         = $quickstack::params::controller_priv_host,
-  $django_debug                 = 'False',
-  $help_url                     = 'http://docs.openstack.org',
-  $cache_server_ip              = '127.0.0.1',
-  $cache_server_port            = '11211',
-  $keystone_port                = 5000,
-  $keystone_scheme              = 'http',
-  $keystone_default_role        = 'Member',
-  $can_set_mount_point          = 'True',
-  $api_result_limit             = 1000,
-  $log_level                    = 'DEBUG',
-  $horizon_app_links            = false,
-  $support_profile              = 'cisco',
+  $django_debug                 = $quickstack::params::django_debug,
+  $help_url                     = $quickstack::params::help_url,
+  $cache_server_ip              = $quickstack::params::cache_server_ip,
+  $cache_server_port            = $quickstack::params::cache_server_port,
+  $keystone_port                = $quickstack::params::keystone_port,
+  $keystone_scheme              = $quickstack::params::keystone_scheme,
+  $keystone_default_role        = $quickstack::params::keystone_default_role,
+  $can_set_mount_point          = $quickstack::params::can_set_mount_point,
+  $api_result_limit             = $quickstack::params::api_result_limit,
+  $log_level                    = $quickstack::params::log_level,
+  $horizon_app_links            = $quickstack::params::horizon_app_links,
   $controller_pub_host          = $quickstack::params::controller_pub_host,
 ) inherits quickstack::params {
 
@@ -76,22 +75,6 @@ class quickstack::neutron::plugins::cisco (
     }
   }
 
-#  if $cisco_nexus_plugin == 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin' {
-#    if $cisco_vswitch_plugin != 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-#      # nexus plugin, setup necessary dependencies and config files"
-#      package { 'python-ncclient':
-#        ensure => installed,
-#      } ~> Service['neutron-server']
-
-#      Neutron_plugin_cisco<||> ->
-#      file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
-#        owner => 'root',
-#        group => 'root',
-#        content => template('quickstack/cisco_plugins.ini.erb')
-#      } ~> Service['neutron-server']
-#    }
-#  }
-
   if $nexus_credentials {
     file {'/var/lib/neutron/.ssh':
       ensure => directory,
@@ -113,7 +96,7 @@ class quickstack::neutron::plugins::cisco (
         baseurl   => $n1kv_source,
         descr     => "Internal repo for Foreman",
         enabled   => 1,
-        priority  => 90,
+        priority  => 1,
         gpgcheck  => 1,
         gpgkey    => "${n1kv_source}/RPM-GPG-KEY",
       }
@@ -129,7 +112,7 @@ class quickstack::neutron::plugins::cisco (
         baseurl   => $n1kv_source,
         descr     => "Internal repo for Foreman",
         enabled   => 1,
-        priority  => 90,
+        priority  => 1,
         gpgcheck  => 0,
       }
     }
@@ -143,15 +126,38 @@ class quickstack::neutron::plugins::cisco (
       vswitch_plugin    => $cisco_vswitch_plugin,
     }
 
-    $listen_ssl    = str2bool_i("$ssl")
-    $secret_key    = $horizon_secret_key
-    $keystone_host = $controller_priv_host
-    $fqdn          = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
+    $listen_ssl        = str2bool_i("$ssl")
+    $support_profile   = 'cisco'
+    $secret_key        = $horizon_secret_key
+    $keystone_host     = $controller_priv_host
+    $fqdn              = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
     file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
       content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
     } ~> Service['httpd']
 
+    $disable_router    = 'False'
+    Neutron_plugin_cisco<||> ->
+    file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
+      content => template('quickstack/_40_router.py.erb')
+    } ~> Service['httpd']
+
+    Neutron_plugin_cisco<||> ->
+    file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
+      content => template('quickstack/cisco_plugins.ini.erb')
+    } ~> Service['neutron-server']
+
   } else {
+    package { 'python-ncclient':
+      ensure => installed,
+    } ~> Service['neutron-server']
+
+    Neutron_plugin_cisco<||> ->
+    file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
+      owner => 'root',
+      group => 'root',
+      content => template('quickstack/cisco_plugins.ini.erb')
+    } ~> Service['neutron-server']
+
     class { '::neutron::plugins::cisco':
       database_user     => $neutron_db_user,
       database_pass     => $neutron_db_password,
@@ -162,18 +168,6 @@ class quickstack::neutron::plugins::cisco (
       nexus_plugin      => $cisco_nexus_plugin
     }
   }
-
-  package { 'python-ncclient':
-    ensure => installed,
-  } ~> Service['neutron-server']
-
-  Neutron_plugin_cisco<||> ->
-  file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
-    owner => 'root',
-    group => 'root',
-    content => template('quickstack/cisco_plugins.ini.erb')
-  } ~> Service['neutron-server']
-
 }
 
 define nexus_creds {

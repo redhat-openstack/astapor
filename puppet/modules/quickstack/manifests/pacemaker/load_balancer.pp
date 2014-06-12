@@ -23,7 +23,12 @@ class quickstack::pacemaker::load_balancer {
     command   => "/tmp/ha-all-in-one-util.bash all_members_include haproxy",
 
   } ->
+<<<<<<< HEAD
   quickstack::pacemaker::resource::service {'haproxy':
+=======
+  quickstack::pacemaker::resource::lsb {'haproxy':
+    group => "$loadbalancer_group",
+>>>>>>> Updating astapor for ICE HOUSE
     clone => true,
   }
 }

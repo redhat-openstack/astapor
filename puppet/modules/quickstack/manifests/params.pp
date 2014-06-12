@@ -122,16 +122,6 @@ class quickstack::params {
   $cisco_vswitch_plugin          = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
   # If using the Cisco plugin, Nexus hardware can be used for l2
   $cisco_nexus_plugin            = 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
-  $n1kv_vsm_ip                   = '0.0.0.0'
-  $n1kv_vsm_password             =  undef
-  $n1kv_source                   = 'None'
-  $additional_params             = {'default_quota' => 'default',
-                                    'quota_network' => 'default',
-                                    'quota_subnet' => 'default',
-                                    'quota_port'  => 'default',
-                                    'quota_security_group' => 'default',
-                                    'quota_security_group_rule' => 'default',
-                                    },
 
   # If using the nexus sub plugin, specify the hardware layout by
   # using the following syntax:
@@ -141,6 +131,33 @@ class quickstack::params {
   # Set the nexus login credentials by creating a list
   # of switch_ip/username/password strings as per the example below:
   $nexus_credentials             = undef
+  
+  # If cisco Nexus 1000v Switch, use the VSM credentials 
+  $n1kv_vsm_ip                   = '0.0.0.0'
+  $n1kv_vsm_password             =  undef
+  $n1kv_source                   = 'None'
+  $additional_params             = {'default_quota' => 'default',
+                                    'quota_network' => 'default',
+                                    'quota_subnet' => 'default',
+                                    'quota_port'  => 'default',
+                                    'quota_security_group' => 'default',
+                                    'quota_security_group_rule' => 'default',
+                                    }
+
+  # Horizon
+
+  $django_debug                  = 'False'
+  $help_url                      = 'http://docs.openstack.org'
+  $cache_server_ip               = '127.0.0.1'
+  $cache_server_port             = '11211'
+  $keystone_port                 = '5000'
+  $keystone_scheme               = 'http'
+  $keystone_default_role         = 'Member'
+  $can_set_mount_point           = 'True'
+  $api_result_limit              = '1000'
+  $log_level                     = 'DEBUG'
+  $horizon_app_links             = 'False'
+  $support_profile               = 'None'
 
   # provider network settings
   $provider_vlan_auto_create     = 'false'
