@@ -149,22 +149,12 @@ class quickstack::pacemaker::cinder(
       command   => "/tmp/ha-all-in-one-util.bash all_members_include cinder",
     }
     ->
-<<<<<<< HEAD
     quickstack::pacemaker::resource::service {'openstack-cinder-api':
-=======
-    quickstack::pacemaker::resource::lsb {'openstack-cinder-api':
-      group => "$pcmk_cinder_group",
->>>>>>> Updating astapor for ICE HOUSE
       clone => true,
       options => 'start-delay=10s',
     }
     ->
-<<<<<<< HEAD
     quickstack::pacemaker::resource::service {'openstack-cinder-scheduler':
-=======
-    quickstack::pacemaker::resource::lsb {'openstack-cinder-scheduler':
-      group => "$pcmk_cinder_group",
->>>>>>> Updating astapor for ICE HOUSE
       clone => true,
       options => 'start-delay=10s',
     }
@@ -224,12 +214,7 @@ class quickstack::pacemaker::cinder(
 
       Exec['all-cinder-nodes-are-up']
       ->
-<<<<<<< HEAD
       quickstack::pacemaker::resource::service {'openstack-cinder-volume':
-=======
-      quickstack::pacemaker::resource::lsb {'openstack-cinder-volume':
-        group => "$pcmk_cinder_group",
->>>>>>> Updating astapor for ICE HOUSE
         clone => true,
         options => 'start-delay=10s',
       }

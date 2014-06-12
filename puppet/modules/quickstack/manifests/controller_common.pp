@@ -94,6 +94,7 @@ class quickstack::controller_common (
     $qpid_protocol = 'ssl'
     $amqp_port = '5671'
     $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
+    apache::listen { '443': }
 
     if str2bool_i("$freeipa") {
       certmonger::request_ipa_cert { 'mysql':
@@ -418,15 +419,15 @@ class quickstack::controller_common (
   }
 
   class {'::horizon':
-    secret_key            => $horizon_secret_key,
-    keystone_default_role => '_member_',
-    keystone_host         => $controller_priv_host,
-    fqdn                  => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
-    listen_ssl  	  => str2bool_i("$ssl"),
-    horizon_cert 	  => $horizon_cert,
-    horizon_key  	  => $horizon_key,
-    horizon_ca 	          => $horizon_ca,
-    support_profile 	  => $support_profile,
+    secret_key           => $horizon_secret_key,
+    keystone_default_role=> '_member_',
+    keystone_host        => $controller_priv_host,
+    fqdn                 => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
+    listen_ssl  	 => str2bool_i("$ssl"),
+    horizon_cert 	 => $horizon_cert,
+    horizon_key  	 => $horizon_key,
+    horizon_ca           => $horizon_ca,
+    support_profile 	 => $support_profile,
   }
   # patch our horizon/apache config to avoid duplicate port 80
   # directive.  TODO: remove this once puppet-horizon/apache can
