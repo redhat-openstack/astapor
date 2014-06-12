@@ -24,10 +24,6 @@ class quickstack::pacemaker::load_balancer {
 
   } ->
   quickstack::pacemaker::resource::service {'haproxy':
-<<<<<<< HEAD
-=======
-    group => "$loadbalancer_group",
->>>>>>> sync with redhat/astapor-master
     clone => true,
   }
 }

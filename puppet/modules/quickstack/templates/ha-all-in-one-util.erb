@@ -34,7 +34,16 @@ property_includes() {
 
 all_members_include() {
   element=$1
+  <%# the perl clause below allows handling of the case where multiple
+      lines are printed from crm_node -l like: "id node_name1\nid
+      node_name2\n..." (new pacemaker).  Otherwise, older pacemaker
+      crm_node output looks like "node_name1 node_name2 ...".  %>
+  <% if scope.lookupvar("::osfamily").downcase == "redhat" &&
+        scope.lookupvar("::operatingsystemrelease").match(/^6\.5.*/) %>
   members=$(/usr/sbin/crm_node -l)
+  <% else %>
+  members=$(/usr/sbin/crm_node -l | perl -p -e 's/^.*\s+(\S+)$/$1/g')
+  <% end %>
   if [ "x${members}" = "x" ]; then return 1; fi
   for member in $members; do
     property_includes $member $element || return 1

@@ -124,7 +124,6 @@ class quickstack::pacemaker::neutron (
     class {"quickstack::pacemaker::neutron_db_check":}
     ->
     quickstack::pacemaker::resource::service {'neutron-server':
-<<<<<<< HEAD
       clone => true,
       monitor_params => { 'start-delay' => '10s' },
     }
@@ -136,72 +135,23 @@ class quickstack::pacemaker::neutron (
     #}
     #->
     quickstack::pacemaker::resource::service {'neutron-openvswitch-agent':
-=======
-      group => "neutron-agents-pre",
-      clone => false,
-    }
-    ->
-    quickstack::pacemaker::resource::service {'neutron-ovs-cleanup':
-      group => "neutron-agents-pre",
->>>>>>> sync with redhat/astapor-master
       clone => false,
       monitor_params => { 'start-delay' => '10s' },
-    }
-    ->
-<<<<<<< HEAD
-    quickstack::pacemaker::resource::service {'neutron-dhcp-agent':
-=======
-    quickstack::pacemaker::resource::service {'neutron-netns-cleanup':
-      group => "neutron-agents-pre",
->>>>>>> sync with redhat/astapor-master
-      clone => false,
-      monitor_params => { 'start-delay' => '10s' },
-    }
-    ->
-<<<<<<< HEAD
-    quickstack::pacemaker::resource::service {'neutron-l3-agent':
-=======
-    quickstack::pacemaker::resource::service {'neutron-agent-watch':
-      group => "neutron-agents-pre",
->>>>>>> sync with redhat/astapor-master
-      clone => false,
-      monitor_params => { 'start-delay' => '10s' },
-    }
-    ->
-<<<<<<< HEAD
-    quickstack::pacemaker::resource::service {'neutron-metadata-agent':
-      clone => false,
-      monitor_params => { 'start-delay' => '10s' },
-=======
-    quickstack::pacemaker::resource::service {'neutron-openvswitch-agent':
-      clone => false,
     }
     ->
     quickstack::pacemaker::resource::service {'neutron-dhcp-agent':
       clone => false,
+      monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::service {'neutron-l3-agent':
       clone => false,
+      monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::service {'neutron-metadata-agent':
       clone => false,
-    }
-    ->
-    quickstack::pacemaker::constraint::base { 'neutron-db-server-constr' :
-      constraint_type => "order",
-      first_resource  => "neutron-db-check",
-      second_resource => "neutron-server",
-      first_action    => "start",
-      second_action   => "start",
-    }
-    ->
-    quickstack::pacemaker::constraint::colocation { 'neutron-db-server-colo' :
-      source => "neutron-server",
-      target => "neutron-db-check",
-      score  => "INFINITY",
->>>>>>> sync with redhat/astapor-master
+      monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-pre-openvswitch-constr' :

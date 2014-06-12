@@ -131,7 +131,8 @@ class quickstack::params {
   # Set the nexus login credentials by creating a list
   # of switch_ip/username/password strings as per the example below:
   $nexus_credentials             = undef
-  
+
+ 
   # If cisco Nexus 1000v Switch, use the VSM credentials 
   $n1kv_vsm_ip                   = '0.0.0.0'
   $n1kv_vsm_password             =  undef
