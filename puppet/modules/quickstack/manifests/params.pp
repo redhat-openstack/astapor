@@ -136,8 +136,8 @@ class quickstack::params {
   # If cisco Nexus 1000v Switch, use the VSM credentials 
   $n1kv_vsm_ip                   = '0.0.0.0'
   $n1kv_vsm_password             =  undef
-  $n1kv_source                   = 'None'
-  $additional_params             = {'default_quota' => 'default',
+  $n1kv_supplemental_repo        = 'None'
+  $n1kv_additional_params        = {'default_quota' => 'default',
                                     'quota_network' => 'default',
                                     'quota_subnet' => 'default',
                                     'quota_port'  => 'default',

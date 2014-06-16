@@ -13,45 +13,44 @@
 #    under the License.
 #
 class quickstack::neutron::plugins::cisco (
-  $neutron_db_password          = $quickstack::params::neutron_db_password,
-  $neutron_user_password        = $quickstack::params::neutron_user_password,
-  # ovs config
-  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  $api_result_limit             = $quickstack::params::api_result_limit,
   # cisco config
   $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
-  $nexus_config                 = $quickstack::params::nexus_config,
   $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
-  $nexus_credentials            = $quickstack::params::nexus_credentials,
-  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
-  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
-  $n1kv_vsm_ip                  = $quickstack::params::n1kv_vsm_ip,
-  $n1kv_vsm_password            = $quickstack::params::n1kv_vsm_password,
-  $n1kv_source                  = $quickstack::params::n1kv_source,
-  $mysql_host                   = $quickstack::params::mysql_host,
-  $mysql_ca                     = $quickstack::params::mysql_ca,
+  $controller_priv_host         = $quickstack::params::controller_priv_host,
+  $controller_admin_host        = $quickstack::params::controller_admin_host,
+  $cache_server_ip              = $quickstack::params::cache_server_ip,
+  $cache_server_port            = $quickstack::params::cache_server_port,
+  $can_set_mount_point          = $quickstack::params::can_set_mount_point,
+  $controller_pub_host          = $quickstack::params::controller_pub_host,
+  $django_debug                 = $quickstack::params::django_debug,
   $enable_server                = true,
   $enable_ovs_agent             = false,
-  $tenant_network_type          = 'vlan',
-  $ssl                          = $quickstack::params::ssl,
-  #these variables are required to configure horizon local_settings.py
-  $controller_admin_host        = $quickstack::params::controller_admin_host,
+  $help_url                     = $quickstack::params::help_url,
   $horizon_secret_key           = $quickstack::params::horizon_secret_key,
   $horizon_ca                   = $quickstack::params::horizon_ca,
   $horizon_cert                 = $quickstack::params::horizon_cert,
   $horizon_key                  = $quickstack::params::horizon_key,
-  $controller_priv_host         = $quickstack::params::controller_priv_host,
-  $django_debug                 = $quickstack::params::django_debug,
-  $help_url                     = $quickstack::params::help_url,
-  $cache_server_ip              = $quickstack::params::cache_server_ip,
-  $cache_server_port            = $quickstack::params::cache_server_port,
+  $horizon_app_links            = $quickstack::params::horizon_app_links,
   $keystone_port                = $quickstack::params::keystone_port,
   $keystone_scheme              = $quickstack::params::keystone_scheme,
   $keystone_default_role        = $quickstack::params::keystone_default_role,
-  $can_set_mount_point          = $quickstack::params::can_set_mount_point,
-  $api_result_limit             = $quickstack::params::api_result_limit,
   $log_level                    = $quickstack::params::log_level,
-  $horizon_app_links            = $quickstack::params::horizon_app_links,
-  $controller_pub_host          = $quickstack::params::controller_pub_host,
+  $mysql_host                   = $quickstack::params::mysql_host,
+  $mysql_ca                     = $quickstack::params::mysql_ca,
+  $n1kv_vsm_ip                  = $quickstack::params::n1kv_vsm_ip,
+  $n1kv_vsm_password            = $quickstack::params::n1kv_vsm_password,
+  $n1kv_supplemental_repo       = $quickstack::params::n1kv_supplemental_repo,
+  $neutron_db_password          = $quickstack::params::neutron_db_password,
+  $neutron_user_password        = $quickstack::params::neutron_user_password,
+  $nexus_config                 = $quickstack::params::nexus_config,
+  $nexus_credentials            = $quickstack::params::nexus_credentials,
+  # ovs config
+  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
+  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
+  $ssl                          = $quickstack::params::ssl,
+  $tenant_network_type          = 'vlan',
 ) inherits quickstack::params {
 
 
@@ -87,29 +86,29 @@ class quickstack::neutron::plugins::cisco (
   }
   
   if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-    if inline_template("<%=n1kv_source.include?('ftp')%>") == "true" {
+    if inline_template("<%=n1kv_supplemental_repo.include?('ftp')%>") == "true" {
       package { 'yum-plugin-priorities':
         name      => 'yum-plugin-priorities',
         ensure    => "installed"
       }
       yumrepo { "cisco-os":
-        baseurl   => $n1kv_source,
+        baseurl   => $n1kv_supplemental_repo,
         descr     => "Internal repo for Foreman",
         enabled   => 1,
         priority  => 1,
         gpgcheck  => 1,
-        gpgkey    => "${n1kv_source}/RPM-GPG-KEY",
+        gpgkey    => "${n1kv_supplemental_repo}/RPM-GPG-KEY",
       }
     }
 
-    if inline_template("<%=n1kv_source.include?('file')%>") == "true" {
+    if inline_template("<%=n1kv_supplemental_repo.include?('file')%>") == "true" {
       package { 'yum-plugin-priorities':
         name      => 'yum-plugin-priorities',
         ensure    => "installed"
       }
 
       yumrepo { "cisco-os":
-        baseurl   => $n1kv_source,
+        baseurl   => $n1kv_supplemental_repo,
         descr     => "Internal repo for Foreman",
         enabled   => 1,
         priority  => 1,

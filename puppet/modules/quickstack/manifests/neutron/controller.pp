@@ -1,6 +1,6 @@
 # Quickstart controller class for nova neutron (OpenStack Networking)
 class quickstack::neutron::controller (
-  $additional_params             = $quickstack::params::additional_params,
+  $n1kv_additional_params        = $quickstack::params::n1kv_additional_params,
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
@@ -62,7 +62,7 @@ class quickstack::neutron::controller (
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
   $n1kv_vsm_ip                   = $quickstack::params::n1kv_vsm_ip,
   $n1kv_vsm_password             = $quickstack::params::n1kv_vsm_password,
-  $n1kv_source                   = $quickstack::params::n1kv_source,
+  $n1kv_supplemental_repo        = $quickstack::params::n1kv_supplemental_repo,
   $neutron_db_password           = $quickstack::params::neutron_db_password,
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nexus_config                  = $quickstack::params::nexus_config,
@@ -298,33 +298,33 @@ class quickstack::neutron::controller (
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-      if $additional_params[default_quota] != 'default' {
+      if $n1kv_additional_params[default_quota] != 'default' {
         neutron_config {
-          'quotas/default_quota':          value => $additional_params[default_quota];
+          'quotas/default_quota':          value => $n1kv_additional_params[default_quota];
         }
       }
 
-      if $additional_params[quota_network] != 'default' {
+      if $n1kv_additional_params[quota_network] != 'default' {
         neutron_config {
-          'quotas/quota_network':          value => $additional_params[quota_network];
+          'quotas/quota_network':          value => $n1kv_additional_params[quota_network];
         }
       }
 
-      if $additional_params[quota_subnet] != 'default' {
+      if $n1kv_additional_params[quota_subnet] != 'default' {
         neutron_config {
-          'quotas/quota_subnet':          value => $additional_params[quota_subnet];
+          'quotas/quota_subnet':          value => $n1kv_additional_params[quota_subnet];
         }      
       }
 
-      if $additional_params[quota_port] != 'default' {
+      if $n1kv_additional_params[quota_port] != 'default' {
         neutron_config {
-          'quotas/quota_port':          value => $additional_params[quota_port];
+          'quotas/quota_port':          value => $n1kv_additional_params[quota_port];
         }
       }
 
-      if $additional_params[quota_security_group] != 'default' {
+      if $n1kv_additional_params[quota_security_group] != 'default' {
         neutron_config {
-          'quotas/quota_security_group':          value => $additional_params[quota_security_group];
+          'quotas/quota_security_group':          value => $n1kv_additional_params[quota_security_group];
         }      
       }
 
@@ -386,7 +386,7 @@ class quickstack::neutron::controller (
         mysql_ca                     => $mysql_ca,
         n1kv_vsm_ip                  => $n1kv_vsm_ip,
         n1kv_vsm_password            => $n1kv_vsm_password,
-        n1kv_source                  => $n1kv_source,
+        n1kv_supplemental_repo       => $n1kv_supplemental_repo,
         controller_priv_host         => $controller_priv_host,
         controller_pub_host          => $controller_pub_host,
       }

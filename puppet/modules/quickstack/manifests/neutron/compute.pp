@@ -79,6 +79,10 @@ class quickstack::neutron::compute (
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
   }
 
+  class { 'quickstack::neutron::controller':
+    neutron_core_plugin  => $quickstack::neutron::controller::neutron_core_plugin;
+  }
+
   if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
     class { '::neutron::plugins::ovs':
       sql_connection      => $sql_connection,
