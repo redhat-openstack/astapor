@@ -377,6 +377,13 @@ class quickstack::neutron::controller (
         }
       }
 
+      if (!defined(Package['neutron-plugin-ovs'])) {
+        package { 'neutron-plugin-ovs':
+          ensure => present,
+          name   => $::neutron::params::ovs_server_package,
+        } 
+      }
+
       Package['neutron-plugin-ovs'] ->
       class { 'quickstack::neutron::plugins::cisco':
         neutron_db_password          => $neutron_db_password,
