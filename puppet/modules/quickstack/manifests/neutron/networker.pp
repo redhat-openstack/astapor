@@ -27,7 +27,6 @@ class quickstack::neutron::networker (
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
   $mysql_ca                      = $quickstack::params::mysql_ca,
-#  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
