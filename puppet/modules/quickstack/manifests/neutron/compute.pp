@@ -16,6 +16,7 @@ class quickstack::neutron::compute (
   $neutron_host                = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
+  $neutron_core_plugin         = $quickstack::neutron::controller::neutron_core_plugin,
   $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
   $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
@@ -77,10 +78,6 @@ class quickstack::neutron::compute (
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
-  }
-
-  class { 'quickstack::neutron::controller':
-    neutron_core_plugin  => $quickstack::neutron::controller::neutron_core_plugin;
   }
 
   if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {

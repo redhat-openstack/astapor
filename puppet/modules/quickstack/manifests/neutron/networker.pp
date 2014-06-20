@@ -6,6 +6,7 @@ class quickstack::neutron::networker (
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
+  $neutron_core_plugin           = $quickstack::neutron::controller::neutron_core_plugin,
   $controller_priv_host          = $quickstack::params::controller_priv_host,
   $ovs_tunnel_iface              = 'eth1',
   $ovs_tunnel_network            = '',
@@ -61,10 +62,6 @@ class quickstack::neutron::networker (
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
-  }
-
-  class { 'quickstack::neutron::controller':
-    neutron_core_plugin  => $quickstack::neutron::controller::neutron_core_plugin;
   }
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
