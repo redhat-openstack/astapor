@@ -130,6 +130,7 @@ class quickstack::pacemaker::heat(
 <<<<<<< HEAD
 <<<<<<< HEAD
     quickstack::pacemaker::resource::service {'openstack-heat-api':
+<<<<<<< HEAD
 =======
     quickstack::pacemaker::resource::lsb {'openstack-heat-api':
 =======
@@ -137,6 +138,8 @@ class quickstack::pacemaker::heat(
 >>>>>>> sync with redhat/astapor-master
       group => "$heat_group",
 >>>>>>> Updating astapor for ICE HOUSE
+=======
+>>>>>>> syncing with redhat repo
       clone => true,
       options => 'start-delay=10s',
     }
@@ -167,9 +170,12 @@ class quickstack::pacemaker::heat(
       quickstack::pacemaker::resource::lsb {"openstack-heat-api-cfn":
 =======
       quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
+<<<<<<< HEAD
 >>>>>>> sync with redhat/astapor-master
         group => "$heat_cfn_group",
 >>>>>>> Updating astapor for ICE HOUSE
+=======
+>>>>>>> syncing with redhat repo
         clone => true,
         options => 'start-delay=10s',
       }
@@ -195,6 +201,7 @@ class quickstack::pacemaker::heat(
 <<<<<<< HEAD
 <<<<<<< HEAD
       quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
+<<<<<<< HEAD
 =======
       quickstack::pacemaker::resource::lsb {"openstack-heat-api-cloudwatch":
 =======
@@ -202,6 +209,8 @@ class quickstack::pacemaker::heat(
 >>>>>>> sync with redhat/astapor-master
         group => "$heat_group",
 >>>>>>> Updating astapor for ICE HOUSE
+=======
+>>>>>>> syncing with redhat repo
         clone => true,
         options => 'start-delay=10s',
       }

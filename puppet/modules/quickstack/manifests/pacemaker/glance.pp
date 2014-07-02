@@ -147,10 +147,14 @@ class quickstack::pacemaker::glance (
     } ->
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> syncing with redhat repo
     quickstack::pacemaker::resource::service {'openstack-glance-registry':
       clone => true,
       options => 'start-delay=10s',
     } ->
+<<<<<<< HEAD
     quickstack::pacemaker::resource::service {'openstack-glance-api':
 =======
     quickstack::pacemaker::resource::lsb {'openstack-glance-api':
@@ -159,6 +163,9 @@ class quickstack::pacemaker::glance (
 >>>>>>> sync with redhat/astapor-master
       group => "$pcmk_glance_group",
 >>>>>>> Updating astapor for ICE HOUSE
+=======
+    quickstack::pacemaker::resource::service {'openstack-glance-api':
+>>>>>>> syncing with redhat repo
       clone => true,
       options => 'start-delay=10s',
     }
@@ -181,6 +188,7 @@ class quickstack::pacemaker::glance (
       Quickstack::Pacemaker::Resource::Filesystem['glance-fs'] ->
       Quickstack::Pacemaker::Resource::Service['openstack-glance-registry'] ->
       Quickstack::Pacemaker::Constraint::Base['glance-fs-registry-constr']
+<<<<<<< HEAD
     }
 
     Quickstack::Pacemaker::Resource::Service['openstack-glance-api']
@@ -192,13 +200,29 @@ class quickstack::pacemaker::glance (
       second_resource => "openstack-glance-api-clone",
       first_action    => "start",
       second_action   => "start",
+=======
+>>>>>>> syncing with redhat repo
     }
+
+    Quickstack::Pacemaker::Resource::Service['openstack-glance-api']
     ->
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    quickstack::pacemaker::constraint::base { 'glance-registry-api-constr' :
+      constraint_type => "order",
+      first_resource  => "openstack-glance-registry-clone",
+      second_resource => "openstack-glance-api-clone",
+      first_action    => "start",
+      second_action   => "start",
+    }
+    ->
+>>>>>>> syncing with redhat repo
     quickstack::pacemaker::constraint::colocation { 'glance-registry-api-colo' :
       source => "openstack-glance-api-clone",
       target => "openstack-glance-registry-clone",
       score => "INFINITY",
+<<<<<<< HEAD
 =======
     quickstack::pacemaker::resource::lsb {'openstack-glance-registry':
 =======
@@ -207,6 +231,8 @@ class quickstack::pacemaker::glance (
       group => "$pcmk_glance_group",
       clone => true,
 >>>>>>> Updating astapor for ICE HOUSE
+=======
+>>>>>>> syncing with redhat repo
     }
   }
 }

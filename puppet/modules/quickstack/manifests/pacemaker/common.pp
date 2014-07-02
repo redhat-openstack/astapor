@@ -49,10 +49,14 @@ class quickstack::pacemaker::common (
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   if has_interface_with("ipaddress", map_params("cluster_control_ip")) {
 =======
   if (map_params("cluster_control_ip") == map_params("local_bind_addr")) {
 >>>>>>> sync with redhat/astapor-master
+=======
+  if has_interface_with("ipaddress", map_params("cluster_control_ip")) {
+>>>>>>> syncing with redhat repo
     $setup_cluster = true
   } else {
     $setup_cluster = false

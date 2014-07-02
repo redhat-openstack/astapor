@@ -26,6 +26,7 @@ class quickstack::pacemaker::horizon (
     if (map_params('include_mysql') == 'true') {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
 =======
        if str2bool_i("$hamysql_is_running") {
@@ -37,6 +38,9 @@ class quickstack::pacemaker::horizon (
         Exec['mysql-has-users'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
       }
 >>>>>>> sync with redhat/astapor-master
+=======
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
+>>>>>>> syncing with redhat repo
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
@@ -123,9 +127,12 @@ class quickstack::pacemaker::horizon (
     quickstack::pacemaker::resource::lsb {"$::horizon::params::http_service":
 =======
     quickstack::pacemaker::resource::service {"$::horizon::params::http_service":
+<<<<<<< HEAD
 >>>>>>> sync with redhat/astapor-master
       group => "$::horizon::params::http_service",
 >>>>>>> Updating astapor for ICE HOUSE
+=======
+>>>>>>> syncing with redhat repo
       clone => true,
       options => 'start-delay=10s',
     }

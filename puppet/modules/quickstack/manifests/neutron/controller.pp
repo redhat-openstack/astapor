@@ -280,6 +280,7 @@ class quickstack::neutron::controller (
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
 =======
@@ -298,6 +299,8 @@ class quickstack::neutron::controller (
     }
   }
 
+=======
+>>>>>>> syncing with redhat repo
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
       if $neutron_conf_additional_params[default_quota] != 'default' {
