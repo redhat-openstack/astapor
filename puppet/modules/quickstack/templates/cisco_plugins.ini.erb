@@ -148,14 +148,13 @@ sql_connection=mysql://neutron:<%= @neutron_db_password %>@<%= @mysql_host %>/ne
 # attached.
 #
 # integration_bridge = br-int
-
 integration_bridge = br-int
 
 # (StrOpt) Name of the policy profile to be associated with a port when no
 # policy profile is specified during port creates.
 #
 # default_policy_profile =
-default_policy_profile = default-pp
+default_policy_profile = <%= @poll_duration %>
 # Example: default_policy_profile = service_profile
 
 
@@ -163,7 +162,7 @@ default_policy_profile = default-pp
 # network node (dhcp, router).
 #
 # network_node_policy_profile =
-network_node_policy_profile = default-pp
+network_node_policy_profile = <%= @network_node_policy_profile %>
 # Example: network_node_policy_profile = dhcp_pp
 
 
@@ -179,12 +178,14 @@ network_node_policy_profile = default-pp
 # policy profiles.
 #
 # poll_duration =
-poll_duration = 10
+poll_duration = <%= @poll_duration %>
 # Example: poll_duration = 180
+
+http_pool_size = <%= @http_pool_size %>
+http_timeout = <%= @http_pool_size %>
  
 [database]
 sql_connection=mysql://neutron:<%= @neutron_db_password %>@<%= @mysql_host %>/neutron
-#connection = mysql://{{ database_user }}:{{ database_password }}@{{ database_host }}/{{ database }}
 
 [CISCO_PLUGINS]
 vswitch_plugin = <%= @cisco_vswitch_plugin %>

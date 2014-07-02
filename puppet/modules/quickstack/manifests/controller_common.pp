@@ -427,7 +427,7 @@ class quickstack::controller_common (
     horizon_cert          => $horizon_cert,
     horizon_key           => $horizon_key,
     horizon_ca            => $horizon_ca,
-    support_profile       => $support_profile,
+    neutron_options       => { 'profile_support' => $support_profile },
   }
 
   class {'memcached':}

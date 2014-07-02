@@ -1,6 +1,5 @@
 # Quickstart controller class for nova neutron (OpenStack Networking)
 class quickstack::neutron::controller (
-  $n1kv_additional_params        = $quickstack::params::n1kv_additional_params,
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
@@ -60,6 +59,9 @@ class quickstack::neutron::controller (
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
+  $neutron_conf_additional_params= $quickstack::params::neutron_conf_additional_params,
+  $nova_conf_additional_params   = $quickstack::params::nova_conf_additional_params,
+  $n1kv_plugin_additional_params = $quickstack::params::n1kv_plugin_additional_params,
   $n1kv_vsm_ip                   = $quickstack::params::n1kv_vsm_ip,
   $n1kv_vsm_password             = $quickstack::params::n1kv_vsm_password,
   $n1kv_supplemental_repo        = $quickstack::params::n1kv_supplemental_repo,
@@ -298,33 +300,33 @@ class quickstack::neutron::controller (
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-      if $n1kv_additional_params[default_quota] != 'default' {
+      if $neutron_conf_additional_params[default_quota] != 'default' {
         neutron_config {
-          'quotas/default_quota':          value => $n1kv_additional_params[default_quota];
+          'quotas/default_quota':          value => $neutron_conf_additional_params[default_quota];
         }
       }
 
-      if $n1kv_additional_params[quota_network] != 'default' {
+      if $neutron_conf_additional_params[quota_network] != 'default' {
         neutron_config {
-          'quotas/quota_network':          value => $n1kv_additional_params[quota_network];
+          'quotas/quota_network':          value => $neutron_conf_additional_params[quota_network];
         }
       }
 
-      if $n1kv_additional_params[quota_subnet] != 'default' {
+      if $neutron_conf_additional_params[quota_subnet] != 'default' {
         neutron_config {
-          'quotas/quota_subnet':          value => $n1kv_additional_params[quota_subnet];
+          'quotas/quota_subnet':          value => $neutron_conf_additional_params[quota_subnet];
         }      
       }
 
-      if $n1kv_additional_params[quota_port] != 'default' {
+      if $neutron_conf_additional_params[quota_port] != 'default' {
         neutron_config {
-          'quotas/quota_port':          value => $n1kv_additional_params[quota_port];
+          'quotas/quota_port':          value => $neutron_conf_additional_params[quota_port];
         }
       }
 
-      if $n1kv_additional_params[quota_security_group] != 'default' {
+      if $neutron_conf_additional_params[quota_security_group] != 'default' {
         neutron_config {
-          'quotas/quota_security_group':          value => $n1kv_additional_params[quota_security_group];
+          'quotas/quota_security_group':          value => $neutron_conf_additional_params[quota_security_group];
         }      
       }
 
@@ -374,28 +376,22 @@ class quickstack::neutron::controller (
         package { 'neutron-plugin-ovs':
           ensure => present,
           name   => $::neutron::params::ovs_server_package,
-        }
-      }
-
-      if (!defined(Package['neutron-plugin-ovs'])) {
-        package { 'neutron-plugin-ovs':
-          ensure => present,
-          name   => $::neutron::params::ovs_server_package,
         } 
       }
 
       Package['neutron-plugin-ovs'] ->
       class { 'quickstack::neutron::plugins::cisco':
-        neutron_db_password          => $neutron_db_password,
-        neutron_user_password        => $neutron_user_password,
         cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+        controller_priv_host         => $controller_priv_host,
+        controller_pub_host          => $controller_pub_host,
         mysql_host                   => $mysql_host,
         mysql_ca                     => $mysql_ca,
+        neutron_db_password          => $neutron_db_password,
+        neutron_user_password        => $neutron_user_password,
         n1kv_vsm_ip                  => $n1kv_vsm_ip,
         n1kv_vsm_password            => $n1kv_vsm_password,
         n1kv_supplemental_repo       => $n1kv_supplemental_repo,
-        controller_priv_host         => $controller_priv_host,
-        controller_pub_host          => $controller_pub_host,
+        n1kv_plugin_additional_params=> $n1kv_plugin_additional_params,
       }
     } else {
       class { 'quickstack::neutron::plugins::cisco':

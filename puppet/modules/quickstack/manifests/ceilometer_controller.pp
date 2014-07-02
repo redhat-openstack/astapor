@@ -50,7 +50,7 @@ class quickstack::ceilometer_controller(
         require => Class['ceilometer::db'],
     }
 
-    class { 'ceilometer::agent::notification':}
+    #class { 'ceilometer::agent::notification':}
     class { 'ceilometer::agent::auth':
         auth_url      => "http://${controller_priv_host}:35357/v2.0",
         auth_password => $ceilometer_user_password,

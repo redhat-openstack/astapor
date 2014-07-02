@@ -41,6 +41,7 @@ class quickstack::neutron::plugins::cisco (
   $n1kv_vsm_ip                  = $quickstack::params::n1kv_vsm_ip,
   $n1kv_vsm_password            = $quickstack::params::n1kv_vsm_password,
   $n1kv_supplemental_repo       = $quickstack::params::n1kv_supplemental_repo,
+  $n1kv_plugin_additional_params= $quickstack::params::n1kv_plugin_additional_params,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   $nexus_config                 = $quickstack::params::nexus_config,
@@ -91,12 +92,14 @@ class quickstack::neutron::plugins::cisco (
         name      => 'yum-plugin-priorities',
         ensure    => "installed"
       }
+      $proxy_url = "_none_"
       yumrepo { "cisco-os":
         baseurl   => $n1kv_supplemental_repo,
         descr     => "Internal repo for Foreman",
         enabled   => 1,
         priority  => 1,
         gpgcheck  => 1,
+        proxy     => $proxy_url,
         gpgkey    => "${n1kv_supplemental_repo}/RPM-GPG-KEY",
       }
     }
@@ -125,11 +128,11 @@ class quickstack::neutron::plugins::cisco (
       vswitch_plugin    => $cisco_vswitch_plugin,
     }
 
-    $listen_ssl        = str2bool_i("$ssl")
-    $support_profile   = 'cisco'
-    $secret_key        = $horizon_secret_key
-    $keystone_host     = $controller_priv_host
-    $fqdn              = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
+    $listen_ssl                         = str2bool_i("$ssl")
+    $neutron_options                    = { 'profile_support' => 'cisco' }
+    $secret_key                         = $horizon_secret_key
+    $keystone_host                      = $controller_priv_host
+    $fqdn                               = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
     file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
       content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
     } ~> Service['httpd']
@@ -139,6 +142,12 @@ class quickstack::neutron::plugins::cisco (
     file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
       content => template('quickstack/_40_router.py.erb')
     } ~> Service['httpd']
+
+    $default_policy_profile      = $n1kv_plugin_additional_params[default_policy_profile]
+    $network_node_policy_profile = $n1kv_plugin_additional_params[network_node_policy_profile]
+    $poll_duration               = $n1kv_plugin_additional_params[poll_duration]
+    $http_pool_size              = $n1kv_plugin_additional_params[http_pool_size]
+    $http_timeout                = $n1kv_plugin_additional_params[http_timeout]
 
     Neutron_plugin_cisco<||> ->
     file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
