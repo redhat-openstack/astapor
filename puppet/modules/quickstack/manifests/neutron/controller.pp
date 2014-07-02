@@ -279,28 +279,6 @@ class quickstack::neutron::controller (
     }
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-    if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
-=======
-  if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
-    neutron_plugin_ovs {
-      'OVS/enable_tunneling': value => $enable_tunneling;
-      'SECURITYGROUP/firewall_driver':
-      value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
-    }
-
-    class { '::neutron::plugins::ovs':
-      sql_connection      => $sql_connection,
-      tenant_network_type => $tenant_network_type,
-      network_vlan_ranges => $ovs_vlan_ranges,
-      tunnel_id_ranges    => $tunnel_id_ranges,
-    }
-  }
-
-=======
->>>>>>> syncing with redhat repo
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
       if $neutron_conf_additional_params[default_quota] != 'default' {

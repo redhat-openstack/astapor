@@ -127,19 +127,7 @@ class quickstack::pacemaker::heat(
       command   => "/tmp/ha-all-in-one-util.bash all_members_include heat",
     }
     ->
-<<<<<<< HEAD
-<<<<<<< HEAD
     quickstack::pacemaker::resource::service {'openstack-heat-api':
-<<<<<<< HEAD
-=======
-    quickstack::pacemaker::resource::lsb {'openstack-heat-api':
-=======
-    quickstack::pacemaker::resource::service {'openstack-heat-api':
->>>>>>> sync with redhat/astapor-master
-      group => "$heat_group",
->>>>>>> Updating astapor for ICE HOUSE
-=======
->>>>>>> syncing with redhat repo
       clone => true,
       options => 'start-delay=10s',
     }
@@ -163,19 +151,7 @@ class quickstack::pacemaker::heat(
 
       Exec["all-heat-nodes-are-up"]
       ->
-<<<<<<< HEAD
-<<<<<<< HEAD
       quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
-=======
-      quickstack::pacemaker::resource::lsb {"openstack-heat-api-cfn":
-=======
-      quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
-<<<<<<< HEAD
->>>>>>> sync with redhat/astapor-master
-        group => "$heat_cfn_group",
->>>>>>> Updating astapor for ICE HOUSE
-=======
->>>>>>> syncing with redhat repo
         clone => true,
         options => 'start-delay=10s',
       }
@@ -198,19 +174,7 @@ class quickstack::pacemaker::heat(
     if str2bool_i($heat_cloudwatch_enabled) {
       Exec["all-heat-nodes-are-up"]
       ->
-<<<<<<< HEAD
-<<<<<<< HEAD
       quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
-<<<<<<< HEAD
-=======
-      quickstack::pacemaker::resource::lsb {"openstack-heat-api-cloudwatch":
-=======
-      quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
->>>>>>> sync with redhat/astapor-master
-        group => "$heat_group",
->>>>>>> Updating astapor for ICE HOUSE
-=======
->>>>>>> syncing with redhat repo
         clone => true,
         options => 'start-delay=10s',
       }

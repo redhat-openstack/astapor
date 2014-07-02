@@ -45,11 +45,6 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_service<| |> -> Exec['pcs-keystone-server-set-up']
 
     if (map_params('include_mysql') == 'true') {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> syncing with redhat repo
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
 
@@ -59,19 +54,6 @@ class quickstack::pacemaker::keystone (
       frontend_admin_host  => map_params("keystone_admin_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-<<<<<<< HEAD
-=======
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
-       }
->>>>>>> Updating astapor for ICE HOUSE
-=======
-      if str2bool_i("$hamysql_is_running") {
-        Exec['mysql-has-users'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
-      }
->>>>>>> sync with redhat/astapor-master
-=======
->>>>>>> syncing with redhat repo
     }
 
     Class['::quickstack::pacemaker::common'] ->
