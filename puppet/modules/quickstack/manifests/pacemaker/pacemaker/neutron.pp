@@ -154,20 +154,6 @@ class quickstack::pacemaker::neutron (
       monitor_params => { 'start-delay' => '10s' },
     }
     ->
-    quickstack::pacemaker::constraint::base { 'neutron-db-server-constr' :
-      constraint_type => "order",
-      first_resource  => "neutron-db-check",
-      second_resource => "neutron-server",
-      first_action    => "start",
-      second_action   => "start",
-    }
-    ->
-    quickstack::pacemaker::constraint::colocation { 'neutron-db-server-colo' :
-      source => "neutron-server",
-      target => "neutron-db-check",
-      score  => "INFINITY",
-    }
-    ->
     quickstack::pacemaker::constraint::base { 'neutron-pre-openvswitch-constr' :
       constraint_type => "order",
       first_resource  => "neutron-agents-pre",

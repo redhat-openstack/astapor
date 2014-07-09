@@ -59,6 +59,12 @@ class quickstack::neutron::controller (
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
+  $neutron_conf_additional_params= $quickstack::params::neutron_conf_additional_params,
+  $nova_conf_additional_params   = $quickstack::params::nova_conf_additional_params,
+  $n1kv_plugin_additional_params = $quickstack::params::n1kv_plugin_additional_params,
+  $n1kv_vsm_ip                   = $quickstack::params::n1kv_vsm_ip,
+  $n1kv_vsm_password             = $quickstack::params::n1kv_vsm_password,
+  $n1kv_supplemental_repo        = $quickstack::params::n1kv_supplemental_repo,
   $neutron_db_password           = $quickstack::params::neutron_db_password,
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nexus_config                  = $quickstack::params::nexus_config,
@@ -274,19 +280,115 @@ class quickstack::neutron::controller (
   }
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-    class { 'quickstack::neutron::plugins::cisco':
-      neutron_db_password          => $neutron_db_password,
-      neutron_user_password        => $neutron_user_password,
-      ovs_vlan_ranges              => $ovs_vlan_ranges,
-      cisco_vswitch_plugin         => $cisco_vswitch_plugin,
-      nexus_config                 => $nexus_config,
-      cisco_nexus_plugin           => $cisco_nexus_plugin,
-      nexus_credentials            => $nexus_credentials,
-      provider_vlan_auto_create    => $provider_vlan_auto_create,
-      provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
-      mysql_host                   => $mysql_host,
-      mysql_ca                     => $mysql_ca,
-      tenant_network_type          => $tenant_network_type,
+    if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
+      if $neutron_conf_additional_params[default_quota] != 'default' {
+        neutron_config {
+          'quotas/default_quota':          value => $neutron_conf_additional_params[default_quota];
+        }
+      }
+
+      if $neutron_conf_additional_params[quota_network] != 'default' {
+        neutron_config {
+          'quotas/quota_network':          value => $neutron_conf_additional_params[quota_network];
+        }
+      }
+
+      if $neutron_conf_additional_params[quota_subnet] != 'default' {
+        neutron_config {
+          'quotas/quota_subnet':          value => $neutron_conf_additional_params[quota_subnet];
+        }      
+      }
+
+      if $neutron_conf_additional_params[quota_port] != 'default' {
+        neutron_config {
+          'quotas/quota_port':          value => $neutron_conf_additional_params[quota_port];
+        }
+      }
+
+      if $neutron_conf_additional_params[quota_security_group] != 'default' {
+        neutron_config {
+          'quotas/quota_security_group':          value => $neutron_conf_additional_params[quota_security_group];
+        }      
+      }
+
+      if $neutron_conf_additional_params[quota_security_group_rule] != 'default' {
+        neutron_config {
+          'quotas/quota_security_group_rule':      value => $neutron_conf_additional_params[quota_security_group_rule];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_instances] != 'default' {
+        nova_config {
+          'DEFAULT/quota_instances':      value => $nova_conf_additional_params[quota_instances];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_cores] != 'default' {
+        nova_config {
+          'DEFAULT/quota_cores':      value => $nova_conf_additional_params[quota_cores];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_ram] != 'default' {
+        nova_config {
+          'DEFAULT/quota_ram':      value => $nova_conf_additional_params[quota_ram];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_floating_ips] != 'default' {
+        nova_config {
+          'DEFAULT/quota_floating_ips':      value => $nova_conf_additional_params[quota_floating_ips];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_fixed_ips] != 'default' {
+        nova_config {
+          'DEFAULT/quota_fixed_ips':      value => $nova_conf_additional_params[quota_fixed_ips];
+        }
+      }
+
+      if $nova_conf_additional_params[quota_driver] != 'default' {
+        nova_config {
+          'DEFAULT/quota_driver':      value => $nova_conf_additional_params[quota_driver];
+        }
+      }
+
+      if (!defined(Package['neutron-plugin-ovs'])) {
+        package { 'neutron-plugin-ovs':
+          ensure => present,
+          name   => $::neutron::params::ovs_server_package,
+        } 
+      }
+
+      Package['neutron-plugin-ovs'] ->
+      class { 'quickstack::neutron::plugins::cisco':
+        cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+        controller_priv_host         => $controller_priv_host,
+        controller_pub_host          => $controller_pub_host,
+        mysql_host                   => $mysql_host,
+        mysql_ca                     => $mysql_ca,
+        neutron_db_password          => $neutron_db_password,
+        neutron_user_password        => $neutron_user_password,
+        n1kv_vsm_ip                  => $n1kv_vsm_ip,
+        n1kv_vsm_password            => $n1kv_vsm_password,
+        n1kv_supplemental_repo       => $n1kv_supplemental_repo,
+        n1kv_plugin_additional_params=> $n1kv_plugin_additional_params,
+      }
+    } else {
+      class { 'quickstack::neutron::plugins::cisco':
+        neutron_db_password          => $neutron_db_password,
+        neutron_user_password        => $neutron_user_password,
+        ovs_vlan_ranges              => $ovs_vlan_ranges,
+        cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+        nexus_config                 => $nexus_config,
+        cisco_nexus_plugin           => $cisco_nexus_plugin,
+        nexus_credentials            => $nexus_credentials,
+        provider_vlan_auto_create    => $provider_vlan_auto_create,
+        provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
+        mysql_host                   => $mysql_host,
+        mysql_ca                     => $mysql_ca,
+        tenant_network_type          => $tenant_network_type,
+      }
     }
   }
 

@@ -16,6 +16,7 @@ class quickstack::neutron::compute (
   $neutron_host                = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
+  $neutron_core_plugin         = $quickstack::neutron::controller::neutron_core_plugin,
   $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
   $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
@@ -79,24 +80,26 @@ class quickstack::neutron::compute (
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
   }
 
-  class { '::neutron::plugins::ovs':
-    sql_connection      => $sql_connection,
-    tenant_network_type => $tenant_network_type,
-    network_vlan_ranges => $ovs_vlan_ranges,
-    tunnel_id_ranges    => $tunnel_id_ranges,
-    vxlan_udp_port      => $ovs_vxlan_udp_port,
-  }
+  if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
+    class { '::neutron::plugins::ovs':
+      sql_connection      => $sql_connection,
+      tenant_network_type => $tenant_network_type,
+      network_vlan_ranges => $ovs_vlan_ranges,
+      tunnel_id_ranges    => $tunnel_id_ranges,
+      vxlan_udp_port      => $ovs_vxlan_udp_port,
+    }
 
-  neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
+    neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
 
-  $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
-  class { '::neutron::agents::ovs':
-    bridge_uplinks   => $ovs_bridge_uplinks,
-    bridge_mappings  => $ovs_bridge_mappings,
-    local_ip         => $local_ip,
-    enable_tunneling => str2bool_i("$enable_tunneling"),
-    tunnel_types     => $ovs_tunnel_types,
-    vxlan_udp_port   => $ovs_vxlan_udp_port,
+    $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
+    class { '::neutron::agents::ovs':
+      bridge_uplinks      => $ovs_bridge_uplinks,
+      bridge_mappings     => $ovs_bridge_mappings,
+      local_ip            => $local_ip,
+      enable_tunneling    => str2bool_i("$enable_tunneling"),
+      tunnel_types     => $ovs_tunnel_types,
+      vxlan_udp_port   => $ovs_vxlan_udp_port,
+    }
   }
 
   class { '::nova::network::neutron':

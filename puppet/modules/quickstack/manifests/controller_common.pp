@@ -68,6 +68,7 @@ class quickstack::controller_common (
   $swift_ringserver_ip           = '192.168.203.1',
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
+  $support_profile               = $quickstack::params::support_profile,
   $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -426,6 +427,7 @@ class quickstack::controller_common (
     horizon_cert          => $horizon_cert,
     horizon_key           => $horizon_key,
     horizon_ca            => $horizon_ca,
+    neutron_options       => { 'profile_support' => $support_profile },
   }
 
   class {'memcached':}
