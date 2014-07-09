@@ -121,8 +121,6 @@ class quickstack::pacemaker::neutron (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include neutron",
     }
     ->
-    class {"quickstack::pacemaker::neutron_db_check":}
-    ->
     quickstack::pacemaker::resource::service {'neutron-server':
       clone => true,
       monitor_params => { 'start-delay' => '10s' },
