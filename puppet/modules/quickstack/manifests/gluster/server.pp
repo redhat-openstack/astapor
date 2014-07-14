@@ -2,222 +2,54 @@
 # This could be used when external resources aren't available
 # It must be executed on each gluster server in a round robbin mode
 class quickstack::gluster::server (
-  $device1       = $quickstack::params::gluster_device1,
-  $device2       = $quickstack::params::gluster_device2,
-  $device3       = $quickstack::params::gluster_device3,
-  $fqdn1         = $quickstack::params::gluster_fqdn1,
-  $fqdn2         = $quickstack::params::gluster_fqdn2,
-  $fqdn3         = $quickstack::params::gluster_fqdn3,
-  $port_count    = $quickstack::params::gluster_port_count,
-  $replica_count = $quickstack::params::gluster_replica_count,
-  $uuid1         = $quickstack::params::gluster_uuid1,
-  $uuid2         = $quickstack::params::gluster_uuid2,
-  $uuid3         = $quickstack::params::gluster_uuid3,
-
-  $volume1_gid   = $quickstack::params::gluster_volume1_gid,
-  $volume1_name  = $quickstack::params::gluster_volume1_name,
-  $volume1_path  = $quickstack::params::gluster_volume1_path,
-  $volume1_uid   = $quickstack::params::gluster_volume1_uid,
-
-  $volume2_gid   = $quickstack::params::gluster_volume2_gid,
-  $volume2_name  = $quickstack::params::gluster_volume2_name,
-  $volume2_path  = $quickstack::params::gluster_volume2_path,
-  $volume2_uid   = $quickstack::params::gluster_volume2_uid,
-
-  $volume3_gid   = $quickstack::params::gluster_volume3_gid,
-  $volume3_name  = $quickstack::params::gluster_volume3_name,
-  $volume3_path  = $quickstack::params::gluster_volume3_path,
-  $volume3_uid   = $quickstack::params::gluster_volume3_uid,
+  $cinder_device  = $quickstack::params::cinder_gluster_device,
+  $cinder_path    = $quickstack::params::cinder_gluster_path,
+  $cinder_peers   = $quickstack::params::cinder_gluster_peers,
+  $cinder_replica = $quickstack::params::cinder_gluster_replica_count,
+  $cinder_volume  = $quickstack::params::cinder_gluster_volume,
+  $glance_device  = $quickstack::params::glance_gluster_device,
+  $glance_path    = $quickstack::params::glance_gluster_path,
+  $glance_peers   = $quickstack::params::glance_gluster_peers,
+  $glance_replica = $quickstack::params::glance_gluster_replica_count,
+  $glance_volume  = $quickstack::params::glance_gluster_volume,
+  $swift_device   = $quickstack::params::swift_gluster_device,
+  $swift_path     = $quickstack::params::swift_gluster_path,
+  $swift_peers    = $quickstack::params::swift_gluster_peers,
+  $swift_replica  = $quickstack::params::swift_gluster_replica_count,
+  $swift_volume   = $quickstack::params::swift_gluster_volume,
+  # Firewall
+  $port_count    = $quickstack::params::gluster_open_port_count,
 ) {
 
-  $vip  = ''
-  $vrrp =  false
-
-  class {'::gluster::server':
-    vip       => $vip,
-    vrrp      => $vrrp,
-    repo      => false,
-    shorewall => false,
+  quickstack::gluster::server::volume {'cinder':
+    device      => $cinder_device,
+    peers       => $cinder_peers,
+    replica     => $cinder_replica,
+    volume_gid  => '165',
+    volume_name => $cinder_volume,
+    volume_path => $cinder_path,
+    volume_uid  => '165',
   }
 
-  gluster::host {"${fqdn1}":
-    uuid => "${uuid1}"
+  quickstack::gluster::server::volume {'glance':
+    device      => $glance_device,
+    peers       => $glance_peers,
+    replica     => $glance_replica,
+    volume_gid  => '161',
+    volume_name => $glance_volume,
+    volume_path => $glance_path,
+    volume_uid  => '161',
   }
 
-  gluster::host {"${fqdn2}":
-    uuid => "${uuid2}"
+  quickstack::gluster::server::volume {'swift':
+    device      => $swift_device,
+    peers       => $swift_peers,
+    replica     => $swift_replica,
+    volume_gid  => '160',
+    volume_name => $swift_volume,
+    volume_path => $swift_path,
+    volume_uid  => '160',
   }
-
-  gluster::host {"${fqdn3}":
-    uuid => "${uuid3}"
-  }
-
-  gluster::brick {"${fqdn1}:${volume1_path}":
-    dev         => "${device1}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn1}:${volume2_path}":
-    dev         => "${device2}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn1}:${volume3_path}":
-    dev         => "${device3}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn2}:${volume1_path}":
-    dev         => "${device1}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn2}:${volume2_path}":
-    dev         => "${device2}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn2}:${volume3_path}":
-    dev         => "${device3}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn3}:${volume1_path}":
-    dev         => "${device1}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn3}:${volume2_path}":
-    dev         => "${device2}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  gluster::brick {"${fqdn3}:${volume3_path}":
-    dev         => "${device3}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
-  }
-
-  $brick_list = [
-    "${fqdn1}:${volume1_path}",
-    "${fqdn2}:${volume1_path}",
-    "${fqdn3}:${volume1_path}",
-    "${fqdn1}:${volume2_path}",
-    "${fqdn2}:${volume2_path}",
-    "${fqdn3}:${volume2_path}",
-    "${fqdn1}:${volume3_path}",
-    "${fqdn2}:${volume3_path}",
-    "${fqdn3}:${volume3_path}",
-  ]
-
-  gluster::volume { ["${volume1_name}", "${volume2_name}", "${volume3_name}"]:
-    replica => "${replica_count}",
-    bricks => $brick_list,
-    vip => "${vip}",
-    ping => false,  # disable fping
-    start => true,
-  }
-
-  gluster::volume::property {"${volume1_name}#storage.owner-uid":
-    value => $volume1_uid,
-  }
-
-  gluster::volume::property {"${volume1_name}#storage.owner-gid":
-    value => $volume1_gid,
-  }
-
-  gluster::volume::property {"${volume2_name}#storage.owner-uid":
-    value => $volume2_uid,
-  }
-
-  gluster::volume::property {"${volume2_name}#storage.owner-gid":
-    value => $volume2_gid,
-  }
-
-  gluster::volume::property {"${volume3_name}#storage.owner-uid":
-    value => $volume3_uid,
-  }
-
-  gluster::volume::property {"${volume3_name}#storage.owner-gid":
-    value => $volume3_gid,
-  }
-
-  gluster::volume::property::group {"${volume1_name}#virt":}
-
-  gluster::volume::property::group {"${volume2_name}#virt":}
-
-  gluster::volume::property::group {"${volume3_name}#virt":}
 
   class {'quickstack::firewall::gluster':
     port_count => "${port_count}",
