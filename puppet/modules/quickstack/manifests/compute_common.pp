@@ -125,6 +125,7 @@ class quickstack::compute_common (
 
     class { 'ceilometer::agent::compute':
       enabled => true,
+      require => Package['nova-common'],
     }
   }
 
