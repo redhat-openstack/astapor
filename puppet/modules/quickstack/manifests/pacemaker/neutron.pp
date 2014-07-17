@@ -126,30 +126,54 @@ class quickstack::pacemaker::neutron (
       monitor_params => { 'start-delay' => '10s' },
     }
     ->
-    # unreliable systemd script to  manage (see howto)
-    #quickstack::pacemaker::resource::service {'neutron-ovs-cleanup':
-    #  group => "neutron-agents-pre",
-    #  clone => false,
-    #}
-    #->
+    quickstack::pacemaker::resource::ocf {'neutron-ovs-cleanup':
+      resource_name => 'neutron:OVSCleanup',
+      clone         => true,
+    }
+    ->
+    quickstack::pacemaker::resource::ocf {'neutron-netns-cleanup':
+      resource_name => 'neutron:NetnsCleanup',
+      clone         => true,
+    }
+    ->
     quickstack::pacemaker::resource::service {'neutron-openvswitch-agent':
+      group => "neutron-agents",
       clone => false,
       monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::service {'neutron-dhcp-agent':
+      group => "neutron-agents",
       clone => false,
       monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::service {'neutron-l3-agent':
+      group => "neutron-agents",
       clone => false,
       monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::service {'neutron-metadata-agent':
+      group => "neutron-agents",
       clone => false,
       monitor_params => { 'start-delay' => '10s' },
+    }
+    ->
+    quickstack::pacemaker::constraint::base { 'neutron-ovs-to-netns-cleanup-constr' :
+      constraint_type => "order",
+      first_resource  => "neutron-ovs-cleanup",
+      second_resource => "neutron-netns-cleanup",
+      first_action    => "start",
+      second_action   => "start",
+    }
+    ->
+    quickstack::pacemaker::constraint::base { 'neutron-cleanup-to-agents-constr' :
+      constraint_type => "order",
+      first_resource  => "neutron-netns-cleanup",
+      second_resource => "neutron-agents",
+      first_action    => "start",
+      second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-openvswitch-dhcp-constr' :
@@ -191,6 +215,18 @@ class quickstack::pacemaker::neutron (
     quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-metadata-colo' :
       source => "neutron-metadata-agent",
       target => "neutron-openvswitch-agent",
+      score  => "INFINITY",
+    }
+    ->
+    quickstack::pacemaker::constraint::colocation { 'neutron-netns-ovs-cleanup-colo' :
+      source => "neutron-netns-cleanup",
+      target => "neutron-ovs-cleanup",
+      score  => "INFINITY",
+    }
+    ->
+    quickstack::pacemaker::constraint::colocation { 'neutron-agents-with-netns-cleanup-colo' :
+      source => "neutron-agents",
+      target => "neutron-netns-cleanup",
       score  => "INFINITY",
     }
   }
