@@ -7,11 +7,12 @@ class quickstack::openstack_common {
           ensure => present, }
   }
 
-  # Stop firewalld since everything uses iptables
-  # for now (same as packstack did)
+  # Stop firewalld since everything uses iptables. Firewalld provider will
+  # have to be implemented in puppetlabs-firewall in future.
   service { "firewalld":
     ensure => "stopped",
     enable => false,
+    before => Service['iptables'],
   }
 
   service { "auditd":
