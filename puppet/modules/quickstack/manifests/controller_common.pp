@@ -239,7 +239,6 @@ class quickstack::controller_common (
     amqp_provider  => $amqp_provider,
   }
 
-
   # Configure Nova
   class { '::nova':
     sql_connection     => $nova_sql_connection,
@@ -339,6 +338,15 @@ class quickstack::controller_common (
   } else {
     $cinder_backend_iscsi_with_fallback = $cinder_backend_iscsi
   }
+ 
+  if (str2bool_i("$cinder_backend_rbd") or ($glance_backend == 'rbd')) {
+    # hack around the glance package declaration if needed
+    if ($glance_backend != 'rbd') {
+      package {'python-ceph': }
+    }
+    include ::quickstack::ceph::client_packages
+  }
+
   class { 'quickstack::cinder_volume':
     backend_eqlx           => $cinder_backend_eqlx,
     backend_eqlx_name      => $cinder_backend_eqlx_name,

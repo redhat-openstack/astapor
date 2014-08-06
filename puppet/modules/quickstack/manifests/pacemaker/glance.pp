@@ -190,5 +190,8 @@ class quickstack::pacemaker::glance (
       target => "openstack-glance-registry-clone",
       score => "INFINITY",
     }
+    if ($backend == 'rbd') {
+      include ::quickstack::ceph::client_packages
+    }
   }
 }
