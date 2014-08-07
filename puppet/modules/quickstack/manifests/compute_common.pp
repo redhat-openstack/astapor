@@ -63,6 +63,9 @@ class quickstack::compute_common (
   }
 
   if str2bool_i("$cinder_backend_rbd") {
+    include ::quickstack::ceph::client_packages
+    package {'python-ceph': }
+
     nova_config {
       'DEFAULT/libvirt_images_rbd_pool':      value => $libvirt_images_rbd_pool;
       'DEFAULT/libvirt_images_rbd_ceph_conf': value => $libvirt_images_rbd_ceph_conf;
