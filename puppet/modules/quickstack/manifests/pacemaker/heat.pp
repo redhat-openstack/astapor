@@ -204,6 +204,12 @@ class quickstack::pacemaker::heat(
           first_action    => "start",
           second_action   => "start",
         }
+        ->
+        quickstack::pacemaker::constraint::colocation { 'heat-cloudwatch-engine-colo' :
+          source => "openstack-heat-engine",
+          target => "openstack-heat-api-cloudwatch",
+          score => "INFINITY",
+        }
       }
     }
   }
