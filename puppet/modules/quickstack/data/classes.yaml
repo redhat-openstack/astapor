@@ -1,0 +1,80 @@
+---
+allinone_classes:
+- quickstack::openstack_common
+- quickstack::roles::mysql
+- quickstack::roles::amqp
+- quickstack::roles::keystonerc
+- quickstack::roles::control::keystone
+- quickstack::roles::nova
+- quickstack::roles::control::nova
+- quickstack::roles::control::glance
+- quickstack::roles::control::ceilometer
+- quickstack::roles::control::heat
+- quickstack::roles::control::heat_cfn
+- quickstack::roles::control::heat_cloudwatch
+- quickstack::roles::control::horizon
+- quickstack::roles::nova::network::neutron
+- quickstack::roles::neutron
+- quickstack::roles::neutron::plugins::ml2
+- quickstack::roles::neutron::server
+- quickstack::roles::neutron::server::notifications
+- quickstack::roles::neutron::agents::metadata
+- quickstack::roles::neutron::agents::dhcp
+- quickstack::roles::neutron::agents::l3
+- quickstack::roles::neutron::agents::ml2::ovs
+- quickstack::roles::neutron::agents::lbaas
+- quickstack::roles::neutron::services::fwaas
+- quickstack::roles::nova::compute
+- nova::compute::neutron
+- quickstack::roles::nova::compute::libvirt
+- quickstack::tuned::virtual_host
+
+controller_classes:
+- quickstack::openstack_common
+- quickstack::roles::mysql
+- quickstack::roles::amqp
+- quickstack::roles::keystonerc
+- quickstack::roles::control::keystone
+- quickstack::roles::nova
+- quickstack::roles::control::nova
+- quickstack::roles::control::glance
+- quickstack::roles::control::ceilometer
+- quickstack::roles::control::heat
+- quickstack::roles::control::heat_cfn
+- quickstack::roles::control::heat_cloudwatch
+- quickstack::roles::control::horizon
+
+compute_classes:
+- quickstack::openstack_common
+- quickstack::roles::nova
+- quickstack::roles::nova::compute
+- quickstack::roles::nova::compute::libvirt
+- quickstack::roles::nova::network::neutron
+- nova::compute::neutron
+- quickstack::roles::neutron
+- quickstack::roles::neutron::plugins::ml2
+- quickstack::roles::neutron::agents::ml2::ovs
+- quickstack::tuned::virtual_host
+
+networker_classes:
+- quickstack::openstack_common
+- quickstack::roles::neutron
+- quickstack::roles::neutron::server
+- quickstack::roles::neutron::server::notifications
+- quickstack::roles::neutron::plugins::ml2
+- quickstack::roles::neutron::agents::dhcp
+- quickstack::roles::neutron::agents::l3
+- quickstack::roles::neutron::agents::ml2::ovs
+- quickstack::roles::neutron::agents::lbaas
+- quickstack::roles::neutron::services::fwaas
+
+other_neutron_plugins_classes:
+## - quickstack::roles::neutron::plugins::cisco
+## - quickstack::roles::neutron::plugins::ovs
+
+wip_classes:
+ - quickstack::roles::control::cinder
+ - quickstack::roles::cinder::compute:backend::gluster
+ - quickstack::roles::cinder::compute:backend::nfs
+ - quickstack::roles::ceph::fsid
+ - quickstack::roles::cinder::compute:backend::rbd

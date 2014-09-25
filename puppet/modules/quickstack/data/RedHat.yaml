@@ -1,0 +1,221 @@
+---
+amqp_ca: "%{hiera('ca')}"
+amqp_cert: '/etc/pki/tls/certs/%{fqdn}-amqp.crt'
+amqp_key: '/etc/pki/tls/private/%{fqdn}-amqp.key'
+amqp_username: 'openstack'
+amqp_vip_admin: "%{hiera('control_admin')}"
+amqp_vip_internal: "%{hiera('control_internal')}"
+amqp_vip_public: "%{hiera('control_public')}"
+
+ca: '/etc/pki/CA/cacert.pem'
+
+ceilometer_vip_admin: "%{hiera('control_admin')}"
+ceilometer_vip_internal: "%{hiera('control_internal')}"
+ceilometer_vip_public: "%{hiera('control_public')}"
+
+glance_vip_admin: "%{hiera('control_admin')}"
+glance_vip_internal: "%{hiera('control_internal')}"
+glance_vip_public: "%{hiera('control_public')}"
+
+horizon_ca: "%{hiera('ca')}"
+horizon_cert: '/etc/pki/tls/certs/%{fqdn}-horizon.crt'
+horizon_key: '/etc/pki/tls/private/%{fqdn}-horizon.key'
+horizon_vip_public: "%{hiera('control_public')}"
+
+keystone_bind_address: '0.0.0.0'
+keystone_vip_admin: "%{hiera('control_admin')}"
+keystone_vip_internal: "%{hiera('control_internal')}"
+keystone_vip_public: "%{hiera('control_public')}"
+
+mysql_bind_address: '0.0.0.0'
+mysql_ca: "%{hiera('ca')}"
+mysql_cert: '/etc/pki/tls/certs/%{fqdn}-mysql.crt'
+mysql_key: '/etc/pki/tls/private/%{fqdn}-mysql.key'
+mysql_vip_admin: "%{hiera('control_admin')}"
+mysql_vip_internal: "%{hiera('control_internal')}"
+mysql_vip_public: "%{hiera('control_public')}"
+
+#neutron_core_plugin: 'neutron.plugins.cisco.network_plugin.PluginV2'
+neutron_core_plugin: 'neutron.plugins.ml2.plugin.Ml2Plugin'
+neutron_vip_admin: "%{hiera('control_admin')}"
+neutron_vip_internal: "%{hiera('control_internal')}"
+neutron_vip_public: "%{hiera('control_public')}"
+
+nova_vip_admin: "%{hiera('control_admin')}"
+nova_vip_internal: "%{hiera('control_internal')}"
+nova_vip_public: "%{hiera('control_public')}"
+
+quickstack::roles::params::admin_email: "%{hiera('admin_email')}"
+quickstack::roles::params::admin_tenant: 'admin'
+quickstack::roles::params::admin_password: "%{hiera('admin_password')}"
+
+quickstack::roles::params::amqp_ca: "%{hiera('amqp_ca')}"
+quickstack::roles::params::amqp_cert: "%{hiera('amqp_cert')}"
+quickstack::roles::params::amqp_key: "%{hiera('amqp_key')}"
+quickstack::roles::params::amqp_password: "%{hiera('amqp_password')}"
+quickstack::roles::params::amqp_provider: "%{hiera('amqp_provider')}"
+quickstack::roles::params::amqp_username: "%{hiera('amqp_username')}"
+quickstack::roles::params::amqp_vip: "%{hiera('amqp_vip_admin')}"
+
+quickstack::roles::params::ceilometer_metering_secret: "%{hiera('ceilometer_metering_secret')}"
+quickstack::roles::params::ceilometer_user_password: "%{hiera('ceilometer_user_password')}"
+quickstack::roles::params::ceilometer_vip_admin: "%{hiera('ceilometer_vip_admin')}"
+quickstack::roles::params::ceilometer_vip_internal: "%{hiera('ceilometer_vip_internal')}"
+quickstack::roles::params::ceilometer_vip_public: "%{hiera('ceilometer_vip_public')}"
+
+quickstack::roles::params::cinder_db_password: "%{hiera('cinder_db_password')}"
+
+quickstack::roles::params::db_type: "%{hiera('database')}"
+
+quickstack::roles::params::freeipa: "%{hiera('freeipa')}"
+
+quickstack::roles::params::glance_db_password: "%{hiera('glance_db_password')}"
+quickstack::roles::params::glance_user_password: "%{hiera('glance_user_password')}"
+quickstack::roles::params::glance_backend: "%{hiera('glance_backend')}"
+quickstack::roles::params::glance_rbd_store_user: 'images'
+quickstack::roles::params::glance_rbd_store_pool: 'images'
+quickstack::roles::params::glance_vip_admin: "%{hiera('glance_vip_admin')}"
+quickstack::roles::params::glance_vip_internal: "%{hiera('glance_vip_internal')}"
+quickstack::roles::params::glance_vip_public: "%{hiera('glance_vip_public')}"
+
+quickstack::roles::params::horizon_ca: "%{hiera('horizon_ca')}"
+quickstack::roles::params::horizon_cert: "/etc/pki/tls/certs/%{fqdn}-horizon.crt"
+quickstack::roles::params::horizon_key: "/etc/pki/tls/private/%{fqdn}-horizon.key"
+quickstack::roles::params::horizon_secret_key: "%{hiera('horizon_secret_key')}"
+quickstack::roles::params::horizon_vip: "%{hiera('horizon_vip_public')}"
+
+quickstack::roles::params::keystone_admin_token: "%{hiera('keystone_admin_token')}"
+quickstack::roles::params::keystone_db_password: "%{hiera('keystone_db_password')}"
+quickstack::roles::params::keystone_db_user: 'keystone'
+quickstack::roles::params::keystone_user_password: "%{hiera('keystone_user_password')}"
+quickstack::roles::params::keystone_vip_admin: "%{hiera('keystone_vip_admin')}"
+quickstack::roles::params::keystone_vip_internal: "%{hiera('keystone_vip_internal')}"
+quickstack::roles::params::keystone_vip_public: "%{hiera('keystone_vip_public')}"
+
+quickstack::roles::params::mysql_ca: "%{hiera('mysql_ca')}"
+quickstack::roles::params::mysql_cert: "%{hiera('mysql_cert')}"
+quickstack::roles::params::mysql_key: "%{hiera('mysql_key')}"
+quickstack::roles::params::mysql_vip: "%{hiera('mysql_vip_internal')}"
+quickstack::roles::params::mysql_root_password: "%{hiera('mysql_root_password')}"
+
+quickstack::roles::params::nova_db_password: "%{hiera('nova_db_password')}"
+quickstack::roles::params::nova_user_password: "%{hiera('nova_user_password')}"
+quickstack::roles::params::nova_vip_admin: "%{hiera('nova_vip_admin')}"
+quickstack::roles::params::nova_vip_internal: "%{hiera('nova_vip_internal')}"
+quickstack::roles::params::nova_vip_public: "%{hiera('nova_vip_public')}"
+
+quickstack::roles::params::neutron: "%{hiera('neutron')}"
+quickstack::roles::params::neutron_admin_password: "%{hiera('neutron_user_password')}"
+quickstack::roles::params::neutron_core_plugin: "%{hiera('neutron_core_plugin')}"
+quickstack::roles::params::neutron_db_password: "%{hiera('neutron_db_password')}"
+quickstack::roles::params::neutron_user_password: "%{hiera('neutron_user_password')}"
+quickstack::roles::params::neutron_metadata_proxy_secret: "%{hiera('neutron_metadata_proxy_secret')}"
+quickstack::roles::params::neutron_vip_admin: "%{hiera('neutron_vip_admin')}"
+quickstack::roles::params::neutron_vip_internal: "%{hiera('neutron_vip_internal')}"
+quickstack::roles::params::neutron_vip_public: "%{hiera('neutron_vip_public')}"
+quickstack::roles::params::neutron_admin_auth_url: "http://%{hiera('control_public')}:35357/v2.0"
+quickstack::roles::params::neutron_url: "http://%{hiera('control_public')}:9696"
+
+quickstack::roles::params::nexus_config: {}
+quickstack::roles::params::nexus_credentials: []
+
+quickstack::roles::params::region: "%{hiera('region')}"
+quickstack::roles::params::ssl: "%{hiera('ssl')}"
+
+quickstack::roles::control::ceilometer::verbose: 'false'
+quickstack::roles::control::cinder::verbose: 'false'
+quickstack::roles::control::glance::verbose: 'false'
+
+quickstack::roles::control::heat::heat_vip_admin: "%{hiera('control_public')}"
+quickstack::roles::control::heat::heat_vip_internal: "%{hiera('control_public')}"
+quickstack::roles::control::heat::heat_vip_public: "%{hiera('control_public')}"
+quickstack::roles::control::heat::heat_db_password: "%{hiera('heat_db_password')}"
+quickstack::roles::control::heat::heat_user_password: "%{hiera('heat_user_password')}"
+quickstack::roles::control::heat::heat_auth_encrypt_key: "%{hiera('heat_auth_encrypt_key')}"
+quickstack::roles::control::heat::verbose: 'false'
+
+quickstack::roles::control::heat_cfn::heat_cfn: "%{hiera('heat_cfn')}"
+quickstack::roles::control::heat_cfn::heat_cfn_vip_admin: "%{hiera('control_public')}"
+quickstack::roles::control::heat_cfn::heat_cfn_vip_internal: "%{hiera('control_public')}"
+quickstack::roles::control::heat_cfn::heat_cfn_vip_public: "%{hiera('control_public')}"
+quickstack::roles::control::heat_cfn::heat_cfn_user_password: "%{hiera('heat_cfn_user_password')}"
+
+quickstack::roles::control::heat_cloudwatch: "%{hiera('heat_cloudwatch')}"
+
+quickstack::roles::control::keystone::admin_token: "%{hiera('keystone_admin_token')}"
+quickstack::roles::control::keystone::db_name: 'keystone'
+quickstack::roles::control::keystone::debug: 'false'
+quickstack::roles::control::keystone::bind_address: "%{hiera('keystone_bind_address')}"
+quickstack::roles::control::keystone::idle_timeout: '200'
+quickstack::roles::control::keystone::log_facility: 'LOG_USER'
+quickstack::roles::control::keystone::manage_service: 'true'
+quickstack::roles::control::keystone::token_format: 'PKI'
+quickstack::roles::control::keystone::use_syslog: 'false'
+quickstack::roles::control::keystone::verbose: 'false'
+quickstack::roles::control::mysql::bind_address: "%{hiera('mysql_bind_address')}"
+quickstack::roles::control::nova::verbose: 'false'
+
+quickstack::roles::nova::compute::libvirt_type: "%{hiera('libvirt_type')}"
+
+quickstack::roles::nova::compute::private_network: ''
+quickstack::roles::nova::compute::private_iface: "%{hiera('neutron_tunnel_iface')}"
+quickstack::roles::nova::compute::private_ip: ''
+
+quickstack::roles::neutron::agents::l3::ext_network_bridge: 'br-ex'
+
+quickstack::roles::neutron::agents::ml2::ovs::bridge_mappings:
+- 'default:br-ex'
+quickstack::roles::neutron::agents::ml2::ovs::bridge_uplinks:
+- 'br-ex:eth0'
+quickstack::roles::neutron::agents::ml2::ovs::enable_tunneling: 'true'
+quickstack::roles::neutron::agents::ml2::ovs::l2_population: 'true'
+quickstack::roles::neutron::agents::ml2::ovs::tenant_network_type: "%{hiera('neutron_tunnel_type')}"
+quickstack::roles::neutron::agents::ml2::ovs::tunnel_iface: "%{hiera('neutron_tunnel_iface')}"
+quickstack::roles::neutron::agents::ml2::ovs::tunnel_network: ''
+quickstack::roles::neutron::agents::ml2::ovs::tunnel_types:
+- vxlan
+
+quickstack::roles::neutron::allow_overlapping_ips: 'true'
+quickstack::roles::neutron::service_plugins:
+# - neutron.services.l3_router.l3_router_plugin.L3RouterPlugin
+  - router
+#  - firewall
+#  - lbaas
+#  - vpnaas
+#  - metering
+quickstack::roles::neutron::verbose: 'false'
+
+quickstack::roles::neutron::plugins::cisco::vswitch_plugin: 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
+quickstack::roles::neutron::plugins::cisco::nexus_plugin: 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
+quickstack::roles::neutron::plugins::cisco::tenant_network_type: 'vxlan'
+quickstack::roles::neutron::plugins::cisco::provider_vlan_auto_create: 'false'
+quickstack::roles::neutron::plugins::cisco::provider_vlan_auto_trunk: 'false'
+
+quickstack::roles::neutron::plugins::ml2::type_drivers:
+#  - 'local'
+#  - 'flat'
+#  - 'vlan'
+#  - 'gre'
+  - 'vxlan'
+quickstack::roles::neutron::plugins::ml2::tenant_network_types:
+  - 'vxlan'
+#  - 'vlan'
+#  - 'gre'
+#  - 'flat'
+quickstack::roles::neutron::plugins::ml2::mechanism_drivers:
+  - 'openvswitch'
+  - 'l2population'
+quickstack::roles::neutron::plugins::ml2::flat_networks:
+  - '*'
+quickstack::roles::neutron::plugins::ml2::firewall_driver: 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver'
+quickstack::roles::neutron::plugins::ml2::network_vlan_ranges:
+  - 'yourphysnet:10:50'
+quickstack::roles::neutron::plugins::ml2::security_group: 'true'
+quickstack::roles::neutron::plugins::ml2::tunnel_id_ranges:
+  - '20:100'
+quickstack::roles::neutron::plugins::ml2::vxlan_group: '224.0.0.1'
+quickstack::roles::neutron::plugins::ml2::vni_ranges:
+  - '10:100'
+
+quickstack::roles::neutron::server::database_max_retries: '10'
+quickstack::roles::neutron::server::manage_service: 'true'
