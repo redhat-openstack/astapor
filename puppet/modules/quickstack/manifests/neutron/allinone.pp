@@ -417,27 +417,26 @@ class quickstack::neutron::allinone (
     enabled => true,
   }
 
-  if str2bool_i("$ceilometer") {
-    class { 'quickstack::ceilometer_controller':
-      ceilometer_metering_secret  => $ceilometer_metering_secret,
-      ceilometer_user_password    => $ceilometer_user_password,
-      controller_admin_host       => $ceilometer_admin_vip,
-      controller_priv_host        => $ceilometer_private_vip,
-      controller_pub_host         => $ceilometer_public_vip,
-      amqp_provider               => $amqp_provider,
-      amqp_host                   => $amqp_vip,
-      qpid_protocol               => $qpid_protocol,
-      amqp_port                   => $amqp_port,
-      amqp_username               => $amqp_username,
-      amqp_password               => $amqp_password,
-      verbose                     => $verbose,
-    }->
-    class { 'ceilometer::agent::compute':
-      enabled => true,
-    }
-    Package['openstack-nova-common'] -> Package['ceilometer-common']
-  }
-
+#  if str2bool_i("$ceilometer") {
+#    class { 'quickstack::ceilometer_controller':
+#      ceilometer_metering_secret  => $ceilometer_metering_secret,
+#      ceilometer_user_password    => $ceilometer_user_password,
+#      controller_admin_host       => $ceilometer_admin_vip,
+#      controller_priv_host        => $ceilometer_private_vip,
+#      controller_pub_host         => $ceilometer_public_vip,
+#      amqp_provider               => $amqp_provider,
+#      amqp_host                   => $amqp_vip,
+#      qpid_protocol               => $qpid_protocol,
+#      amqp_port                   => $amqp_port,
+#      amqp_username               => $amqp_username,
+#      amqp_password               => $amqp_password,
+#      verbose                     => $verbose,
+#    }->
+#    class { 'ceilometer::agent::compute':
+#      enabled => true,
+#    }
+#    Package['openstack-nova-common'] -> Package['ceilometer-common']
+#  }
 
   class {'quickstack::swift::proxy':
     swift_proxy_host           => $swift_public_vip,
