@@ -350,13 +350,6 @@ class quickstack::neutron::allinone (
     swift_admin_address         => $swift_public_vip,
   }
 
-  class { 'swift::keystone::auth':
-    password         => $swift_admin_password,
-    public_address   => $swift_public_vip,
-    internal_address => $swift_private_vip,
-    admin_address    => $swift_admin_vip,
-  }
-
   class {'quickstack::glance':
     db_host        => $mysql_vip,
     db_ssl         => str2bool_i("$ssl"),
@@ -530,26 +523,26 @@ class quickstack::neutron::allinone (
     rbd_secret_uuid        => $cinder_rbd_secret_uuid,
   }
 
-  class { 'quickstack::heat_controller':
-    auth_encryption_key         => $heat_auth_encrypt_key,
-    heat_cfn                    => $heat_cfn,
-    heat_cloudwatch             => $heat_cloudwatch,
-    heat_user_password          => $heat_user_password,
-    heat_db_password            => $heat_db_password,
-    controller_admin_host       => $heat_admin_vip,
-    controller_priv_host        => $heat_private_vip,
-    controller_pub_host         => $heat_public_vip,
-    mysql_host                  => $mysql_vip,
-    mysql_ca                    => $mysql_ca,
-    ssl                         => $ssl,
-    amqp_provider               => $amqp_provider,
-    amqp_host                   => $amqp_vip,
-    amqp_port                   => $amqp_port,
-    qpid_protocol               => $qpid_protocol,
-    amqp_username               => $amqp_username,
-    amqp_password               => $amqp_password,
-    verbose                     => $verbose,
-  }
+#  class { 'quickstack::heat_controller':
+#    auth_encryption_key         => $heat_auth_encrypt_key,
+#    heat_cfn                    => $heat_cfn,
+#    heat_cloudwatch             => $heat_cloudwatch,
+#    heat_user_password          => $heat_user_password,
+#    heat_db_password            => $heat_db_password,
+#    controller_admin_host       => $heat_admin_vip,
+#    controller_priv_host        => $heat_private_vip,
+#    controller_pub_host         => $heat_public_vip,
+#    mysql_host                  => $mysql_vip,
+#    mysql_ca                    => $mysql_ca,
+#    ssl                         => $ssl,
+#    amqp_provider               => $amqp_provider,
+#    amqp_host                   => $amqp_vip,
+#    amqp_port                   => $amqp_port,
+#    qpid_protocol               => $qpid_protocol,
+#    amqp_username               => $amqp_username,
+#    amqp_password               => $amqp_password,
+#    verbose                     => $verbose,
+#  }
 
   # horizon packages
   package {'python-memcached':
