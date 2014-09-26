@@ -102,6 +102,7 @@ class quickstack::neutron::allinone (
   $heat_cfn_private_vip,
   $heat_cfn_public_vip,
 
+  $horizon,
   $horizon_vip,
   $horizon_ca,
   $horizon_cert,
@@ -111,7 +112,7 @@ class quickstack::neutron::allinone (
   $keystone_admin_vip,
   $keystone_private_vip,
   $keystone_public_vip,
-  $keystonerc                    = 'True',
+  $keystonerc                    = 'true',
   $keystone_admin_token,
   $keystone_db_password,
 
@@ -250,7 +251,7 @@ class quickstack::neutron::allinone (
       $neutron_sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_vip}/neutron"
   }
 
-  # Controller
+  ### Controller
 
   class {'quickstack::db::mysql':
     mysql_root_password  => $mysql_root_password,
@@ -275,6 +276,13 @@ class quickstack::neutron::allinone (
     neutron                => str2bool_i("$neutron"),
   }
 
+  # TODO:
+  firewall { '001 mysql incoming':
+    proto    => 'tcp',
+    dport    => '3306',
+    action   => 'accept',
+  }
+
   class {'quickstack::amqp::server':
     amqp_provider => $amqp_provider,
     amqp_host     => $amqp_vip,
@@ -286,6 +294,17 @@ class quickstack::neutron::allinone (
     amqp_key      => $amqp_key,
     ssl           => $ssl,
     freeipa       => $freeipa,
+  }
+
+  # TODO: Need to fix quickstack::firewall::amqp
+  if str2bool_i("$ssl") {
+    class {'quickstack::firewall::amqp':}
+  } else {
+    firewall { '001 amqp incoming':
+      proto    => 'tcp',
+      dport    => '5672',
+      action   => 'accept',
+    }
   }
 
   class {"::quickstack::keystone::common":
@@ -350,24 +369,29 @@ class quickstack::neutron::allinone (
     swift_admin_address         => $swift_public_vip,
   }
 
-  class {'quickstack::glance':
-    db_host        => $mysql_vip,
-    db_ssl         => str2bool_i("$ssl"),
-    db_ssl_ca      => $mysql_ca,
-    user_password  => $glance_user_password,
-    db_password    => $glance_db_password,
-    backend        => $glance_backend,
-    rbd_store_user => $glance_rbd_store_user,
-    rbd_store_pool => $glance_rbd_store_pool,
-    require        => Class['quickstack::db::mysql'],
-    amqp_host      => $amqp_vip,
-    amqp_port      => $amqp_port,
-    amqp_username  => $amqp_username,
-    amqp_password  => $amqp_password,
-    amqp_provider  => $amqp_provider,
+  class {'quickstack::firewall::keystone':}
+
+  # Glance controller
+  if str2bool_i("$glance") {
+    class {'quickstack::glance':
+      db_host        => $mysql_vip,
+      db_ssl         => str2bool_i("$ssl"),
+      db_ssl_ca      => $mysql_ca,
+      user_password  => $glance_user_password,
+      db_password    => $glance_db_password,
+      backend        => $glance_backend,
+      rbd_store_user => $glance_rbd_store_user,
+      rbd_store_pool => $glance_rbd_store_pool,
+      require        => Class['quickstack::db::mysql'],
+      amqp_host      => $amqp_vip,
+      amqp_port      => $amqp_port,
+      amqp_username  => $amqp_username,
+      amqp_password  => $amqp_password,
+      amqp_provider  => $amqp_provider,
+    }
   }
 
-  # Configure Nova
+  # Nova Controller
   class { '::nova':
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
@@ -410,211 +434,289 @@ class quickstack::neutron::allinone (
     enabled => true,
   }
 
-#  if str2bool_i("$ceilometer") {
-#    class { 'quickstack::ceilometer_controller':
-#      ceilometer_metering_secret  => $ceilometer_metering_secret,
-#      ceilometer_user_password    => $ceilometer_user_password,
-#      controller_admin_host       => $ceilometer_admin_vip,
-#      controller_priv_host        => $ceilometer_private_vip,
-#      controller_pub_host         => $ceilometer_public_vip,
-#      amqp_provider               => $amqp_provider,
-#      amqp_host                   => $amqp_vip,
-#      qpid_protocol               => $qpid_protocol,
-#      amqp_port                   => $amqp_port,
-#      amqp_username               => $amqp_username,
-#      amqp_password               => $amqp_password,
-#      verbose                     => $verbose,
-#    }->
-#    class { 'ceilometer::agent::compute':
-#      enabled => true,
-#    }
-#    Package['openstack-nova-common'] -> Package['ceilometer-common']
-#  }
+  class {'quickstack::firewall::nova':}
 
-  class {'quickstack::swift::proxy':
-    swift_proxy_host           => $swift_public_vip,
-    keystone_host              => $keystone_public_vip,
-    swift_admin_password       => $swift_admin_password,
-    swift_shared_secret        => $swift_shared_secret,
-    swift_storage_ips          => $swift_storage_ips,
-    swift_storage_device       => $swift_storage_device,
-    swift_ringserver_ip        => $swift_ringserver_ip,
-    swift_is_ringserver        => true,
-  }
-
-  class { 'quickstack::cinder':
-    user_password => $cinder_user_password,
-    db_host       => $mysql_vip,
-    db_ssl        => $ssl,
-    db_ssl_ca     => $mysql_ca,
-    db_password   => $cinder_db_password,
-    glance_host   => $glance_private_vip,
-    rpc_backend   => amqp_backend('cinder', $amqp_provider),
-    amqp_host     => $amqp_vip,
-    amqp_port     => $amqp_port,
-    amqp_username => $amqp_username,
-    amqp_password => $amqp_password,
-    qpid_protocol => $qpid_protocol,
-    verbose       => $verbose,
-  }
-
-  # preserve original behavior - fall back to iscsi
-  # https://github.com/redhat-openstack/astapor/blob/7cf25e1022bee08b0c385ae956d4e9e4ade14a9d/puppet/modules/quickstack/manifests/cinder_controller.pp#L85
-  if (!str2bool_i("$cinder_backend_gluster") and
-      !str2bool_i("$cinder_backend_eqlx") and
-      !str2bool_i("$cinder_backend_rbd") and
-      !str2bool_i("$cinder_backend_nfs")) {
-    $cinder_backend_iscsi_with_fallback = 'true'
-  } else {
-    $cinder_backend_iscsi_with_fallback = $cinder_backend_iscsi
-  }
-
-  if (str2bool_i("$cinder_backend_rbd") or ($glance_backend == 'rbd')) {
-    include ::quickstack::ceph::client_packages
-    # hack around the glance package declaration if needed
-    if ($glance_backend != 'rbd') {
-      package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
+  # Ceilometer controller
+  if str2bool_i("$ceilometer") {
+    class { 'mongodb::server':
+        port => '27017',
     }
-    if $ceph_fsid {
-      class { '::quickstack::ceph::config':
-        fsid                => $ceph_fsid,
-        cluster_network     => $ceph_cluster_network,
-        public_network      => $ceph_public_network,
-        mon_initial_members => $ceph_mon_initial_members,
-        mon_host            => $ceph_mon_host,
-        images_key          => $ceph_images_key,
-        volumes_key         => $ceph_volumes_key,
-      } -> Class['quickstack::ceph::client_packages']
+    ->
+    # FIXME: passwordless connection is insecure, also we might use a
+    # way to run mongo on a different host in the future
+    class { 'ceilometer::db':
+        database_connection => 'mongodb://localhost:27017/ceilometer',
+        require             => Service['mongod'],
     }
+
+    class { 'ceilometer':
+        metering_secret => $ceilometer_metering_secret,
+        qpid_hostname   => $amqp_host,
+        qpid_port       => $amqp_port,
+        qpid_protocol   => $qpid_protocol,
+        qpid_username   => $amqp_username,
+        qpid_password   => $amqp_password,
+        rabbit_host     => $amqp_host,
+        rabbit_port     => $amqp_port,
+        rabbit_userid   => $amqp_username,
+        rabbit_password => $amqp_password,
+        rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
+        verbose         => $verbose,
+    }
+
+    class { 'ceilometer::collector':
+        require => Class['ceilometer::db'],
+    }
+
+    class { 'ceilometer::agent::notification':}
+    class { 'ceilometer::agent::auth':
+        auth_url      => "http://${keystone_private_vip}:35357/v2.0",
+        auth_password => $ceilometer_user_password,
+    }
+
+    class { 'ceilometer::agent::central':
+        enabled => true,
+    }
+
+    class { 'ceilometer::alarm::notifier':
+    }
+
+    class { 'ceilometer::alarm::evaluator':
+    }
+
+    class { 'ceilometer::api':
+        keystone_host     => $keystone_private_vip,
+        keystone_password => $ceilometer_user_password,
+        require             => Service['mongod'],
+    }
+
+    class {'quickstack::firewall::ceilometer':}
   }
 
-  class { 'quickstack::cinder_volume':
-    backend_eqlx           => $cinder_backend_eqlx,
-    backend_eqlx_name      => $cinder_backend_eqlx_name,
-    backend_glusterfs      => $cinder_backend_gluster,
-    backend_glusterfs_name => $cinder_backend_gluster_name,
-    backend_iscsi          => $cinder_backend_iscsi_with_fallback,
-    backend_iscsi_name     => $cinder_backend_iscsi_name,
-    backend_nfs            => $cinder_backend_nfs,
-    backend_nfs_name       => $cinder_backend_nfs_name,
-    backend_rbd            => $cinder_backend_rbd,
-    backend_rbd_name       => $cinder_backend_rbd_name,
-    multiple_backends      => $cinder_multiple_backends,
-    # TODO: Create a parameter
-    iscsi_bind_addr        => localhost,
-    glusterfs_shares       => $cinder_gluster_shares,
-    nfs_shares             => $cinder_nfs_shares,
-    nfs_mount_options      => $cinder_nfs_mount_options,
-    san_ip                 => $cinder_san_ip,
-    san_login              => $cinder_san_login,
-    san_password           => $cinder_san_password,
-    san_thin_provision     => $cinder_san_thin_provision,
-    eqlx_group_name        => $cinder_eqlx_group_name,
-    eqlx_pool              => $cinder_eqlx_pool,
-    eqlx_use_chap          => $cinder_eqlx_use_chap,
-    eqlx_chap_login        => $cinder_eqlx_chap_login,
-    eqlx_chap_password     => $cinder_eqlx_chap_password,
-    rbd_pool               => $cinder_rbd_pool,
-    rbd_ceph_conf          => $cinder_rbd_ceph_conf,
-    rbd_flatten_volume_from_snapshot
-                           => $cinder_rbd_flatten_volume_from_snapshot,
-    rbd_max_clone_depth    => $cinder_rbd_max_clone_depth,
-    rbd_user               => $cinder_rbd_user,
-    rbd_secret_uuid        => $cinder_rbd_secret_uuid,
+  if str2bool_i("$swift") {
+    class {'quickstack::swift::proxy':
+      swift_proxy_host           => $swift_public_vip,
+      keystone_host              => $keystone_public_vip,
+      swift_admin_password       => $swift_admin_password,
+      swift_shared_secret        => $swift_shared_secret,
+      swift_storage_ips          => $swift_storage_ips,
+      swift_storage_device       => $swift_storage_device,
+      swift_ringserver_ip        => $swift_ringserver_ip,
+      swift_is_ringserver        => true,
+    }
+
+    class {'quickstack::firewall::swift':}
   }
 
-#  class { 'quickstack::heat_controller':
-#    auth_encryption_key         => $heat_auth_encrypt_key,
-#    heat_cfn                    => $heat_cfn,
-#    heat_cloudwatch             => $heat_cloudwatch,
-#    heat_user_password          => $heat_user_password,
-#    heat_db_password            => $heat_db_password,
-#    controller_admin_host       => $heat_admin_vip,
-#    controller_priv_host        => $heat_private_vip,
-#    controller_pub_host         => $heat_public_vip,
-#    mysql_host                  => $mysql_vip,
-#    mysql_ca                    => $mysql_ca,
-#    ssl                         => $ssl,
-#    amqp_provider               => $amqp_provider,
-#    amqp_host                   => $amqp_vip,
-#    amqp_port                   => $amqp_port,
-#    qpid_protocol               => $qpid_protocol,
-#    amqp_username               => $amqp_username,
-#    amqp_password               => $amqp_password,
-#    verbose                     => $verbose,
-#  }
+  if str2bool_i("$cinder") {
+    class { 'quickstack::cinder':
+      user_password => $cinder_user_password,
+      db_host       => $mysql_vip,
+      db_ssl        => $ssl,
+      db_ssl_ca     => $mysql_ca,
+      db_password   => $cinder_db_password,
+      glance_host   => $glance_private_vip,
+      rpc_backend   => amqp_backend('cinder', $amqp_provider),
+      amqp_host     => $amqp_vip,
+      amqp_port     => $amqp_port,
+      amqp_username => $amqp_username,
+      amqp_password => $amqp_password,
+      qpid_protocol => $qpid_protocol,
+      verbose       => $verbose,
+    }
 
-  # horizon packages
-  package {'python-memcached':
-    ensure => installed,
-  }~>
-  package {'python-netaddr':
-    ensure => installed,
-    notify => Class['::horizon'],
-  }
+    # preserve original behavior - fall back to iscsi
+    # https://github.com/redhat-openstack/astapor/blob/7cf25e1022bee08b0c385ae956d4e9e4ade14a9d/puppet/modules/quickstack/manifests/cinder_controller.pp#L85
+    if (!str2bool_i("$cinder_backend_gluster") and
+        !str2bool_i("$cinder_backend_eqlx") and
+        !str2bool_i("$cinder_backend_rbd") and
+        !str2bool_i("$cinder_backend_nfs")) {
+      $cinder_backend_iscsi_with_fallback = 'true'
+    } else {
+      $cinder_backend_iscsi_with_fallback = $cinder_backend_iscsi
+    }
 
-  file {'/etc/httpd/conf.d/rootredirect.conf':
-    ensure  => present,
-    content => 'RedirectMatch ^/$ /dashboard/',
-    notify  => File['/etc/httpd/conf.d/openstack-dashboard.conf'],
-  }
+    if (str2bool_i("$cinder_backend_rbd") or ($glance_backend == 'rbd')) {
+      include ::quickstack::ceph::client_packages
+      # hack around the glance package declaration if needed
+      if ($glance_backend != 'rbd') {
+        package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
+      }
+      if $ceph_fsid {
+        class { '::quickstack::ceph::config':
+          fsid                => $ceph_fsid,
+          cluster_network     => $ceph_cluster_network,
+          public_network      => $ceph_public_network,
+          mon_initial_members => $ceph_mon_initial_members,
+          mon_host            => $ceph_mon_host,
+          images_key          => $ceph_images_key,
+          volumes_key         => $ceph_volumes_key,
+        } -> Class['quickstack::ceph::client_packages']
+      }
 
-  class {'::horizon':
-    secret_key            => $horizon_secret_key,
-    keystone_default_role => '_member_',
-    keystone_host         => $keystone_private_vip,
-    fqdn                  => ["$horizon_vip", "$::fqdn", "$::hostname", 'localhost', '*'],
-    listen_ssl            => str2bool_i("$ssl"),
-    horizon_cert          => $horizon_cert,
-    horizon_key           => $horizon_key,
-    horizon_ca            => $horizon_ca,
-  }
+      class {'quickstack::firewall::cinder':}
+    }
 
-  class {'memcached':}
-
-  firewall { '001 controller incoming':
-    proto    => 'tcp',
-    dport    => ['80', '443', '3260', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '8777', '9292', '6080'],
-    action   => 'accept',
-  }
-
-  firewall { '001 controller incoming pt2':
-    proto    => 'tcp',
-    dport    => ['8000', '8003', '8004'],
-    action   => 'accept',
-  }
-
-  if $ssl {
-    firewall { '002 ssl controller incoming':
-      proto    => 'tcp',
-      dport    => ['443', '5671',],
-      action   => 'accept',
+    class { 'quickstack::cinder_volume':
+      backend_eqlx           => $cinder_backend_eqlx,
+      backend_eqlx_name      => $cinder_backend_eqlx_name,
+      backend_glusterfs      => $cinder_backend_gluster,
+      backend_glusterfs_name => $cinder_backend_gluster_name,
+      backend_iscsi          => $cinder_backend_iscsi_with_fallback,
+      backend_iscsi_name     => $cinder_backend_iscsi_name,
+      backend_nfs            => $cinder_backend_nfs,
+      backend_nfs_name       => $cinder_backend_nfs_name,
+      backend_rbd            => $cinder_backend_rbd,
+      backend_rbd_name       => $cinder_backend_rbd_name,
+      multiple_backends      => $cinder_multiple_backends,
+      # TODO: Create a parameter
+      iscsi_bind_addr        => localhost,
+      glusterfs_shares       => $cinder_gluster_shares,
+      nfs_shares             => $cinder_nfs_shares,
+      nfs_mount_options      => $cinder_nfs_mount_options,
+      san_ip                 => $cinder_san_ip,
+      san_login              => $cinder_san_login,
+      san_password           => $cinder_san_password,
+      san_thin_provision     => $cinder_san_thin_provision,
+      eqlx_group_name        => $cinder_eqlx_group_name,
+      eqlx_pool              => $cinder_eqlx_pool,
+      eqlx_use_chap          => $cinder_eqlx_use_chap,
+      eqlx_chap_login        => $cinder_eqlx_chap_login,
+      eqlx_chap_password     => $cinder_eqlx_chap_password,
+      rbd_pool               => $cinder_rbd_pool,
+      rbd_ceph_conf          => $cinder_rbd_ceph_conf,
+      rbd_flatten_volume_from_snapshot
+                             => $cinder_rbd_flatten_volume_from_snapshot,
+      rbd_max_clone_depth    => $cinder_rbd_max_clone_depth,
+      rbd_user               => $cinder_rbd_user,
+      rbd_secret_uuid        => $cinder_rbd_secret_uuid,
     }
   }
 
-  if ($::selinux != "false"){
-    selboolean { 'httpd_can_network_connect':
-      value => on,
-      persistent => true,
+  if str2bool_i("$heat") {
+
+    if str2bool_i("$ssl") {
+      $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat?ssl_ca=${mysql_ca}"
+    } else {
+      $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat"
     }
+
+    class { '::heat':
+        keystone_host     => $controller_priv_host,
+        keystone_password => $heat_user_password,
+        auth_uri          => "http://${controller_priv_host}:35357/v2.0",
+        rpc_backend       => amqp_backend('heat', $amqp_provider),
+        qpid_hostname     => $amqp_host,
+        qpid_port         => $amqp_port,
+        qpid_protocol     => $qpid_protocol,
+        qpid_username     => $amqp_username,
+        qpid_password     => $amqp_password,
+        rabbit_host       => $amqp_host,
+        rabbit_port       => $amqp_port,
+        rabbit_userid     => $amqp_username,
+        rabbit_password   => $amqp_password,
+        verbose           => $verbose,
+        sql_connection    => $sql_connection,
+    }
+
+    class { '::heat::api_cfn':
+        enabled => str2bool_i("$heat_cfn"),
+    }
+
+    class { '::heat::api_cloudwatch':
+        enabled => str2bool_i("$heat_cloudwatch"),
+    }
+
+    class { '::heat::engine':
+        auth_encryption_key           => $auth_encryption_key,
+        heat_metadata_server_url      => "http://${controller_priv_host}:8000",
+        heat_waitcondition_server_url => "http://${controller_priv_host}:8000/v1/waitcondition",
+        heat_watch_server_url         => "http://${controller_priv_host}:8003",
+    }
+
+    # TODO: this ain't no place to be creating a db locally as happens below
+    class { 'heat::db::mysql':
+      password      => $heat_db_password,
+      host          => $mysql_host,
+      allowed_hosts => "%%",
+    }
+
+    class { '::heat::api':}
+
+    class {'quickstack::firewall::heat':}
   }
 
-  # This exists to cover havana release, where we only exposed the pub and priv
-  # hosts, admin was not a param there.
-  if $keystone_admin_vip == undef or $keystone_admin_vip == '' {
-    $real_admin_host = $keystone_private_vip
-  } else {
-    $real_admin_host = $keystone_admin_vip
+  # Horizon
+
+  if str2bool_i("$horizon") {
+    package {'python-memcached':
+      ensure => installed,
+    }~>
+    package {'python-netaddr':
+      ensure => installed,
+      notify => Class['::horizon'],
+    }
+
+    file {'/etc/httpd/conf.d/rootredirect.conf':
+      ensure  => present,
+      content => 'RedirectMatch ^/$ /dashboard/',
+      notify  => File['/etc/httpd/conf.d/openstack-dashboard.conf'],
+    }
+
+    class {'::horizon':
+      secret_key            => $horizon_secret_key,
+      keystone_default_role => '_member_',
+      keystone_host         => $keystone_private_vip,
+      fqdn                  => ["$horizon_vip", "$::fqdn", "$::hostname", 'localhost', '*'],
+      listen_ssl            => str2bool_i("$ssl"),
+      horizon_cert          => $horizon_cert,
+      horizon_key           => $horizon_key,
+      horizon_ca            => $horizon_ca,
+    }
+
+    class {'memcached':}
+
+    class {'quickstack::firewall::horizon':}
+
+    if ($::selinux != "false"){
+      selboolean { 'httpd_can_network_connect':
+        value => on,
+        persistent => true,
+      }
+    }
   }
 
   if str2bool_i("$keystonerc") {
+    # This exists to cover havana release, where we only exposed the pub and priv
+    # hosts, admin was not a param there.
+    if $keystone_admin_vip == undef or $keystone_admin_vip == '' {
+      $real_admin_host = $keystone_private_vip
+    } else {
+      $real_admin_host = $keystone_admin_vip
+    }
+
     class { 'quickstack::admin_client':
       admin_password        => $admin_password,
       controller_admin_host => $real_admin_host,
     }
   }
 
-  # Neutron
+  # ToDO
+  firewall { '001 nova volume incoming':
+    proto    => 'tcp',
+    dport    => '3260',
+    action   => 'accept',
+  }
+
+  # ToDO
+  firewall { '001 EC2 API incoming':
+    proto    => 'tcp',
+    dport    => '8773',
+    action   => 'accept',
+  }
+
+  ### Openstack Networking (neutron)
+
   class { '::neutron':
     allow_overlapping_ips => str2bool_i("$allow_overlapping_ips"),
     bind_host             => $neutron_private_vip,
@@ -781,7 +883,7 @@ class quickstack::neutron::allinone (
 
   class {'::quickstack::firewall::neutron':}
 
-  # Compute
+  ### Compute
 
   if str2bool_i("$cinder_backend_gluster") {
     if defined('gluster::client') {
@@ -895,6 +997,7 @@ class quickstack::neutron::allinone (
 
   include quickstack::tuned::virtual_host
 
+  # TODO
   firewall { '001 nova compute incoming':
     proto  => 'tcp',
     dport  => '5900-5999',
