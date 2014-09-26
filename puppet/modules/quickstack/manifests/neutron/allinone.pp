@@ -3,7 +3,7 @@ class quickstack::neutron::allinone (
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
 
-  $amqp_host                     = $quickstack::params::amqp_host,
+  $amqp_vip                      = $quickstack::params::amqp_vip,
   $amqp_password                 = $quickstack::params::amqp_password,
   $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -11,7 +11,8 @@ class quickstack::neutron::allinone (
   $amqp_cert                     = $quickstack::params::amqp_cert,
   $amqp_key                      = $quickstack::params::amqp_key,
 
-  # $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
+  # TODO: Check usage
+  $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
 
   $ceilometer                    = $quickstack::params::ceilometer,
   $ceilometer_admin_vip          = $quickstack::params::ceilometer_admin_vip,
@@ -67,6 +68,9 @@ class quickstack::neutron::allinone (
 
   $cisco_nexus_plugin            = $quickstack::params::cisco_nexus_plugin,
   $cisco_vswitch_plugin          = $quickstack::params::cisco_vswitch_plugin,
+  $cisco_provider_vlan_auto_create=$quickstack::params::cisco_provider_vlan_auto_create,
+  $cisco_provider_vlan_auto_trunk= $quickstack::params::cisco_provider_vlan_auto_trunk,
+  $cisco_tenant_network_type     = $quickstack::params::ciso_tenant_network_type,
 
   $freeipa                       = $quickstack::params::freeipa,
 
@@ -99,7 +103,7 @@ class quickstack::neutron::allinone (
   $heat_cfn_private_vip          = $quickstack::params::heat_cfn_private_vip,
   $heat_cfn_public_vip           = $quickstack::params::heat_cfn_public_vip,
 
-  $horizon_host                  = $quickstack::params::horizon_host,
+  $horizon_vip                  = $quickstack::params::horizon_vip,
   $horizon_ca                    = $quickstack::params::horizon_ca,
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
@@ -117,9 +121,10 @@ class quickstack::neutron::allinone (
   $libvirt_inject_password       = 'false',
   $libvirt_inject_key            = 'false',
   $libvirt_images_type           = 'rbd',
+  $libvirt_kvm_capable           =  $quickstack::params::libvirt_kvm_capable,
 
-  $ml2_type_drivers              = ['vxlan', 'flat','vlan','gre','local'],
-  $ml2_tenant_network_types      = ['vxlan', 'flat','vlan','gre'],
+  $ml2_type_drivers              = ['vxlan', 'flat', 'vlan', 'gre', 'local'],
+  $ml2_tenant_network_types      = ['vxlan', 'flat', 'vlan', 'gre'],
   $ml2_mechanism_drivers         = ['openvswitch','l2population'],
   $ml2_flat_networks             = ['*'],
   $ml2_network_vlan_ranges       = ['physnet1:1000:2999'],
@@ -129,9 +134,9 @@ class quickstack::neutron::allinone (
   $ml2_security_group            = 'true',
   $ml2_firewall_driver           = 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver',
 
-  $mysql_host                    = $quickstack::params::mysql_host,
+  $mysql_vip                    = $quickstack::params::mysql_vip,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
-
+  $mysql_bind_address            = '0.0.0.0',
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $mysql_cert                    = $quickstack::params::mysql_cert,
   $mysql_key                     = $quickstack::params::mysql_key,
@@ -142,7 +147,6 @@ class quickstack::neutron::allinone (
   $neutron_public_vip            = $quickstack::params::neutron_public_vip,
   $neutron_auth_tenant           = 'services',
   $neutron_auth_user             = 'neutron',
-  $neutron_host                  = '127.0.0.1',
   $neutron_db_password           = $quickstack::params::neutron_db_password,
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
@@ -172,17 +176,11 @@ class quickstack::neutron::allinone (
   $ovs_vxlan_udp_port            = $quickstack::params::ovs_vxlan_udp_port,
 #  $ovs_l2_population            = 'True',
 
-  $provider_vlan_auto_create     = $quickstack::params::provider_vlan_auto_create,
-  $provider_vlan_auto_trunk      = $quickstack::params::provider_vlan_auto_trunk,
-
-  $tenant_network_type           = $quickstack::params::tenant_network_type,
-
-  $ssl                           = $quickstack::params::ssl,
-  $verbose                       = $quickstack::params::verbose,
-
   $private_network               = '',
   $private_iface                 = 'eth2',
   $private_ip                    = '',
+
+  $ssl                           = $quickstack::params::ssl,
 
   $swift                         = $quickstack::params::swift,
   $swift_admin_vip               = $quickstack::params::switf_admin_vip,
@@ -193,6 +191,8 @@ class quickstack::neutron::allinone (
   $swift_ringserver_ip           = '192.168.203.1',
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
+
+  $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -200,14 +200,14 @@ class quickstack::neutron::allinone (
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
     $amqp_port = '5671'
-    $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
-    $neutron_sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
+    $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_vip}/nova?ssl_ca=${mysql_ca}"
+    $neutron_sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_vip}/neutron?ssl_ca=${mysql_ca}"
     apache::listen { '443': }
 
     if str2bool_i("$freeipa") {
       certmonger::request_ipa_cert { 'mysql':
         seclib => "openssl",
-        principal => "mysql/${mysql_host}",
+        principal => "mysql/${mysql_vip}",
         key => $mysql_key,
         cert => $mysql_cert,
         owner_id => 'mysql',
@@ -215,17 +215,17 @@ class quickstack::neutron::allinone (
       }
       certmonger::request_ipa_cert { 'horizon':
         seclib => "openssl",
-        principal => "horizon/${horizon_host}",
+        principal => "horizon/${horizon_vip}",
         key => $horizon_key,
         cert => $horizon_cert,
         owner_id => 'apache',
         group_id => 'apache',
-        hostname => $horizon_host,
+        hostname => $horizon_vip,
       }
       if $amqp_provider == 'rabbitmq' {
         certmonger::request_ipa_cert { 'amqp':
           seclib => "openssl",
-          principal => "amqp/${amqp_host}",
+          principal => "amqp/${amqp_vip}",
           key => $amqp_key,
           cert => $amqp_cert,
           owner_id => 'rabbitmq',
@@ -247,13 +247,11 @@ class quickstack::neutron::allinone (
   } else {
       $qpid_protocol = 'tcp'
       $amqp_port = '5672'
-      $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
-      $neutron_sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
+      $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_vip}/nova"
+      $neutron_sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_vip}/neutron"
   }
 
-###################
-#### Controller ###
-###################
+  # Controller
 
   class {'quickstack::db::mysql':
     mysql_root_password  => $mysql_root_password,
@@ -264,14 +262,14 @@ class quickstack::neutron::allinone (
     neutron_db_password  => $neutron_db_password,
 
     # MySQL
-    mysql_bind_address     => '0.0.0.0',
+    mysql_bind_address     => $mysql_bind_address,
     mysql_account_security => true,
     mysql_ssl              => str2bool_i("$ssl"),
     mysql_ca               => $mysql_ca,
     mysql_cert             => $mysql_cert,
     mysql_key              => $mysql_key,
 
-    allowed_hosts          => ['%',$mysql_host],
+    allowed_hosts          => ['%',$mysql_vip],
     enabled                => true,
 
     # Networking
@@ -280,7 +278,7 @@ class quickstack::neutron::allinone (
 
   class {'quickstack::amqp::server':
     amqp_provider => $amqp_provider,
-    amqp_host     => $amqp_host,
+    amqp_host     => $amqp_vip,
     amqp_port     => $amqp_port,
     amqp_username => $amqp_username,
     amqp_password => $amqp_password,
@@ -294,7 +292,7 @@ class quickstack::neutron::allinone (
   class {"::quickstack::keystone::common":
     admin_token                 => $keystone_admin_token,
     bind_host                   => '0.0.0.0',
-    db_host                     => $mysql_host,
+    db_host                     => $mysql_vip,
     db_password                 => $keystone_db_password,
     db_ssl                      => str2bool_i("$ssl"),
     db_ssl_ca                   => $mysql_ca,
@@ -361,7 +359,7 @@ class quickstack::neutron::allinone (
   }
 
   class {'quickstack::glance':
-    db_host        => $mysql_host,
+    db_host        => $mysql_vip,
     db_ssl         => str2bool_i("$ssl"),
     db_ssl_ca      => $mysql_ca,
     user_password  => $glance_user_password,
@@ -370,7 +368,7 @@ class quickstack::neutron::allinone (
     rbd_store_user => $glance_rbd_store_user,
     rbd_store_pool => $glance_rbd_store_pool,
     require        => Class['quickstack::db::mysql'],
-    amqp_host      => $amqp_host,
+    amqp_host      => $amqp_vip,
     amqp_port      => $amqp_port,
     amqp_username  => $amqp_username,
     amqp_password  => $amqp_password,
@@ -383,12 +381,12 @@ class quickstack::neutron::allinone (
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${glance_private_vip}:9292/v1",
     rpc_backend        => amqp_backend('nova', $amqp_provider),
-    qpid_hostname      => $amqp_host,
+    qpid_hostname      => $amqp_vip,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $amqp_port,
     qpid_username      => $amqp_username,
     qpid_password      => $amqp_password,
-    rabbit_host        => $amqp_host,
+    rabbit_host        => $amqp_vip,
     rabbit_port        => $amqp_port,
     rabbit_userid      => $amqp_username,
     rabbit_password    => $amqp_password,
@@ -428,7 +426,7 @@ class quickstack::neutron::allinone (
       controller_priv_host        => $ceilometer_private_vip,
       controller_pub_host         => $ceilometer_public_vip,
       amqp_provider               => $amqp_provider,
-      amqp_host                   => $amqp_host,
+      amqp_host                   => $amqp_vip,
       qpid_protocol               => $qpid_protocol,
       amqp_port                   => $amqp_port,
       amqp_username               => $amqp_username,
@@ -455,13 +453,13 @@ class quickstack::neutron::allinone (
 
   class { 'quickstack::cinder':
     user_password => $cinder_user_password,
-    db_host       => $mysql_host,
+    db_host       => $mysql_vip,
     db_ssl        => $ssl,
     db_ssl_ca     => $mysql_ca,
     db_password   => $cinder_db_password,
     glance_host   => $glance_private_vip,
     rpc_backend   => amqp_backend('cinder', $amqp_provider),
-    amqp_host     => $amqp_host,
+    amqp_host     => $amqp_vip,
     amqp_port     => $amqp_port,
     amqp_username => $amqp_username,
     amqp_password => $amqp_password,
@@ -543,11 +541,11 @@ class quickstack::neutron::allinone (
     controller_admin_host       => $heat_admin_vip,
     controller_priv_host        => $heat_private_vip,
     controller_pub_host         => $heat_public_vip,
-    mysql_host                  => $mysql_host,
+    mysql_host                  => $mysql_vip,
     mysql_ca                    => $mysql_ca,
     ssl                         => $ssl,
     amqp_provider               => $amqp_provider,
-    amqp_host                   => $amqp_host,
+    amqp_host                   => $amqp_vip,
     amqp_port                   => $amqp_port,
     qpid_protocol               => $qpid_protocol,
     amqp_username               => $amqp_username,
@@ -574,7 +572,7 @@ class quickstack::neutron::allinone (
     secret_key            => $horizon_secret_key,
     keystone_default_role => '_member_',
     keystone_host         => $keystone_private_vip,
-    fqdn                  => ["$horizon_host", "$::fqdn", "$::hostname", 'localhost', '*'],
+    fqdn                  => ["$horizon_vip", "$::fqdn", "$::hostname", 'localhost', '*'],
     listen_ssl            => str2bool_i("$ssl"),
     horizon_cert          => $horizon_cert,
     horizon_key           => $horizon_key,
@@ -625,22 +623,19 @@ class quickstack::neutron::allinone (
     }
   }
 
-###################
-##### Neutron #####
-###################
-
+  # Neutron
   class { '::neutron':
     allow_overlapping_ips => str2bool_i("$allow_overlapping_ips"),
-    bind_host             => $neutron_host,
+    bind_host             => $neutron_private_vip,
     core_plugin           => $neutron_core_plugin,
     enabled               => str2bool_i("$neutron"),
     rpc_backend           => amqp_backend('neutron', $amqp_provider),
-    qpid_hostname         => $amqp_host,
+    qpid_hostname         => $amqp_vip,
     qpid_port             => $amqp_port,
     qpid_protocol         => $qpid_protocol,
     qpid_username         => $amqp_username,
     qpid_password         => $amqp_password,
-    rabbit_host           => $amqp_host,
+    rabbit_host           => $amqp_vip,
     rabbit_port           => $amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
@@ -733,9 +728,9 @@ class quickstack::neutron::allinone (
       nexus_credentials            => $nexus_credentials,
       provider_vlan_auto_create    => $provider_vlan_auto_create,
       provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
-      mysql_host                   => $mysql_host,
+      mysql_host                   => $mysql_vip,
       mysql_ca                     => $mysql_ca,
-      tenant_network_type          => $tenant_network_type,
+      tenant_network_type          => $cisco_tenant_network_type,
     }
   }
 
@@ -779,7 +774,7 @@ class quickstack::neutron::allinone (
     auth_url       => "http://${keystonre_private_vip}:35357/v2.0",
     enabled        => str2bool_i("$neutron"),
     manage_service => str2bool_i("$neutron_manage_service"),
-    metadata_ip    => $neutron_host,
+    metadata_ip    => $neutron_public_vip,
     shared_secret  => $neutron_metadata_proxy_secret,
   }
 
@@ -795,9 +790,7 @@ class quickstack::neutron::allinone (
 
   class {'::quickstack::firewall::neutron':}
 
-###################
-##### Compute #####
-###################
+  # Compute
 
   if str2bool_i("$cinder_backend_gluster") {
     if defined('gluster::client') {
@@ -887,7 +880,7 @@ class quickstack::neutron::allinone (
     }
   }
 
-  if str2bool_i($kvm_capable) {
+  if str2bool_i($libvirt_kvm_capable) {
     $libvirt_type = 'kvm'
   } else {
     include quickstack::compute::qemu
