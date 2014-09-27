@@ -112,7 +112,7 @@ class quickstack::neutron::allinone (
   $keystone_admin_vip,
   $keystone_private_vip,
   $keystone_public_vip,
-  $keystonerc                    = 'true',
+  $keystonerc                    = undef,
   $keystone_admin_token,
   $keystone_db_password,
 
