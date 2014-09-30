@@ -732,6 +732,10 @@ class quickstack::neutron::allinone (
     rabbit_port           => $amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
+    rabbit_use_ssl        => str2bool_i("$ssl"),
+    kombu_ssl_keyfile     => $amqp_key,
+    kombu_ssl_certfile    => $amqp_cert,
+    kombu_ssl_ca_certs    => $amqp_ca,
     verbose               => $verbose,
   }
   ->
