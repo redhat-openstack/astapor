@@ -143,6 +143,8 @@ class quickstack::neutron::allinone (
 
   $neutron,
   $neutron_admin_vip,
+  $neutron_agent_lbaas           = false,
+  $neutron_agent_fwaas           = false,
   $neutron_private_vip,
   $neutron_public_vip,
   $neutron_auth_tenant           = 'services',
@@ -150,7 +152,6 @@ class quickstack::neutron::allinone (
   $neutron_db_password,
   $neutron_user_password,
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
-  #$neutron_core_plugin,
   $neutron_metadata_proxy_secret,
   $neutron_ext_network_bridge    = '',
   $neutron_database_max_retries  = '',
@@ -174,7 +175,7 @@ class quickstack::neutron::allinone (
   $ovs_tunnel_types,
   $ovs_vlan_ranges,
   $ovs_vxlan_udp_port,
-#  $ovs_l2_population            = 'True',
+  $ovs_l2_population            = 'True',
 
   $private_network               = '',
   $private_iface                 = 'eth2',
@@ -839,7 +840,7 @@ class quickstack::neutron::allinone (
   #    vxlan_udp_port      => $ovs_vxlan_udp_port,
   #  }
 
-  #  neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
+  neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
 
   $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
@@ -875,9 +876,15 @@ class quickstack::neutron::allinone (
     shared_secret  => $neutron_metadata_proxy_secret,
   }
 
-  #class { 'neutron::agents::lbaas': }
+  if str2bool_i("$neutron") {
+    if str2bool_i("$lbaas") {
+      class { 'neutron::agents::lbaas': }
+     }
 
-  #class { 'neutron::agents::fwaas': }
+    if str2bool_i("$fwaas") {
+      class { 'neutron::agents::fwaas': }
+    }
+  }
 
   class {'quickstack::neutron::firewall::gre': }
 
