@@ -407,6 +407,7 @@ class quickstack::neutron::allinone (
     rabbit_port        => $amqp_port,
     rabbit_userid      => $amqp_username,
     rabbit_password    => $amqp_password,
+    rabbit_use_ssl     => str2bool_i("$ssl"),
     verbose            => $verbose,
     require            => Class['quickstack::db::mysql', 'quickstack::amqp::server'],
   }
