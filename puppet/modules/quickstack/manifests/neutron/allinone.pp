@@ -777,7 +777,7 @@ class quickstack::neutron::allinone (
 #  }
 
   class { '::neutron::server':
-    auth_host            => $neutron_private_vip,
+    auth_host            => $keystone_private_vip,
     auth_password        => $neutron_user_password,
     auth_tenant          => $neutron_auth_tenant,
     auth_user            => $neutron_auth_user,
@@ -877,11 +877,11 @@ class quickstack::neutron::allinone (
   }
 
   if str2bool_i("$neutron") {
-    if str2bool_i("$lbaas") {
+    if str2bool_i("$neutron_agent_lbaas") {
       class { 'neutron::agents::lbaas': }
      }
 
-    if str2bool_i("$fwaas") {
+    if str2bool_i("$neutron_agent_fwaas") {
       class { 'neutron::agents::fwaas': }
     }
   }
