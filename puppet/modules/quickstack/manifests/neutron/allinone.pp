@@ -825,8 +825,8 @@ class quickstack::neutron::allinone (
       nexus_config                 => $nexus_config,
       cisco_nexus_plugin           => $cisco_nexus_plugin,
       nexus_credentials            => $nexus_credentials,
-      provider_vlan_auto_create    => $provider_vlan_auto_create,
-      provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
+      provider_vlan_auto_create    => $cisco_provider_vlan_auto_create,
+      provider_vlan_auto_trunk     => $cisco_provider_vlan_auto_trunk,
       mysql_host                   => $mysql_vip,
       mysql_ca                     => $mysql_ca,
       tenant_network_type          => $cisco_tenant_network_type,
@@ -870,7 +870,7 @@ class quickstack::neutron::allinone (
 
   class { 'neutron::agents::metadata':
     auth_password  => $neutron_user_password,
-    auth_url       => "http://${keystonre_private_vip}:35357/v2.0",
+    auth_url       => "http://${keystone_private_vip}:35357/v2.0",
     enabled        => str2bool_i("$neutron"),
     manage_service => str2bool_i("$neutron_manage_service"),
     metadata_ip    => $neutron_public_vip,
