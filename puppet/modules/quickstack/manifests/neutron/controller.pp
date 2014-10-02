@@ -140,6 +140,9 @@ class quickstack::neutron::controller (
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
   $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
+  $monitoring                    = $quickstack::params::monitoring,
+  $monitoring_host               = $quickstack::params::monitoring_host,
+  $monitoring_interface          = $quickstack::params::monitoring_interface,
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -246,6 +249,9 @@ class quickstack::neutron::controller (
     horizon_cert                  => $horizon_cert,
     horizon_key                   => $horizon_key,
     amqp_nssdb_password           => $amqp_nssdb_password,
+    monitoring                    => $monitoring,
+    monitoring_host               => $monitoring_host,
+    monitoring_interface          => $monitoring_interface,
   }
   ->
   class { '::neutron':

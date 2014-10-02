@@ -28,6 +28,9 @@ class quickstack::neutron::networker (
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
   $mysql_ca                      = $quickstack::params::mysql_ca,
+  $monitoring                    = $quickstack::params::monitoring,
+  $monitoring_host               = $quickstack::params::monitoring_host,
+  $monitoring_interface          = $quickstack::params::monitoring_interface,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -108,5 +111,13 @@ class quickstack::neutron::networker (
 
   class {'quickstack::neutron::firewall::vxlan':
     port => $ovs_vxlan_udp_port,
+  }
+
+  if ($monitoring) {
+    class {'quickstack::monitoring::client':
+      monitoring           => $monitoring,
+      monitoring_host      => $monitoring_host,
+      monitoring_interface => $monitoring_interface,
+    }
   }
 }

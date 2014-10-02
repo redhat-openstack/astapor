@@ -177,3 +177,7 @@ wsrep_sst_password: <%= passwd_auto %>
 wsrep_ssl: true
 wsrep_ssl_key: /etc/pki/galera/galera.key
 wsrep_ssl_cert: /etc/pki/galera/galera.crt
+monitoring: nagios
+monitoring_adm_passwd: <%= passwd_auto %>
+monitoring_host: 172.16.0.1
+monitoring_interface: eth0

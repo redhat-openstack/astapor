@@ -86,6 +86,13 @@ class quickstack::params (
   # Gluster
   $gluster_open_port_count      = '10',
 
+  # Monitoring
+  # Options are none ('') or 'nagios' for now
+  $monitoring                   = '',
+  $monitoring_host              = '172.16.0.1',
+  $monitoring_interface         = 'eth0',
+  $monitoring_adm_passwd        = 'CHANGEME',
+
   # Networking
   $neutron                       = 'false',
   $controller_admin_host         = '172.16.0.1',

@@ -63,6 +63,9 @@ class quickstack::controller_common (
   $keystone_db_password          = $quickstack::params::keystone_db_password,
   $keystonerc                    = false,
   $neutron_metadata_proxy_secret = $quickstack::params::neutron_metadata_proxy_secret,
+  $monitoring                    = $quickstack::params::monitoring,
+  $monitoring_host               = $quickstack::params::monitoring_host,
+  $monitoring_interface          = $quickstack::params::monitoring_interface,
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
   $neutron                       = $quickstack::params::neutron,
@@ -95,7 +98,6 @@ class quickstack::controller_common (
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
   $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
-
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -498,4 +500,11 @@ class quickstack::controller_common (
     }
   }
 
+  if ($monitoring) {
+    class {'quickstack::monitoring::client':
+      monitoring           => $monitoring,
+      monitoring_host      => $monitoring_host,
+      monitoring_interface => $monitoring_interface,
+    }
+  }
 }

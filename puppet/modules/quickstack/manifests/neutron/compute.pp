@@ -22,6 +22,9 @@ class quickstack::neutron::compute (
   $glance_host                  = '127.0.0.1',
   $nova_host                    = '127.0.0.1',
   $enable_tunneling             = $quickstack::params::enable_tunneling,
+  $monitoring                   = $quickstack::params::monitoring,
+  $monitoring_host              = $quickstack::params::monitoring_host,
+  $monitoring_interface         = $quickstack::params::monitoring_interface,
   $mysql_host                   = $quickstack::params::mysql_host,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
@@ -175,6 +178,9 @@ class quickstack::neutron::compute (
     private_iface                => $private_iface,
     private_ip                   => $private_ip,
     private_network              => $private_network,
+    monitoring                 => $monitoring,
+    monitoring_host            => $monitoring_host,
+    monitoring_interface       => $monitoring_interface,
   }
 
   class {'quickstack::neutron::firewall::gre':}

@@ -41,3 +41,5 @@
   - quickstack::gluster::server
 - :name: Galera Server
   :class: quickstack::galera::server
+- :name: Nagios Server
+  :class: quickstack::monitoring::server

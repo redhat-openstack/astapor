@@ -436,6 +436,10 @@ params = {
   "wsrep_ssl"                     => true,
   "wsrep_ssl_key"                 => "/etc/pki/galera/galera.key",
   "wsrep_ssl_cert"                => "/etc/pki/galera/galera.crt",
+  "monitoring"                    => 'nagios',
+  "monitoring_adm_passwd"         => SecureRandom.hex,
+  "monitoring_host"               => '172.16.0.1',
+  "monitoring_interface"          => 'eth0',
 }
 
 hostgroups = [
@@ -480,7 +484,9 @@ hostgroups = [
               "quickstack::gluster::server",
              ]},
     {:name=>"Galera Server",
-     :class=>"quickstack::galera::server"}
+     :class=>"quickstack::galera::server"},
+    {:name=>"Nagios Server",
+     :class=>"quickstack::monitoring::server"}
 ]
 
 def get_key_type(value)

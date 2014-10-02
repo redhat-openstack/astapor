@@ -37,6 +37,9 @@ class quickstack::compute_common (
   $libvirt_inject_password      = 'false',
   $libvirt_inject_key           = 'false',
   $libvirt_images_type          = 'rbd',
+  $monitoring                   = $quickstack::params::monitoring,
+  $monitoring_host              = $quickstack::params::monitoring_host,
+  $monitoring_interface         = $quickstack::params::monitoring_interface,
   $mysql_ca                     = $quickstack::params::mysql_ca,
   $mysql_host                   = $quickstack::params::mysql_host,
   $nova_host                    = '127.0.0.1',
@@ -223,5 +226,13 @@ class quickstack::compute_common (
     proto  => 'tcp',
     dport  => '5900-5999',
     action => 'accept',
+  }
+
+  if ($monitoring) {
+    class {'quickstack::monitoring::client':
+      monitoring           => $monitoring,
+      monitoring_host      => $monitoring_host,
+      monitoring_interface => $monitoring_interface,
+    }
   }
 }
