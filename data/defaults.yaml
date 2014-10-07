@@ -1,0 +1,52 @@
+---
+# All In One
+
+control_admin: localhost
+control_internal: localhost
+control_public: localhost
+password_default: changeme
+admin_email: 'admin@example.com'
+
+amqp_provider: 'rabbitmq'
+database: 'mysql'
+freeipa: 'false'
+glance_backend: 'file'
+libvirt_type: 'qemu'
+neutron: 'true'
+neutron_tunnel_iface: 'eth2'
+neutron_tunnel_type: 'vxlan'
+region: 'RegionOne'
+ssl: 'true'
+
+admin_password: "%{hiera('password_default')}"
+admin_token: "%{hiera('password_default')}"
+amqp_nssdb_password: "%{hiera('password_default')}"
+amqp_password: "%{hiera('password_default')}"
+ceilometer_metering_secret: "%{hiera('password_default')}"
+ceilometer_user_password: "%{hiera('password_default')}"
+cinder_db_password: "%{hiera('password_default')}"
+cinder_user_password: "%{hiera('password_default')}"
+cinder_san_password: "%{hiera('password_default')}"
+cinder_eqlx_chap_password: "%{hiera('password_default')}"
+fence_xvm_key_file_password: "%{hiera('password_default')}"
+galera_monitor_password: "%{hiera('password_default')}"
+glance_db_password: "%{hiera('password_default')}"
+glance_user_password: "%{hiera('password_default')}"
+heat_auth_encrypt_key: "%{hiera('password_default')}"
+heat_cfn_user_password: "%{hiera('password_default')}"
+heat_db_password: "%{hiera('password_default')}"
+heat_user_password: "%{hiera('password_default')}"
+horizon_secret_key: "%{hiera('password_default')}"
+keystone_admin_token: "%{hiera('password_default')}"
+keystone_db_password: "%{hiera('password_default')}"
+keystone_user_password: "%{hiera('password_default')}"
+mysql_root_password: "%{hiera('password_default')}"
+neutron_db_password: "%{hiera('password_default')}"
+neutron_metadata_proxy_secret: "%{hiera('password_default')}"
+neutron_user_password: "%{hiera('password_default')}"
+nova_db_password: "%{hiera('password_default')}"
+nova_user_password: "%{hiera('password_default')}"
+secret_key: "%{hiera('password_default')}"
+swift_shared_secret: "%{hiera('password_default')}"
+swift_admin_password: "%{hiera('password_default')}"
+swift_user_password: "%{hiera('password_default')}"
