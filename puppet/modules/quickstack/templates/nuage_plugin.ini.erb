@@ -1,0 +1,32 @@
+[DATABASE]
+# Database connection if not specified in neutron.conf
+connection = mysql://neutron:<%=neutron_db_password %>@<%= mysql_host %>/neutron?charset=utf8
+[KEYSTONE]
+# Keystone authentication if not specified in neutron.conf
+keystone_service_endpoint = http://<%= controller_priv_host %>:35357/v2.0/
+keystone_admin_token = <%= keystone_admin_token %>
+[RESTPROXY]
+# Desired Name of VSD Organization/Enterprise to use when netpartition
+# is not specified
+default_net_partition_name = <%= net_partition %>
+# Hostname or IP address and port for connection to VSD server
+server = <%= vsdhostname %>:<%= vsdport %>
+# VSD Username and password for OpenStack plugin connection
+# User must belong to CSP Root group and CSP CMS group
+serverauth = <%= vsdusername %>:<%= vsdpassword %>
+### Custom Template options - not used in standard install
+## All templates must be created in the default net-partition
+## before Neutron is started.
+## L3 domain template name
+#default_l3domain_template = router-service
+## L2 domain template name - not used but must be created
+#default_l2domain_template = subnet-service
+## zone to be used in L3 domain for shared networks
+#default_shared_zone = shared
+## zone to be used in L3 domain for isolated networks
+#default_isolated_zone = isolated
+### Do not change the below options for standard installs
+organization = csp
+auth_resource = /me
+serverssl = True
+base_uri = /nuage/api/v3_0
