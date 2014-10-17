@@ -33,6 +33,7 @@ class quickstack::params (
   $cinder_backend_gluster_name  = 'glusterfs',
   $cinder_backend_iscsi         = false,
   $cinder_backend_iscsi_name    = 'iscsi',
+  $cinder_backend_netapp        = false,
   $cinder_backend_nfs           = false,
   $cinder_backend_nfs_name      = 'nfs',
   $cinder_backend_eqlx          = false,
@@ -46,6 +47,13 @@ class quickstack::params (
   $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ],
   $cinder_gluster_replica_count = '3',
   $cinder_glusterfs_shares      = [ '192.168.0.4:/cinder -o backup-volfile-servers=192.168.0.5' ],
+  # Cinder netapp
+  $cinder_netapp_ip              = ['192.168.0.4'],
+  $cinder_netapp_mode            = 'cmodeDirectNFS',
+  $cinder_netapp_port            = '80',
+  $cinder_netapp_login           = 'CHANGEME',
+  $cinder_netapp_password        = 'CHANGEME',
+  $cinder_netapp_shares          = [ '192.168.0.4:/cinder' ],
   # Cinder nfs
   $cinder_nfs_shares            = [ '192.168.0.4:/cinder' ],
   $cinder_nfs_mount_options     = '',
