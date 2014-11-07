@@ -27,12 +27,22 @@ class quickstack::pacemaker::galera (
       $_ensure = undef
     }
 
-    Exec['all-memcached-nodes-are-up'] -> Service['galera']
-    Class['::quickstack::pacemaker::rsync::galera'] -> Service['galera']
+    # defined for galera.cnf template
+    $wsrep_provider         = '/usr/lib64/galera/libgalera_smm.so'
+    $wsrep_bind_address     = map_params("local_bind_addr")
+    $wsrep_provider_options = wsrep_options({
+      'socket.ssl'      => $wsrep_ssl,
+      'socket.ssl_key'  => $wsrep_ssl_key,
+      'socket.ssl_cert' => $wsrep_ssl_cert,
+    })
+    $wsrep_debug = 0
+
+    Exec['all-memcached-nodes-are-up'] -> Exec['galera-bootstrap-OR-galera-property-exists']
 
     if (has_interface_with("ipaddress", map_params("cluster_control_ip")) and str2bool_i($::galera_bootstrap_ok)) {
       $galera_bootstrap = true
       $galera_test      = "/bin/true"
+      $bootstrap        = true  # variable referenced by galera.cnf
     } else {
       $galera_bootstrap = false
       $galera_test     = "/tmp/ha-all-in-one-util.bash property_exists galera"
@@ -50,7 +60,36 @@ class quickstack::pacemaker::galera (
       private_vip => map_params("db_vip"),
       admin_vip   => map_params("db_vip"),
     } ->
-    class {'::quickstack::firewall::galera':} ->
+    class {'::quickstack::firewall::galera':}
+
+    # if bootstrap, set up mariadb on all nodes
+    if str2bool_i($::galera_bootstrap_ok) {
+      Class ['::quickstack::firewall::galera'] ->
+      class { 'mysql::server':
+        #manage_config_file => false,
+        #config_file => $mysql_server_config_file,
+        package_name => 'mariadb-galera-server',
+        override_options => {
+        'mysqld' => {
+          'bind-address' => map_params("local_bind_addr"),
+          'default_storage_engine' => "InnoDB",
+          # maybe below?
+          max_connections => "1024",
+          open_files_limit => '-1',
+          },
+        },
+        root_password => $mysql_root_password,
+        #  notify => Service['xinetd'],
+        #require => Package['mariadb-server'], ? maybe
+      }
+      ->
+      exec {'stop mariadb after one-time initial start':
+        command => '/usr/sbin/service mariadb stop',
+      }
+      ->
+      Exec['galera-bootstrap-OR-galera-property-exists']
+    }
+    Class ['::quickstack::firewall::galera'] ->
     exec {"galera-bootstrap-OR-galera-property-exists":
       timeout   => 3600,
       tries     => 360,
@@ -58,29 +97,35 @@ class quickstack::pacemaker::galera (
       command   => $galera_test,
       unless    => $galera_test,
     } ->
-    class { "::quickstack::pacemaker::rsync::galera":
-      cluster_control_ip => map_params("cluster_control_ip"),
+    file { '/etc/my.cnf.d/galera.cnf':
+      ensure  => present,
+      mode    => '0644',
+      owner   => 'root',
+      group   => 'root',
+      content => template('galera/wsrep.cnf.erb'),
     } ->
-    class { '::quickstack::galera::server':
-      mysql_bind_address      => map_params("local_bind_addr"),
-      mysql_root_password     => $mysql_root_password,
-      galera_bootstrap        => $galera_bootstrap,
-      galera_monitor_username => $galera_monitor_username,
-      galera_monitor_password => $galera_monitor_password,
-      service_enable          => $_enabled,
-      service_ensure          => $_ensure,
-      wsrep_cluster_name      => $wsrep_cluster_name,
-      wsrep_cluster_members   => $wsrep_cluster_members,
-      wsrep_sst_method        => $wsrep_sst_method,
-      wsrep_sst_username      => $wsrep_sst_username,
-      wsrep_sst_password      => $wsrep_sst_password,
-      wsrep_ssl               => $wsrep_ssl,
-      wsrep_ssl_key           => $wsrep_ssl_key,
-      wsrep_ssl_cert          => $wsrep_ssl_cert,
-    } ->
-    class {"::mysql::server::account_security": }
+    Exec['pcs-galera-server-setup']
+
+    if str2bool_i("$wsrep_ssl") {
+      File['/etc/my.cnf.d/galera.cnf'] ->
+      class { "::quickstack::pacemaker::rsync::galera":
+        cluster_control_ip => map_params("cluster_control_ip"),
+      } ->
+      Exec['pcs-galera-server-setup']
+    }
+
+    if str2bool_i($::galera_bootstrap_ok) {
+      File['/etc/my.cnf.d/galera.cnf'] ->
+      exec {'start galera in bootstrap':
+        command => "/usr/sbin/service mysqld start"
+      }
+      ->
+      Exec['pcs-galera-server-setup']        
+    }
+ 
     if (has_interface_with("ipaddress", map_params("cluster_control_ip")) and str2bool_i($::galera_bootstrap_ok)) {
-      Class ['::mysql::server::account_security'] ->
+
+      Exec['start galera in bootstrap'] ->
       class {"::quickstack::galera::db":
         keystone_db_password => map_params("keystone_db_password"),
         glance_db_password   => map_params("glance_db_password"),
@@ -88,11 +133,8 @@ class quickstack::pacemaker::galera (
         cinder_db_password   => map_params("cinder_db_password"),
         heat_db_password     => map_params("heat_db_password"),
         neutron_db_password  => map_params("neutron_db_password"),
-        require              => File['/root/.my.cnf'],
+        require              => Exec['start galera in bootstrap'],
       } ->
-      Exec['pcs-galera-server-setup']
-    } else {
-      Class ['::mysql::server::account_security'] ->
       Exec['pcs-galera-server-setup']
     }
     exec {"pcs-galera-server-setup":
@@ -103,7 +145,10 @@ class quickstack::pacemaker::galera (
       tries     => 360,
       try_sleep => 10,
       environment => ["AVAILABLE_WHEN_READONLY=0"],
-      command   => "/usr/bin/clustercheck >/dev/null",
+      #command   => "/usr/bin/clustercheck >/dev/null",
+      # short term substitute since clustercheck always indicates HTTP/1.1 503 Service Unavailable right now
+      command => 'echo "SHOW STATUS LIKE \"wsrep_cluster_status%\"" | mysql --defaults-file=/root/.my.cnf | grep -P "\bPrimary\b"',
+      path     => '/usr/bin',
     } ->
     exec {"pcs-galera-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property galera"
@@ -158,7 +203,10 @@ class quickstack::pacemaker::galera (
       # if clustercheck fails, it may be that we need to allow
       #  pacemaker to re-attempt to start mysqld on a node, which we
       #  can acheive by cleaning up the resource
-      command   => '/usr/bin/clustercheck || (/usr/sbin/pcs resource cleanup mysqld-clone && /bin/false)',
+      #command   => '/usr/bin/clustercheck || (/usr/sbin/pcs resource cleanup mysqld-clone && /bin/false)',
+      # TODO revisit.  use clustercheck if possible
+      command => 'echo "SHOW STATUS LIKE \"wsrep_cluster_status%\"" | mysql --defaults-file=/root/.my.cnf | grep -P "\bPrimary\b" || (/usr/sbin/pcs resource cleanup mysqld-clone && /bin/false)',
+      path     => '/usr/bin',
     }
 
     # in the bootstrap case, make sure pacemaker galera resource
