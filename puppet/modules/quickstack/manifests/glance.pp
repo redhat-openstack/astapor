@@ -39,6 +39,10 @@ class quickstack::glance (
   $amqp_username            = '',
   $amqp_password            = '',
   $amqp_provider            = 'rabbitmq',
+  $amqp_use_ssl             = false,
+  $amqp_ssl_ca_certs        = undef,
+  $amqp_ssl_certfile        = undef,
+  $amqp_ssl_keyfile         = undef,
 ) {
 
   # Configure the db string
@@ -113,10 +117,14 @@ class quickstack::glance (
     }
   } else {
     class { 'glance::notify::rabbitmq':
-      rabbit_password => $amqp_password,
-      rabbit_userid   => $amqp_username,
-      rabbit_host     => $amqp_host,
-      rabbit_port     => $amqp_port,
+      rabbit_password    => $amqp_password,
+      rabbit_userid      => $amqp_username,
+      rabbit_host        => $amqp_host,
+      rabbit_port        => $amqp_port,
+      rabbit_use_ssl     => $amqp_use_ssl,
+      kombu_ssl_ca_certs => $amqp_ssl_ca_certs,
+      kombu_ssl_certfile => $amqp_ssl_certfile,
+      kombu_ssl_keyfile  => $amqp_ssl_keyfile,
     }
   }
 
