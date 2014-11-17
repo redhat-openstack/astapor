@@ -1,0 +1,36 @@
+### Configuration options for nuage-metadata-agent
+
+# Copyright (C) 2014, Nuage Networks
+
+# METADATA_PORT: TCP Port used by Nuage metadata agent
+METADATA_PORT=<%= agentport %>
+
+# NOVA_METADATA_IP: IP address used by Nova metadata server
+NOVA_METADATA_IP=<%= novaip %>
+
+# NOVA_METADATA_PORT: TCP Port used by Nova metadata server
+NOVA_METADATA_PORT=<%= metadataport %>
+
+# METADATA_PROXY_SHARED_SECRET: with which to sign the Instance-ID header
+METADATA_PROXY_SHARED_SECRET="<%= metadatasecret %>"
+
+# NOVA_CLIENT_VERSION: 
+NOVA_CLIENT_VERSION=2
+
+# NOVA_OS_USERNAME: 
+NOVA_OS_USERNAME=<%= novausername %>
+
+# NOVA_OS_PASSWORD: 
+NOVA_OS_PASSWORD=<%= novapassword %>
+
+# NOVA_OS_TENANT_NAME: 
+NOVA_OS_TENANT_NAME=admin
+
+# NOVA_OS_AUTH_URL: 
+NOVA_OS_AUTH_URL=http://<%= keystoneip %>:5000/v2.0 
+
+# NUAGE_METADATA_AGENT_START_WITH_OVS: if nuage-metadata-agent needs to be started with nuage-openvswitch-switch
+NUAGE_METADATA_AGENT_START_WITH_OVS=true 
+
+# NOVA_API_ENDPOINT_TYPE: one of publicURL, internalURL, adminURL
+NOVA_API_ENDPOINT_TYPE=adminURL

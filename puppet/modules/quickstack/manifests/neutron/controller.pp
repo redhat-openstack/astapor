@@ -19,6 +19,7 @@ class quickstack::neutron::controller (
   $cinder_backend_gluster_name   = $quickstack::params::cinder_backend_gluster_name,
   $cinder_backend_iscsi          = $quickstack::params::cinder_backend_iscsi,
   $cinder_backend_iscsi_name     = $quickstack::params::cinder_backend_iscsi_name,
+  $cinder_backend_netapp         = $quickstack::params::cinder_backend_netapp,
   $cinder_backend_nfs            = $quickstack::params::cinder_backend_nfs,
   $cinder_backend_nfs_name       = $quickstack::params::cinder_backend_nfs_name,
   $cinder_backend_rbd            = $quickstack::params::cinder_backend_rbd,
@@ -27,6 +28,12 @@ class quickstack::neutron::controller (
   $cinder_multiple_backends      = $quickstack::params::cinder_multiple_backends,
   $cinder_create_volume_types    = true,
   $cinder_gluster_shares         = $quickstack::params::cinder_gluster_shares,
+  $cinder_netapp_ip              = $quickstack::params::cinder_netapp_ip,
+  $cinder_netapp_mode            = $quickstack::params::cinder_netapp_mode,
+  $cinder_netapp_port            = $quickstack::params::cinder_netapp_port,
+  $cinder_netapp_login           = $quickstack::params::cinder_netapp_login,
+  $cinder_netapp_password        = $quickstack::params::cinder_netapp_password,
+  $cinder_netapp_shares          = $quickstack::params::cinder_netapp_shares,
   $cinder_nfs_shares             = $quickstack::params::cinder_nfs_shares,
   $cinder_nfs_mount_options      = $quickstack::params::cinder_nfs_mount_options,
   $cinder_san_ip                 = $quickstack::params::cinder_san_ip,
@@ -140,6 +147,13 @@ class quickstack::neutron::controller (
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
   $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
+  $net_partition                 = 'Openstack_Default' ,
+  $vsdhostname                   = '127.0.0.1',
+  $vsdport                       = '8443',
+  $vsdusername                   = 'csproot',
+  $vsdpassword                   = 'csproot',
+  $neutron_ovs_bridge            = 'br-int',
+
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -172,6 +186,7 @@ class quickstack::neutron::controller (
     cinder_backend_gluster_name   => $cinder_backend_gluster_name,
     cinder_backend_iscsi          => $cinder_backend_iscsi,
     cinder_backend_iscsi_name     => $cinder_backend_iscsi_name,
+    cinder_backend_netapp         => $cinder_backend_netapp,
     cinder_backend_nfs            => $cinder_backend_nfs,
     cinder_backend_nfs_name       => $cinder_backend_nfs_name,
     cinder_backend_rbd            => $cinder_backend_rbd,
@@ -180,6 +195,12 @@ class quickstack::neutron::controller (
     cinder_multiple_backends      => $cinder_multiple_backends,
     cinder_create_volume_types    => $cinder_create_volume_types,
     cinder_gluster_shares         => $cinder_gluster_shares,
+    cinder_netapp_ip              => $cinder_netapp_ip,
+    cinder_netapp_mode            => $cinder_netapp_mode,
+    cinder_netapp_port            => $cinder_netapp_port,
+    cinder_netapp_login           => $cinder_netapp_login,
+    cinder_netapp_password        => $cinder_netapp_password,
+    cinder_netapp_shares          => $cinder_netapp_shares,
     cinder_nfs_shares             => $cinder_nfs_shares,
     cinder_nfs_mount_options      => $cinder_nfs_mount_options,
     cinder_san_ip                 => $cinder_san_ip,
@@ -269,6 +290,7 @@ class quickstack::neutron::controller (
   ->
   class { '::nova::network::neutron':
     neutron_admin_password => $neutron_user_password,
+    neutron_ovs_bridge     => $neutron_ovs_bridge,
     security_group_api     => $security_group_api,
   }
   ->
@@ -281,6 +303,7 @@ class quickstack::neutron::controller (
     nova_admin_password                => "${nova_user_password}",
   }
   ->
+  if $neutron_core_plugin != 'neutron.plugins.nuage.plugin_adv.NuageAdvPlugin' {
   # FIXME: This really should be handled by the neutron-puppet module, which has
   # a review request open right now: https://review.openstack.org/#/c/50162/
   # If and when that is merged (or similar), the below can be removed.
@@ -291,6 +314,7 @@ class quickstack::neutron::controller (
     logoutput   => 'on_failure',
     before      => Service['neutron-server'],
     require     => [Neutron_config['database/connection'], Neutron_config['DEFAULT/core_plugin']],
+  }
   }
 
   class { '::neutron::server':
@@ -359,6 +383,23 @@ class quickstack::neutron::controller (
       tenant_network_type          => $tenant_network_type,
     }
   }
+
+  if $neutron_core_plugin == 'neutron.plugins.nuage.plugin_adv.NuageAdvPlugin' {
+  neutron_config {
+      'DEFAULT/api_extensions_path':      value => '/usr/lib/python2.6/site-packages/neutron/plugins/nuage/extensions';
+      'DEFAULT/service_plugins':          ensure => absent;
+  }
+    class { 'quickstack::neutron::plugins::nuage':
+        neutron_db_password  => $neutron_db_password,
+        mysql_host           => $mysql_host,
+        controller_priv_host => $controller_priv_host,
+        keystone_admin_token => $keystone_admin_token,
+        net_partition        => $netpartition ,
+        vsdhostname          => $vsdhostname,
+        vsdport              => $vsdport,
+        vsdusername          => $vsdusername,
+         }
+}
 
   firewall { '001 neutron server (API)':
     proto    => 'tcp',

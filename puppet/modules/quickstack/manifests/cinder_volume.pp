@@ -5,6 +5,7 @@ class quickstack::cinder_volume(
   $backend_glusterfs_name = 'glusterfs',
   $backend_iscsi          = false,
   $backend_iscsi_name     = 'iscsi',
+  $backend_netapp         = false,
   $backend_nfs            = false,
   $backend_nfs_name       = 'nfs',
   $backend_rbd            = false,
@@ -16,6 +17,13 @@ class quickstack::cinder_volume(
   $iscsi_bind_addr        = '',
 
   $glusterfs_shares       = [],
+
+  $netapp_ip              = '',
+  $netapp_mode            = 'cmodeDirectNFS',
+  $netapp_port            = '80',
+  $netapp_login           = 'CHANGEME',
+  $netapp_password        = 'CHANGEME',
+  $netapp_shares          = [],
 
   $nfs_shares             = [],
   $nfs_mount_options      = undef,
@@ -83,6 +91,16 @@ class quickstack::cinder_volume(
         glusterfs_shares           => $glusterfs_shares,
         glusterfs_shares_config    => '/etc/cinder/shares-glusterfs.conf',
       }
+    } elsif str2bool_i("$backend_netapp") {
+      class { '::cinder::volume::netapp':
+        netapp_server_hostname  => $netapp_ip,
+        netapp_mode             => $netapp_mode,
+        netapp_port             => $netapp_port,
+        netapp_login            => $netapp_login,
+        netapp_password         => $netapp_password,
+        nfs_shares_config       => $netapp_shares,
+      }
+
     } elsif str2bool_i("$backend_nfs") {
       include ::quickstack::nfs_common
       Package['nfs-utils'] -> Cinder::Backend::Nfs<| |>
