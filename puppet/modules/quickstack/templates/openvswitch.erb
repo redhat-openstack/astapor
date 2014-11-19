@@ -1,0 +1,88 @@
+### Configuration options for openvswitch
+
+# Copyright (C) 2009, 2010, 2011 Nicira Networks, Inc.
+
+# FORCE_COREFILES: If 'yes' then core files will be enabled.
+# FORCE_COREFILES=yes
+
+# OVSDB_SERVER_PRIORITY: "nice" priority at which to run ovsdb-server.
+#
+# OVSDB_SERVER_PRIORITY=-10
+
+# VSWITCHD_PRIORITY: "nice" priority at which to run ovs-vswitchd.
+# VSWITCHD_PRIORITY=-10
+
+# VSWITCHD_MLOCKALL: Whether to pass ovs-vswitchd the --mlockall option.
+#     This option should be set to "yes" or "no".  The default is "yes".
+#     Enabling this option can avoid networking interruptions due to
+#     system memory pressure in extraordinary situations, such as multiple
+#     concurrent VM import operations.
+# VSWITCHD_MLOCKALL=yes
+
+# BRCOMPAT: If 'yes' compatibility mode will be enabled.
+ BRCOMPAT=no
+
+# DELETE_BRIDGES: Delete the previously existing ones, default is "no".
+# DELETE_BRIDGES=no
+
+# PERSONALITY: vrs/vrs-g/none (default: vrs)
+PERSONALITY=vrs
+
+# PLATFORM: kvm/xen/esx-i. Only apply when in VRS personality
+PLATFORM=kvm
+
+# DEFAULT_BRIDGE: Nuage managed bridge
+DEFAULT_BRIDGE=<%= defaultbridge %>
+
+# CONNID_TYPE: This could be set to type uuid or string
+# CONNID_TYPE=
+
+# CONNID_VAL: This could be a uuid value or a string
+# CONNID_VAL=
+
+# CLIENT_KEY_PATH: SSL client key file path
+# CLIENT_KEY_PATH=
+
+# CLIENT_CERT_PATH: SSL client certificate file path
+# CLIENT_CERT_PATH=
+
+# CA_CERT_PATH: CA certificate file path
+# CA_CERT_PATH=
+
+# CONN_TYPE: ssl or tcp
+CONN_TYPE=<%= connectiontype %>
+
+# ACTIVE_CONTROLLER: Primary controller IP. Only valid IP addresses will be
+# accepted. To delete the controller comment out the ACTIVE_CONTROLLER
+# variable below
+ACTIVE_CONTROLLER="<%= activecontroller %>"
+#
+# STANDBY_CONTROLLER: Secondary controller IP. Only valid IP addresses
+# will be accepted. To delete the controller comment out the STANDBY_CONTROLLER
+# variable below
+STANDBY_CONTROLLER="<%= standbycontroller %>"
+#
+# NUAGE_MONITOR_PRIORITY: 
+# NUAGE_MONITOR_PRIORITY= -10
+#
+# VM_MONITOR_PRIORITY:
+# VM_MONITOR_PRIORITY= -10
+
+# TUNNEL_CACHING_ENABLED: "yes" to enable caching, "no" to disable.
+TUNNEL_CACHING_ENABLED=yes
+
+# MANAGEMENT_INTERFACE: Management interface (example: eth0) 
+# MANAGEMENT_INTERFACE=eth0
+
+# OVS_CTL_OPTS: Extra options to pass to ovs-ctl.  This is, for example,
+# a suitable place to specify --ovs-vswitchd-wrapper=valgrind.
+# OVS_CTL_OPTS=
+
+# VRSG_PEER_IP: Applies only when in GateWay mode
+# VRSG_PEER_IP=0.0.0.0
+
+# MCAST_UNDERLAY_INTF_1: mcast interface
+#MCAST_UNDERLAY_INTF_1=
+
+# MCAST_UNDERLAY_INTF_RANGE_1: mcast interface range
+#MCAST_UNDERLAY_INTF_RANGE_1=
