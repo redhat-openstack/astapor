@@ -29,13 +29,12 @@ Alternatively use github source
 * Run Puppet on each node
 
 ```
-puppet apply -e "hiera_include(<NODE_TYPE>)"  --modulepath=/usr/share/openstack-puppet/modules:/usr/share/openstack-foreman-installer/puppet/modules
+puppet apply -e "hiera_include('<NODE_TYPE>')"  --modulepath=/usr/share/openstack-puppet/modules:/usr/share/openstack-foreman-installer/puppet/modules
 ```
 
-where `<NODE_TYPE> ::= HA_AIO_classes | compute_classes`
+where `<NODE_TYPE> ::= HA_classes | compute_classes | AIO_classes`
 
 ## Notes
-* Tested on RHO5/RHEL7
-* Setenforce 0 - Nova scheduler: missing SELinux AVC (BZ#1149975)
-* Compute class to be added soon
+* Compute class [Work in Progress]
+* AIO [Work in Progress]
 * The Openstack Puppet Modules includes module-data which allows YAML data to be built-in
