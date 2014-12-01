@@ -1,5 +1,5 @@
-# HA All In One Controller
-HA_AIO_classes:
+# HA multi controllers
+HA_classes:
   - quickstack::openstack_common
   - quickstack::pacemaker::common
   - quickstack::pacemaker::params
@@ -17,5 +17,27 @@ HA_AIO_classes:
   - quickstack::pacemaker::galera
   - quickstack::pacemaker::neutron
 
+# Just a Compute node
 compute_classes:
   - quickstack::compute::neutron
+
+# All-in-One (Fake HA)
+AIO_classes:
+  - quickstack::openstack_common
+  - quickstack::pacemaker::common
+  - quickstack::pacemaker::params
+  - quickstack::pacemaker::keystone
+  - quickstack::pacemaker::swift
+  - quickstack::pacemaker::load_balancer
+  - quickstack::pacemaker::memcached
+  - quickstack::pacemaker::qpid
+  - quickstack::pacemaker::rabbitmq
+  - quickstack::pacemaker::glance
+  - quickstack::pacemaker::nova
+  - quickstack::pacemaker::heat
+  - quickstack::pacemaker::cinder
+  - quickstack::pacemaker::horizon
+  - quickstack::pacemaker::galera
+  - quickstack::pacemaker::neutron
+# Some work needed:
+#  - quickstack::compute::neutron
