@@ -2,10 +2,9 @@
 class quickstack (
 ) inherits quickstack::params {
 
-  $list = scenario_classes("$scenario", $scenarii)
-  $incl = join($list)
+  $list = join(scenario_classes("$scenario", $scenarii))
   notify {"running $scenario":}
   notify {"$list":}
   # $list.each |$e| { include "$e" }
-  include $incl
+  include $list
 }
