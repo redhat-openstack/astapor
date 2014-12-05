@@ -7,7 +7,7 @@ def get_all_classes(roles)
   roles.each do |role|
     if SCENARII[role]
       if SCENARII[role]['roles']
-        list << Scene.get_all_classes(SCENARII[role]['roles'])
+        list << get_all_classes(SCENARII[role]['roles'])
       end
       if SCENARII[role]['classes']
         list << SCENARII[role]['classes']
