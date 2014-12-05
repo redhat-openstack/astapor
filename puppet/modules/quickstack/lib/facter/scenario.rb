@@ -32,13 +32,15 @@ class Scene
 end
 
 Facter.add("scenario_name") do
-setcode do
-  scenario
+  setcode do
+    scenario
+  end
 end
 
 Facter.add("scenario_classes") do
-setcode do
-  list = Scene.details(scenarii[scenario]['roles']) if scenarii[scenario]['roles']
-  list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
-  list.flatten! unless list.empty?
+  setcode do
+    list = Scene.details(scenarii[scenario]['roles']) if scenarii[scenario]['roles']
+    list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
+    list.flatten! unless list.empty?
+  end
 end
