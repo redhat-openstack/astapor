@@ -23,15 +23,11 @@ class Scene
       deps.flatten!.uniq! unless deps.empty?
       deps
     end
-
-    def details(roles)
-      classes = []
-      classes << Scene.get_all_classes(roles) if roles
-      classes
-    end
   end
 end
-
-list = Scene.details(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
-list.concat(SCENARII[scenario]['classes']) if SCENARII[scenario]['classes']
+list = []
+list << Scene.get_all_classes(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
+list << SCENARII[scenario]['classes'] if SCENARII[scenario]['classes']
+p list
 list.flatten! unless list.empty?
+list
