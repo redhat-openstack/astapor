@@ -1,5 +1,3 @@
-module Puppet::Parser::Functions
-
 class Scene
   class << self
     def get_all_classes(roles, scenarii)
@@ -19,6 +17,8 @@ class Scene
     end
   end
 end
+
+module Puppet::Parser::Functions
 
 newfunction(:scenario_classes, :type => :rvalue, :doc => <<-EOS
 Returns unique list of all embedded class for a scenario
