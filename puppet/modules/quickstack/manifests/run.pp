@@ -4,7 +4,7 @@ class quickstack::run (
 
   notify {"test $scenario":}
 
-  $foo = scenario_classes($scenario)
+  $foo = scenario_classes($scenario, $scenarii)
 
   notify {"test $foo":}
 
