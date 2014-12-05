@@ -11,13 +11,8 @@ def get_all_classes(roles, scenarii)
     end
   end
   deps.flatten!.uniq! unless deps.empty?
+  p deps
   deps
-end
-
-def details(roles, scenarii)
-  classes = []
-  classes << get_all_classes(roles, scenarii) if roles
-  classes
 end
 
 module Puppet::Parser::Functions
@@ -33,7 +28,7 @@ EOS
     scenarii = arguments[1] ||= []
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
-    list = details(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
+    list = get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
     p list
     list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
     list.flatten! unless list.empty?
