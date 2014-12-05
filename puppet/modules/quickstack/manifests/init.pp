@@ -5,8 +5,6 @@ class quickstack (
   $list = scenario_classes("$scenario", $scenarii)
 
   notify {"running $scenario":}
-  ->
   notify {"$list":}
-  ->
   include "$list"
 }
