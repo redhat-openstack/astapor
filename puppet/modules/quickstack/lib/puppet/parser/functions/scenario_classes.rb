@@ -31,7 +31,8 @@ EOS
 
     scenario = arguments[0] ||= ''
     scenarii = arguments[1] ||= []
-
+   p scenario
+   p scenarii
     raise(Puppet::ParseError, "Missing argumets") if @scenario.empty? || @scenarii.empty?
 
     list = details(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
