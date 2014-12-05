@@ -33,6 +33,7 @@ end
 
 Facter.add("scenario_name") do
 setcode do
+  scenario
 end
 
 Facter.add("scenario_classes") do
