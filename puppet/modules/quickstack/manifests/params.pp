@@ -62,8 +62,8 @@ class quickstack::params (
   #  Cinder RBD
   $cinder_rbd_pool              = 'volumes',
   $cinder_rbd_ceph_conf         = '/etc/ceph/ceph.conf',
-  $cinder_rbd_flatten_volume_from_snapshot,
-                                = false
+  $cinder_rbd_flatten_volume_from_snapshot
+                                = false,
   $cinder_rbd_max_clone_depth   = '5',
   $cinder_rbd_user              = 'volumes',
   $cinder_rbd_secret_uuid       = '',
@@ -330,6 +330,6 @@ class quickstack::params (
  # $ovs_tunnel_types_details = {"gre"=>{"proto"=>"gre"}, "vxlan"=>{"proto"=>"udp", "dport"=>"4789"}}}
 ## END - Neutron refactor: Added for consolidation
 
-  #$quickstack::params::scenario = undef
+  $scenarii = []
   $scenario = '',
 ) {}
