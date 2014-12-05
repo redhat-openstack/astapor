@@ -1,30 +1,23 @@
-require 'facter'
-require 'hiera'
-
-class Scene
-  class << self
-    def get_all_classes(roles)
-      deps = []
-      roles.each do |role|
-        if SCENARII[role]
-          if SCENARII[role]['roles']
-            deps << Scene.get_all_classes(SCENARII[role]['roles'])
-          end
-          if SCENARII[role]['classes']
-            deps << SCENARII[role]['classes']
-          end
-        end
+def get_all_classes(roles, scenarii)
+  deps = []
+  roles.each do |role|
+    if scenarii[role]
+      if scenarii[role]['roles']
+        deps << Scene.get_all_classes(scenarii[role]['roles'])
       end
-      deps.flatten!.uniq! unless deps.empty?
-      deps
-    end
-
-    def details(roles)
-      classes = []
-      classes << Scene.get_all_classes(roles) if roles
-      classes
+      if scenarii[role]['classes']
+        deps << scenarii[role]['classes']
+      end
     end
   end
+  deps.flatten!.uniq! unless deps.empty?
+  deps
+end
+
+def details(roles, scenarii)
+  classes = []
+  classes << get_all_classes(roles, scenarii) if roles
+  classes
 end
 
 module Puppet::Parser::Functions
@@ -34,14 +27,14 @@ EOS
 ) do |arguments|
     Puppet::Parser::Functions.autoloader.loadall
     raise(Puppet::ParseError, "scenario_classes(): Wrong number of arguments " +
-      "given (#{arguments.size} for 1)") if arguments.size < 1
+      "given (#{arguments.size} for 2)") if arguments.size < 2
 
-    scenario = arguments[0] ||= false
-    hiera = Hiera.new
-    SCENARII = hiera.lookup('scenarii', '', '')
+    scenario = arguments[0] ||= ''
+    scenarii = arguments[1] ||= []
+    raise(Puppet::ParseError, "Missing argumets") if @scenario.empty? || @scenarii.empty?
 
-    list = Scene.details(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
-    list.concat(SCENARII[scenario]['classes']) if SCENARII[scenario]['classes']
+    list = details(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
+    list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
     list.flatten! unless list.empty?
   end
 end
