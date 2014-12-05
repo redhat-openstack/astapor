@@ -6,6 +6,6 @@ class quickstack (
   # notify {"test $scenarii":}
 
   $list = scenario_classes($scenario, $scenarii)
-  notify {"showing $list":}
+  notify {$list:}
   include $list
 }
