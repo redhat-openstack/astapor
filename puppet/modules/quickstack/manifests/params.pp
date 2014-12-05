@@ -330,6 +330,6 @@ class quickstack::params (
  # $ovs_tunnel_types_details = {"gre"=>{"proto"=>"gre"}, "vxlan"=>{"proto"=>"udp", "dport"=>"4789"}}}
 ## END - Neutron refactor: Added for consolidation
 
-  $scenarii = []
+  $scenarii = [],
   $scenario = '',
 ) {}
