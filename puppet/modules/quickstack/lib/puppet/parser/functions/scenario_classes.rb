@@ -34,7 +34,7 @@ p scenarii.class
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
     list = []
-    list = get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
+    list = Scene.get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
     list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
     p list
     list.flatten! unless list.empty?
