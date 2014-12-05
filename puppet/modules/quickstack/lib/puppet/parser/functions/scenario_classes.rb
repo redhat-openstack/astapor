@@ -1,7 +1,7 @@
 class Scene
   class << self
     def get_all_classes(roles, scenarii)
-      list = Array.new
+      list = []
       roles.each do |role|
         if scenarii[role]
           if scenarii[role]['roles']
@@ -32,11 +32,10 @@ EOS
     scenarii = arguments[1] ||= {}
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
-    list = Array.new
+    list = []
     list = Scene.get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
     list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
     list.flatten! unless list.empty?
-    p list
     list
   end
 end
