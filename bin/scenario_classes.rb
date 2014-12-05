@@ -25,9 +25,10 @@ class Scene
     end
   end
 end
-list = []
-list << Scene.get_all_classes(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
-list << SCENARII[scenario]['classes'] if SCENARII[scenario]['classes']
-p list
-list.flatten! unless list.empty?
-list
+
+deps=[]
+deps << Scene.get_all_classes(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
+deps << SCENARII[scenario]['classes'] if SCENARII[scenario]['classes']
+p deps
+deps.flatten! unless deps.empty?
+deps
