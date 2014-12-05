@@ -1,6 +1,6 @@
 ---
-scenario: HA
-scenarii:
+quickstack::params:scenario: HA
+quickstack::params:scenarii:
   compute:
     desc: "Nova Compute (no network)"
     classes:
