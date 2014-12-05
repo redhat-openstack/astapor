@@ -3,8 +3,8 @@ class quickstack (
 ) inherits quickstack::params {
 
   notify {"running $scenario":}
-  #notify {"test $scenarii":}
+  # notify {"test $scenarii":}
 
-  list = scenario_classes($scenario, $scenarii)
+  $list = scenario_classes([$scenario, $scenarii])
   notify {"showing $list":}
 }
