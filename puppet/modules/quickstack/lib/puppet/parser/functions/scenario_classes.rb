@@ -1,23 +1,26 @@
 module Puppet::Parser::Functions
 
-def get_all_classes(roles, scenarii)
-  deps = []
-  roles.each do |role|
-    if scenarii[role]
-      if scenarii[role]['roles']
-        deps << get_all_classes(scenarii[role]['roles'], scenarii)
+class Scene
+  class << self
+    def get_all_classes(roles, scenarii)
+      list = Array.new
+      roles.each do |role|
+        if scenarii[role]
+          if scenarii[role]['roles']
+            list << get_all_classes(scenarii[role]['roles'], scenarii)
+          end
+          if scenarii[role]['classes']
+            list << scenarii[role]['classes']
+          end
+        end
       end
-      if scenarii[role]['classes']
-        deps << scenarii[role]['classes']
-      end
+      list
+      # deps.flatten!.uniq! unless deps.empty?
     end
   end
-  deps.flatten!.uniq! unless deps.empty?
-  p deps
-  deps
 end
 
-    newfunction(:scenario_classes, :type => :rvalue, :doc => <<-EOS
+newfunction(:scenario_classes, :type => :rvalue, :doc => <<-EOS
 Returns unique list of all embedded class for a scenario
 EOS
 ) do |arguments|
