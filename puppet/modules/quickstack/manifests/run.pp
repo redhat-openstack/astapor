@@ -4,14 +4,4 @@ class quickstack::run (
 
   notify {"test $scenario":}
 
-  $foo = scenario_classes($scenario, $scenarii)
-
-  notify {"test $foo":}
-
-  if  $foo.empty {
-    notify {"No classes to run":}
-  }
-  else {
-    hiera_include($foo)
-  }
 }
