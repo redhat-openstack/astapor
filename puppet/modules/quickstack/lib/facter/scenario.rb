@@ -2,20 +2,20 @@ require 'facter'
 require 'hiera'
 
 hiera = Hiera.new
-scenario = hiera.lookup('scenario', '', '')
-scenarii = hiera.lookup('scenarii', '', '')
+SCENARIO = hiera.lookup('scenario', '', '')
+SCENARII = hiera.lookup('scenarii', '', '')
 
 class Scene
   class << self
     def get_all_classes(roles)
       deps = []
       roles.each do |role|
-        if scenarii[role]
-          if scenarii[role]['roles']
-            deps << Scene.get_all_classes(scenarii[role]['roles'])
+        if SCENARII[role]
+          if SCENARII[role]['roles']
+            deps << Scene.get_all_classes(SCENARII[role]['roles'])
           end
-          if scenarii[role]['classes']
-            deps << scenarii[role]['classes']
+          if SCENARII[role]['classes']
+            deps << SCENARII[role]['classes']
           end
         end
       end
@@ -33,14 +33,14 @@ end
 
 Facter.add("scenario_name") do
   setcode do
-    scenario
+    SCENARIO
   end
 end
 
-Facter.add("scenario_classes") do
+Facter.add("SCENARIO_classes") do
   setcode do
-    list = Scene.details(scenarii[scenario]['roles']) if scenarii[scenario]['roles']
-    list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
+    list = Scene.details(SCENARII[SCENARIO]['roles']) if SCENARII[SCENARIO]['roles']
+    list.concat(SCENARII[SCENARIO]['classes']) if SCENARII[SCENARIO]['classes']
     list.flatten! unless list.empty?
   end
 end
