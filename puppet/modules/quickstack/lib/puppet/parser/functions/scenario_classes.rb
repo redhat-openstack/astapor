@@ -25,9 +25,10 @@ EOS
       "given (#{arguments.size} for 2)") if arguments.size < 2
 
     scenario = arguments[0] ||= ''
-    scenarii = arguments[1].split(',')
+    scenarii = arguments[1] ||= {}
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
+p scenarii
     list = []
     list = get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
     list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
