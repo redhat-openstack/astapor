@@ -8,5 +8,5 @@ class quickstack (
 
   $list = scenario_classes("$scenario", $scenarii)
   notify {"$list":}
-  #include $list
+  include $list
 }
