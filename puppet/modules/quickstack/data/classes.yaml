@@ -1,5 +1,5 @@
 ---
-quickstack::params::scenario: HA
+quickstack::params::scenario: "%{hiera('scenario')}"
 quickstack::params::scenarii:
   compute:
     desc: "Nova Compute (no network)"
