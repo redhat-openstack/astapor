@@ -6,5 +6,6 @@ class quickstack (
 
   notify {"running $scenario":}
   notify {"$list":}
-  include $list
+  #include $list
+  include quickstack::neutron
 }
