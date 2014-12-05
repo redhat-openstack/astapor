@@ -1,6 +1,6 @@
 ---
 # To display scenarii: hiera scenarii
-scenario: 'legacy-compute-neutron'
+scenario: 'custom'
 
 admin_email: 'admin@example.com'
 
