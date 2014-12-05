@@ -31,13 +31,7 @@ class Scene
   end
 end
 
-Facter.add("scenario_name") do
-  setcode do
-    SCENARIO
-  end
-end
-
-Facter.add("SCENARIO_classes") do
+Facter.add("scenario_classes") do
   setcode do
     list = Scene.details(SCENARII[SCENARIO]['roles']) if SCENARII[SCENARIO]['roles']
     list.concat(SCENARII[SCENARIO]['classes']) if SCENARII[SCENARIO]['classes']
