@@ -2,5 +2,5 @@
 class quickstack::run (
 ) inherits quickstack::params {
 
-  notify {"running $scenario":}
+  notify {"running run":}
 }
