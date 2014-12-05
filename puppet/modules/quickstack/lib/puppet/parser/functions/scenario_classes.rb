@@ -30,7 +30,6 @@ EOS
 
     scenario = arguments[0] ||= ''
     scenarii = arguments[1] ||= {}
-p scenarii.class
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
     list = []
@@ -38,6 +37,7 @@ p scenarii.class
     list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
     p list
     list.flatten! unless list.empty?
+    p list
     list
   end
 end
