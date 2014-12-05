@@ -1,10 +1,6 @@
 require 'facter'
 require 'hiera'
 
-hiera = Hiera.new
-SCENARIO = hiera.lookup('scenario', '', '')
-SCENARII = hiera.lookup('scenarii', '', '')
-
 class Scene
   class << self
     def get_all_classes(roles)
@@ -40,11 +36,13 @@ EOS
     raise(Puppet::ParseError, "scenario_classes(): Wrong number of arguments " +
       "given (#{arguments.size} for 1)") if arguments.size < 1
 
-    ssl    = arguments[0] ||= false
-    ssl_ca = arguments[1] ||= ''
+    scenario = arguments[0] ||= false
+    hiera = Hiera.new
+    #scenario = hiera.lookup('scenario', '', '')
+    SCENARII = hiera.lookup('scenarii', '', '')
 
-    list = Scene.details(SCENARII[SCENARIO]['roles']) if SCENARII[SCENARIO]['roles']
-    list.concat(SCENARII[SCENARIO]['classes']) if SCENARII[SCENARIO]['classes']
+    list = Scene.details(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
+    list.concat(SCENARII[scenario]['classes']) if SCENARII[scenario]['classes']
     list.flatten! unless list.empty?
   end
 end
