@@ -1,4 +1,5 @@
 # Quickstack network node configuration for neutron (OpenStack Networking)
+# Used with NON-HA controller scenarios
 class quickstack::neutron::networker (
   $agent_type                    = 'ovs',
   $fixed_network_range           = $quickstack::params::fixed_network_range,

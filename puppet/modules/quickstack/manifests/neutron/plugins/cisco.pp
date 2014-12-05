@@ -54,7 +54,7 @@ class quickstack::neutron::plugins::cisco (
   $nexus_config                 = $quickstack::params::nexus_config,
   $nexus_credentials            = $quickstack::params::nexus_credentials,
   $neutron_core_plugin          = '',
-  $n1kv_os_ha                   = 'false',
+  $n1kv_os_ha                   = 'true',
   # ovs config
   $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
@@ -95,7 +95,7 @@ class quickstack::neutron::plugins::cisco (
       require => File['/var/lib/neutron/.ssh']
     }
   }
-  
+
   if $cisco_vswitch_plugin == 'neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2' {
     class { '::neutron::plugins::cisco':
       database_user     => $neutron_db_user,

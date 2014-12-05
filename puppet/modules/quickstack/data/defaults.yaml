@@ -1,4 +1,7 @@
 ---
+# To display scenarii: hiera scenarii
+scenario: 'HA'
+
 admin_email: 'admin@example.com'
 
 amqp_provider: 'rabbitmq'
@@ -88,3 +91,32 @@ nova_vip_public: "%{hiera('network_public')}.%{hiera('nova_vip')}"
 swift_vip_admin: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
 swift_vip_internal: "%{hiera('network_internal')}.%{hiera('swift_vip')}"
 swift_vip_public: "%{hiera('network_public')}.%{hiera('swift_vip')}"
+
+
+# NEW - TODO
+neutron::bind_host: "%{hiera('control_public')}"
+neutron::core_plugin: neutron.plugins.ml2.plugin.Ml2Plugin
+neutron::rabbit_password: guest
+neutron::service_plugins:
+- neutron.services.l3_router.l3_router_plugin.L3RouterPlugin
+neutron::rabbit_host: "%{hiera('control_internal')}"
+
+neutron::agents::metadata::auth_password: neutron_pass
+neutron::agents::metadata::shared_secret: a_secret
+neutron::agents::metadata::auth_url: "http://%{hiera('control_public')}:35357/v2.0"
+neutron::agents::metadata::metadata_ip: "%{hiera('control_public')}"
+neutron::agents::ml2::ovs::bridge_uplinks:
+- 'br-ex:eth2'
+neutron::agents::ml2::ovs::bridge_mappings:
+- 'default:br-ex'
+neutron::agents::ml2::ovs::local_ip: "%{ipaddress_eth3}"
+neutron::agents::ml2::ovs::enable_tunneling: true
+neutron::agents::ml2::ovs::tunnel_types:
+- vxlan
+
+neutron::plugins::ml2::type_drivers:
+- vxlan
+neutron::plugins::ml2::tenant_network_types:
+- vxlan
+neutron::plugins::ml2::mechanism_drivers:
+- openvswitch

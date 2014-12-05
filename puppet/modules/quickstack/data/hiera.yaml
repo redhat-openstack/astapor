@@ -1,5 +1,6 @@
 ---
 :hierarchy:
+- classes
 - "%{::fqdn}"
 - custom
 - secrets

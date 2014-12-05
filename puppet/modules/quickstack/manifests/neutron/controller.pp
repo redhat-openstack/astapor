@@ -1,4 +1,4 @@
-# Quickstart controller class for nova neutron (OpenStack Networking)
+# Quickstart NON-HA controller class for nova neutron (OpenStack Networking)
 class quickstack::neutron::controller (
   $admin_email                   = $quickstack::params::admin_email,
   $admin_password                = $quickstack::params::admin_password,
@@ -341,7 +341,7 @@ class quickstack::neutron::controller (
   class {'quickstack::neutron::plugins::neutron_config':
     neutron_conf_additional_params => $neutron_conf_additional_params,
   }
- 
+
   class {'quickstack::neutron::plugins::nova_config':
     nova_conf_additional_params => $nova_conf_additional_params,
   }

@@ -1,0 +1,66 @@
+---
+  quickstack::params::allow_overlapping_ips: 'true'
+  quickstack::params::mysql_host: '172.16.0.1'
+  quickstack::params::amqp_provider: 'rabbitmq'
+  quickstack::params::amqp_host: '172.16.0.1'
+  quickstack::params::amqp_username: 'openstack'
+  quickstack::params::amqp_password: 'CHANGEME'
+  quickstack::params::amqp_port: '5672'
+  quickstack::params::amqp_ssl_port: '5671'
+  quickstack::params::network_device_mtu: ''
+  quickstack::params::mysql_ca: '/etc/ipa/ca.crt'
+  quickstack::params::mysql_cert: undef
+  quickstack::params::mysql_key: undef
+  quickstack::params::amqp_ca: undef
+  quickstack::params::amqp_cert: undef
+  quickstack::params::amqp_key: undef
+  quickstack::params::neutron_db_password: 'CHANGEME'
+  quickstack::params::mysql_host: '172.16.0.1'
+  quickstack::params::database_max_retries: '-1'
+
+  quickstack::params::keystone_public_vip: '127.0.0.1'
+  quickstack::params::neutron_public_vip: '127.0.0.1'
+  quickstack::params::neutron_vip_admin: '127.0.0.1'
+  quickstack::params::neutron_vip_internal: '127.0.0.1'
+  quickstack::params::region: 'RegionOne'
+
+  quickstack::params::service_plugins: [ 'dhcp', 'l3' ]
+  quickstack::params::neutron_host_priv: '127.0.0.1'
+  quickstack::params::pcs_setup_neutron: 'true'
+  quickstack::params::neutron_verbose: 'false'
+  quickstack::params::ssl: 'false'
+
+  quickstack::params::neutron_conf_additional_params: { 'default_quota' => 'default',
+                                     'quota_network' => 'default',
+                                     'quota_subnet' => 'default',
+                                     'quota_port' => 'default',
+                                     'quota_security_group' => 'default',
+                                     'quota_security_group_rule' => 'default',
+                                     'quota_vip' => 'default',
+                                     'quota_pool' => 'default',
+                                     'quota_router' => 'default',
+                                     'quota_floatingip' => 'default',
+                                     'network_auto_schedule' => 'default',
+                                   }
+  quickstack::params::nova_conf_additional_params: { 'quota_instances' => 'default',
+                                     'quota_cores' => 'default',
+                                     'quota_ram' => 'default',
+                                     'quota_floating_ips' => 'default',
+                                     'quota_fixed_ips' => 'default',
+                                     'quota_driver' => 'default',
+                                     }
+  quickstack::params::n1kv_plugin_additional_params: { 'default_policy_profile' => 'default-pp',
+                                     'network_node_policy_profile' => 'default-pp',
+                                     'poll_duration' => '10',
+                                     'http_pool_size' => '4',
+                                     'http_timeout' => '30',
+                                     'firewall_driver' => 'neutron.agent.firewall.NoopFirewallDriver',
+                                     'enable_sync_on_start' => 'True',
+                                     'restrict_policy_profiles' => 'False',
+                                     }
+
+
+# Don't add unless also present in ovs_tunnel_types
+# Used by firewall rules
+  quickstack::params::ovs_tunnel_types_details: {"gre"=>{"proto"=>"gre"}, "vxlan"=>{"proto"=>"udp", "dport"=>"4789"}}}
+end
