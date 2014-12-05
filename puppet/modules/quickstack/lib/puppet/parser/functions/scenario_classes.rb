@@ -3,7 +3,7 @@ def get_all_classes(roles, scenarii)
   roles.each do |role|
     if scenarii[role]
       if scenarii[role]['roles']
-        deps << get_all_classes(scenarii[role]['roles'])
+        deps << get_all_classes(scenarii[role]['roles'], scenarii)
       end
       if scenarii[role]['classes']
         deps << scenarii[role]['classes']
@@ -31,12 +31,9 @@ EOS
 
     scenario = arguments[0] ||= ''
     scenarii = arguments[1] ||= []
-p scenario
-p scenarii
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
     list = details(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
-
     list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
     list.flatten! unless list.empty?
   end
