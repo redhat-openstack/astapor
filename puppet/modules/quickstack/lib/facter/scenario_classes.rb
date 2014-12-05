@@ -31,6 +31,8 @@ class Scene
   end
 end
 
-list = Scene.details(scenarii[scenario]['roles']) if scenarii[scenario]['roles']
-list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
-list
+setcode do
+  list = Scene.details(scenarii[scenario]['roles']) if scenarii[scenario]['roles']
+  list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
+  list.flatten!
+end

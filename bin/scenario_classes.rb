@@ -3,7 +3,6 @@ require 'facter'
 require 'hiera'
 
 hiera = Hiera.new
-#scenario = hiera.lookup('scenario', '', '')
 scenario = ARGV[0]
 SCENARII = hiera.lookup('scenarii', '', '')
 
@@ -35,4 +34,4 @@ end
 
 list = Scene.details(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
 list.concat(SCENARII[scenario]['classes']) if SCENARII[scenario]['classes']
-list
+list.flatten!
