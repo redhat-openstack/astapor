@@ -6,5 +6,5 @@ class quickstack (
 
   notify {"running $scenario":}
   notify {"$list":}
-  include $list
+  $list.each |$e| { include $e }
 }
