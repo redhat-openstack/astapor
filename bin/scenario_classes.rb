@@ -17,7 +17,7 @@ class Scene
         end
       end
       list
-      # deps.flatten!.uniq! unless deps.empty?
+      list.flatten!.uniq! unless list.empty?
     end
   end
 end
