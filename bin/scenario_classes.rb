@@ -20,7 +20,7 @@ class Scene
           end
         end
       end
-      deps.flatten!.uniq! if deps
+      deps.flatten!.uniq! unless deps.empty?
       deps
     end
 
@@ -34,4 +34,4 @@ end
 
 list = Scene.details(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
 list.concat(SCENARII[scenario]['classes']) if SCENARII[scenario]['classes']
-list.flatten!
+list.flatten! unless list.empty?

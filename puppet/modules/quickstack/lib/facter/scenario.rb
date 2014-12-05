@@ -19,7 +19,7 @@ class Scene
           end
         end
       end
-      deps.flatten!.uniq! if deps
+      deps.flatten!.uniq! unless deps.empty?
       deps
     end
 
@@ -31,8 +31,13 @@ class Scene
   end
 end
 
+Facter.add("scenario_name") do
+setcode do
+end
+
+Facter.add("scenario_classes") do
 setcode do
   list = Scene.details(scenarii[scenario]['roles']) if scenarii[scenario]['roles']
   list.concat(scenarii[scenario]['classes']) if scenarii[scenario]['classes']
-  list.flatten!
+  list.flatten! unless list.empty?
 end

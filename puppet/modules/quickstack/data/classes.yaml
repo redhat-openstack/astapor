@@ -91,3 +91,11 @@ scenarii:
     desc: "Nova Compute, Neutron NHA client"
     classes:
     - quickstack::neutron::compute
+
+ "quickstack::neutron"
+ "quickstack::neutron::plugins::ml2"
+ "quickstack::neutron::agents::ovs"
+ "quickstack::neutron::agents::dhcp"
+ "quickstack::neutron::agents::l3"
+ "quickstack::neutron::agents::lbass"
+ "quickstack::neutron::services::fwaas"

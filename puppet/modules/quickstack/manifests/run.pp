@@ -2,7 +2,7 @@
 class quickstack::run (
 ) inherits quickstack::params {
 
-  $foo = $scenario_classes
+  $foo = "$::scenario_classes"
     notify {"test $foo":}
   if  $foo.empty {
     notify {"No classes to run":}
