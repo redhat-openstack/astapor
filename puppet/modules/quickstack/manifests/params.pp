@@ -331,5 +331,5 @@ class quickstack::params () {
 ## END - Neutron refactor: Added for consolidation
 
   #$quickstack::params::scenario = undef
-  $scenario_classes = []
+  $scenario = undef
 }
