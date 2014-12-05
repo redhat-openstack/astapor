@@ -1,5 +1,8 @@
-# Common quickstack configurations
+# Quickstack init
+class quickstack(
+) inherits quickstack::params {
 
-class quickstack(){
-  require ntp
+  notify {"test $scenario":}
+
+  # include
 }
