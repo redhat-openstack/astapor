@@ -27,14 +27,13 @@ quickstack::params::scenarii:
     - quickstack::run2
     roles: []
 
-
   HA:
     desc: "HA Controllers (3+), Neutron Network agents"
     classes:
     roles:
     - HA-controller
-    - neutron-network-agents
     - PCS-neutron
+    - neutron-network-agents
 
   HA-AIO:
     desc: "HA All in One (1), HA Controllers, Neutron network agents, Compute"

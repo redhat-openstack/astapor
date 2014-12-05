@@ -1,6 +1,6 @@
 ---
 # To display scenarii: hiera scenarii
-scenario: 'custom'
+scenario: 'HA'
 
 admin_email: 'admin@example.com'
 
