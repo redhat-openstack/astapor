@@ -1,6 +1,6 @@
 # Common quickstack configurations
 class quickstack::run (
-  $scenario = undef,
+  $scenario,
 ) inherits quickstack::params {
 
   notify {"test $scenario":}
