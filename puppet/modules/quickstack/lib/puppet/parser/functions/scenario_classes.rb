@@ -1,3 +1,5 @@
+module Puppet::Parser::Functions
+
 def get_all_classes(roles, scenarii)
   deps = []
   roles.each do |role|
@@ -15,7 +17,6 @@ def get_all_classes(roles, scenarii)
   deps
 end
 
-module Puppet::Parser::Functions
     newfunction(:scenario_classes, :type => :rvalue, :doc => <<-EOS
 Returns unique list of all embedded class for a scenario
 EOS
