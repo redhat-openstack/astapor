@@ -13,6 +13,7 @@ class Scene
         end
       end
       list.flatten!.uniq! unless list.empty?
+      list.delete_if {|x| x == nil }
     end
   end
 end
