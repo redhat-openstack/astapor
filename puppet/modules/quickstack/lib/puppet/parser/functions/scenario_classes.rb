@@ -31,8 +31,18 @@ class Scene
   end
 end
 
-Facter.add("scenario_classes") do
-  setcode do
+module Puppet::Parser::Functions
+    newfunction(:scenario_classes, :type => :rvalue, :doc => <<-EOS
+Returns unique list of all embedded class for a scenario
+EOS
+) do |arguments|
+    Puppet::Parser::Functions.autoloader.loadall
+    raise(Puppet::ParseError, "scenario_classes(): Wrong number of arguments " +
+      "given (#{arguments.size} for 1)") if arguments.size < 1
+
+    ssl    = arguments[0] ||= false
+    ssl_ca = arguments[1] ||= ''
+
     list = Scene.details(SCENARII[SCENARIO]['roles']) if SCENARII[SCENARIO]['roles']
     list.concat(SCENARII[SCENARIO]['classes']) if SCENARII[SCENARIO]['classes']
     list.flatten! unless list.empty?
