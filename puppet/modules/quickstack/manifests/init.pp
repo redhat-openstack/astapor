@@ -1,5 +1,6 @@
 # Quickstack init
 class quickstack (
+  $scenario,
 ) inherits quickstack::params {
 
   notify {"running $scenario":}
