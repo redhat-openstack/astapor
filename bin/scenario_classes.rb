@@ -23,7 +23,7 @@ class Scene
 end
 
 deps=[]
-deps << Scene.get_all_classes(SCENARII[scenario]['roles'], scenarii) if SCENARII[scenario]['roles']
+deps << Scene.get_all_classes(SCENARII[scenario]['roles'], SCENARII) if SCENARII[scenario]['roles']
 deps << SCENARII[scenario]['classes'] if SCENARII[scenario]['classes']
 p deps
 deps.flatten! unless deps.empty?
