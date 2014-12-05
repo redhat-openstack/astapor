@@ -25,7 +25,7 @@ EOS
       "given (#{arguments.size} for 2)") if arguments.size < 2
 
     scenario = arguments[0] ||= ''
-    scenarii = arguments[1].split(',') ||= []
+    scenarii = arguments[1].split(',')
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
     list = []
