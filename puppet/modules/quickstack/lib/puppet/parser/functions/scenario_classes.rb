@@ -22,7 +22,7 @@ class Scene
     def details(roles)
       classes = []
       classes << Scene.get_all_classes(roles) if roles
-      classes.to_s
+      classes
     end
   end
 end
@@ -38,7 +38,6 @@ EOS
 
     scenario = arguments[0] ||= false
     hiera = Hiera.new
-    #scenario = hiera.lookup('scenario', '', '')
     SCENARII = hiera.lookup('scenarii', '', '')
 
     list = Scene.details(SCENARII[scenario]['roles']) if SCENARII[scenario]['roles']
