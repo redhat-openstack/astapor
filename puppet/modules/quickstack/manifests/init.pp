@@ -4,5 +4,6 @@ class quickstack (
 
   notify {"test $scenario":}
 
+  notify {"test $scenarii":}
   # include
 }
