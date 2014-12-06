@@ -4,7 +4,7 @@ require "hiera"
 require "hiera/config"
 require "hiera/scope"
 require "/usr/share/openstack-puppet/modules/module-data/lib/hiera/backend/module_data_backend"
-require '/usr/share/openstack-foreman-installer/puppet/modules/quickstack/lib/puppetx/redhat/scenario.rb'
+require '/usr/share/openstack-foreman-installer/puppet/modules/quickstack/lib/puppetx/redhat/scenario'
 
 class Hiera::Config
   class << self
@@ -30,7 +30,8 @@ when 'dry'
   # result == [expected_test1]
   # using rspec lib for ^
 when 'run'
-  scenarii = Hiera.lookup('quickstack::params::scenarii')
+  hiera = Hiera.new
+  scenarii = hiera.lookup('quickstack::params::scenarii')
   puts scenarii
   Scenario::Scene.all_classes(scenario, scenarii)
 end
