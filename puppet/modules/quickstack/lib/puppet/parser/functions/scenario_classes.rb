@@ -17,6 +17,14 @@ class Scene
       list.flatten!.uniq! unless list.empty?
       list.delete_if {|x| x == nil }
     end
+
+    def all_classes(scenario, scenarii)
+      list = []
+      list = Scene.get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
+      list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
+      list.flatten! unless list.empty?
+      list
+    end
   end
 end
 
@@ -34,10 +42,6 @@ EOS
     scenarii = arguments[1] ||= {}
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
-    list = []
-    list = Scene.get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
-    list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
-    list.flatten! unless list.empty?
-    list
+    Scene.all_classes(scenario, scenarii)
   end
 end
