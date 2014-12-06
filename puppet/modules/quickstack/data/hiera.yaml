@@ -1,8 +1,8 @@
 ---
 :hierarchy:
-- classes
 - "%{::fqdn}"
 - custom
 - secrets
 - "%{::osfamily}"
+- classes
 - defaults
