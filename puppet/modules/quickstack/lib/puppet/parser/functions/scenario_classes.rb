@@ -1,3 +1,5 @@
+Puppet::Parser::Functions.autoloader.loadall
+
 class Scene
   class << self
     def get_all_classes(roles, scenarii)
