@@ -1,4 +1,6 @@
-Puppet::Parser::Functions.autoloader.loadall
+require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppetx', 'redhat', 'scenario.rb'))
+
+# Puppet::Parser::Functions.autoloader.loadall
 
 load '/usr/share/openstack-foreman-installer/lib/scenario'
 

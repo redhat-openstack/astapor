@@ -1,5 +1,3 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppetx', 'redhat', 'scenario.rb'))
-
 module Scenario
   class Scene
     class << self
