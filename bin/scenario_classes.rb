@@ -20,9 +20,7 @@ class Hiera::Config
   end
 end
 
-context = ARGV[1].to_sym ||= :run
-
-raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
+context = ARGV[0] ||= 'run'
 
 case context
 when 'dry'
