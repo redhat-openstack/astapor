@@ -28,7 +28,6 @@ quickstack::params::scenarii:
 
   HA:
     desc: "HA Controllers (3+), Neutron Network agents"
-    classes:
     roles:
     - HA-controller
     - PCS-neutron
