@@ -12,7 +12,9 @@ class quickstack::scene (
   ->
   notify {"$scenario":}
 
-  notify {"Scenario's Puppet classes: ${modules}":}
-  ->
-  notify {"$modules":}
+  spc = "Scenario's Puppet classes: ${modules}"
+  notify {"$spc":}
+  #notify {"Scenario's Puppet classes: ${modules}":}
+
+  #notify {"$modules":}
 }
