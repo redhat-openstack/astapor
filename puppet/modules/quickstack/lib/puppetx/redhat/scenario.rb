@@ -5,10 +5,10 @@ module Scenario
         list = []
         roles.each do |role|
           if scenarii[role]
-            if scenarii[role]['roles']
+            if scenarii[role]['roles'] && !scenarii[role]['roles'].empty?
               list << Scene.get_all_classes(scenarii[role]['roles'], scenarii)
             end
-            if scenarii[role]['classes']
+            if scenarii[role]['classes'] && !scenarii[role]['classes'].empty?
               list << scenarii[role]['classes']
             end
           end
