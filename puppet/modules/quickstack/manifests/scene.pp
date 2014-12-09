@@ -5,7 +5,7 @@ class quickstack::scene (
   $modules = join(scenario_classes("$scenario", $scenarii), ',')
   $scenes = join($scenarii, ',')
 
-  notify {"quickstack::params::scenarii: "$scenes":}
+  notify {"quickstack::params::scenarii: ${scenes}":}
   ->
   notify {"quickstack::params::scenario: ${scenario}":}
   ->
