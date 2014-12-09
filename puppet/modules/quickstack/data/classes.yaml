@@ -25,7 +25,8 @@ quickstack::params::scenarii:
     desc: "Scenario from a list of classes and/or roles"
     classes:
     - quickstack::run2
-    roles: []
+    roles:
+    - custom
 
   HA:
     desc: "HA Controllers (3+), Neutron Network agents"
@@ -99,3 +100,4 @@ quickstack::params::scenarii:
     desc: "Nova Compute, Neutron NHA client"
     classes:
     - quickstack::neutron::compute
+
