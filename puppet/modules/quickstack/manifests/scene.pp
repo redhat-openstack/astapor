@@ -2,19 +2,12 @@
 class quickstack::scene (
 ) inherits quickstack::params {
 
-  $modules = join(scenario_classes("$scenario", $scenarii),',')
+  $modules = join(scenario_classes("$scenario", $scenarii), ',')
+  $scenes = join($scenarii, ',')
 
-  notify {"quickstack::scene: Available Scenarios":}
+  notify {"quickstack::params::scenarii: "$scenes":}
   ->
-  notify {"$scenarii":}
-
-  notify {"quickstack::params::scenario":}
+  notify {"quickstack::params::scenario: ${scenario}":}
   ->
-  notify {"$scenario":}
-
-  #$spc = "Scenario's Puppet classes: ${modules}"
-  #notify {"$spc":}
   notify {"Scenario's Puppet classes: ${modules}":}
-
-  #notify {"$modules":}
 }
