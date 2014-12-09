@@ -7,7 +7,5 @@ class quickstack::scene (
 
   notify {"quickstack::params::scenarii: ${scenes}":}
   ->
-  notify {"quickstack::params::scenario: ${scenario}":}
-  ->
-  notify {"Scenario's Puppet classes: ${modules}":}
+  notify {"Puppet classes for scenario ${scenario}: ${modules}":}
 }
