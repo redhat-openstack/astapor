@@ -16,14 +16,8 @@ quickstack::params::scenarii:
 
   custom:
     desc: "Scenario from a list of classes and/or roles"
-    roles:
-    - custom2
-
-  custom2:
-    desc: "Scenario from a list of classes and/or roles"
-    classes:
-    - quickstack::run2
     roles: []
+    classes: []
 
   HA:
     desc: "HA Controllers (3+), Neutron Network agents"
@@ -32,7 +26,6 @@ quickstack::params::scenarii:
     - PCS-neutron
     - neutron-network-agents
     - custom
-    classes: []
 
   HA-AIO:
     desc: "HA All in One (1), HA Controllers, Neutron network agents, Compute"
