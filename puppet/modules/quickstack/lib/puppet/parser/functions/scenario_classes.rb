@@ -16,6 +16,6 @@ EOS
     scenarii = arguments[1] ||= {}
     raise(Puppet::ParseError, "Missing argumets") if scenario.empty? || scenarii.empty?
 
-    Scenario.Scene.all_classes(scenario, scenarii)
+    Scenario::Scene.all_classes(scenario, scenarii)
   end
 end
