@@ -1,6 +1,6 @@
-#require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppetx', 'redhat', 'scenario.rb'))
+require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppetx', 'redhat', 'scenario.rb'))
 
-Puppet::Parser::Functions.autoloader.loadall
+#Puppet::Parser::Functions.autoloader.loadall
 
 module Puppet::Parser::Functions
 
