@@ -23,7 +23,6 @@ module Scenario
         list = Scene.get_all_classes(scenarii[scenario]['roles'], scenarii) if scenarii[scenario]['roles']
         list << scenarii[scenario]['classes'] if scenarii[scenario]['classes']
         list.flatten! unless list.empty?
-        list.uniq! unless list.empty?
         list
       end
     end
