@@ -35,6 +35,7 @@ quickstack::params::scenarii:
 
   HA-AIO:
     desc: "HA All in One (1), HA Controllers, Neutron network agents, Compute"
+    roles: []
     classes:
     - quickstack::compute_common
     roles:
