@@ -16,7 +16,6 @@ quickstack::params::scenarii:
 
   custom:
     desc: "Scenario from a list of classes and/or roles"
-    classes: []
     roles:
     - custom2
 
