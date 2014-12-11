@@ -1,0 +1,2 @@
+class quickstack::neutron {
+}
