@@ -1,52 +1,39 @@
 ---
 scenario: 'HA'
 
+## Infra
+# Top
 admin_email: 'admin@example.com'
 
-amqp_provider: 'rabbitmq'
+# AMQP
 amqp: 'true'
-cinder: 'false'
+amqp_vip: "%{hiera('network_admin')}.200"
+amqp_username: 'Openstack'
+amqp_password: "%{hiera('password')}"
+amqp_provider: 'rabbitmq'
+
+# DBMS
+db_vip: "%{hiera('network_admin')}.201"
+dbms: 'mysql'
+mysql: 'true'
+
+## Openstack
+region: 'RegionOne'
+
+## Switches
+ceilometer: 'true'
+cinder: 'true'
+debug: 'true'
 glance: 'true'
-fencing: 'disabled'
+heat_cfn: 'true'
 heat: 'true'
 horizon: 'true'
+keystonerc: 'true'
 keystone: 'true'
-mysql: 'true'
 neutron: 'true'
 nova: 'true'
-swift: 'false'
-
-network_admin: '192.168.1'
-network_internal: '192.168.2'
-network_public: '192.168.3'
-
-private_iface: 'eth2'
-private_ip: ''
-private_network: "%{hiera('network_internal')}.0"
-public_network: "%{hiera('network_public')}.0"
-tunnel_iface: 'eth2'
-tunnel_network: ''
-
-server1_name: 'controller1'
-server1_ip: "%{hiera('network_admin')}.11"
-server2_name: 'controller2'
-server2_ip: "%{hiera('network_admin')}.12"
-server3_name: 'controller3'
-server3_ip: "%{hiera('network_admin')}.13"
-
-storage1_ip: "%{hiera('network_internal')}.14"
-storage2_ip: "%{hiera('network_internal')}.15"
-storage3_ip: "%{hiera('network_internal')}.16"
-
-cluster_control_ip: "%{hiera('server1_ip')}"
-swift_storage1_ip: "%{hiera('storage1_ip')}"
-glance_device: "%{hiera('storage2_ip')}:/mnt/glance"
-nfs_share1: "%{hiera('storage3_ip')}:/mnt/cinder"
-
-# Infra VIPs
-amqp_vip: "%{hiera('network_admin')}.200"
-db_vip: "%{hiera('network_admin')}.201"
-loadbalancer_vip: "%{hiera('network_admin')}.202"
+swift: 'true'
+ssl: 'true'
 
 # Openstack VIPs
 ceilometer_vip: '203'
@@ -57,9 +44,44 @@ heat_vip: '207'
 horizon_vip: '208'
 keystone_vip: '209'
 neutron_vip: '210'
-nova_vip: '211'
-swift_vip: '212'
+nosql_vip: '211'
+nova_vip: '212'
+swift_vip: '213'
 
+# HA
+fencing: 'disabled'
+cluster_control_ip: "%{hiera('server1_ip')}"
+loadbalancer_vip: "%{hiera('network_admin')}.202"
+server1_name: 'controller1'
+server1_ip: "%{hiera('network_internal')}.11"
+server2_name: 'controller2'
+server2_ip: "%{hiera('network_internal')}.12"
+server3_name: 'controller3'
+server3_ip: "%{hiera('network_internal')}.13"
+
+# Network
+network_admin: '192.168.1'
+network_internal: '192.168.2'
+network_public: '192.168.3'
+private_iface: 'eth2'
+private_ip: ''
+private_network: "%{hiera('network_internal')}.0"
+public_network: "%{hiera('network_public')}.0"
+tunnel_iface: 'eth2'
+tunnel_network: ''
+
+# Storage VIPs
+storage1_ip: "%{hiera('network_internal')}.14"
+storage2_ip: "%{hiera('network_internal')}.15"
+storage3_ip: "%{hiera('network_internal')}.16"
+swift_storage1_ip: "%{hiera('storage1_ip')}"
+
+# Storage defaults
+glance_backend: 'file'
+glance_device: "%{hiera('storage2_ip')}:/mnt/glance"
+nfs_share1: "%{hiera('storage3_ip')}:/mnt/cinder"
+
+# Openstack services - VIP mapping
 ceilometer_vip_admin: "%{hiera('network_admin')}.%{hiera('ceilometer_vip')}"
 ceilometer_vip_internal: "%{hiera('network_internal')}.%{hiera('ceilometer_vip')}"
 ceilometer_vip_public: "%{hiera('network_public')}.%{hiera('ceilometer_vip')}"
@@ -90,3 +112,20 @@ nova_vip_public: "%{hiera('network_public')}.%{hiera('nova_vip')}"
 swift_vip_admin: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
 swift_vip_internal: "%{hiera('network_internal')}.%{hiera('swift_vip')}"
 swift_vip_public: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
+
+# SSL
+ca: '/etc/pki/CA/cacert.pem'
+
+amqp_ca: "%{hiera('ca')}"
+amqp_cert: '/etc/pki/tls/certs/amqp.crt'
+amqp_key: '/etc/pki/tls/private/amqp.key'
+db_ca: "%{hiera('ca')}"
+db_cert: '/etc/pki/tls/certs/db.crt'
+db_key: '/etc/pki/tls/private/db.key'
+horizon_ca: "%{hiera('ca')}"
+horizon_cert: '/etc/pki/tls/certs/horizon.crt'
+horizon_key: '/etc/pki/tls/private/horizon.key'
+mysql_ca: "%{hiera('ca')}"
+mysql_cert: '/etc/pki/tls/certs/mysql.crt'
+mysql_key: '/etc/pki/tls/private/mysql.key'
+
