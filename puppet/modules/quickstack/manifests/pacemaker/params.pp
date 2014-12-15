@@ -71,7 +71,7 @@ class quickstack::pacemaker::params (
   $keystone_db_password      = '',
   $keystone_user_password    = '',
   $neutron                   = 'false',
-  $neutron_metadata_proxy_secret,
+  $neutron_metadata_proxy_secret = '',
   $neutron_public_vip        = '',
   $neutron_private_vip       = '',
   $neutron_admin_vip         = '',

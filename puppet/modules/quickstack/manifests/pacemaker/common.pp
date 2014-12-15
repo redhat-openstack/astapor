@@ -40,7 +40,7 @@ class quickstack::pacemaker::common (
   $fence_xvm_port                 = "",
   $fence_xvm_manage_key_file      = "false",
   $fence_xvm_key_file_password    = "",
-) inherits quickstack::pacemaker::base {
+) inherits quickstack::pacemaker::params {
 
   include quickstack::pacemaker::base
 

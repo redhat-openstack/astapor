@@ -60,6 +60,8 @@ server3_name: 'controller3'
 server3_ip: "%{hiera('network_internal')}.13"
 
 # Network
+allow_overlapping_ips: 'true'
+external_network_bridge: 'br-ex'
 network_admin: '192.168.1'
 network_internal: '192.168.2'
 network_public: '192.168.3'
@@ -81,7 +83,7 @@ glance_backend: 'file'
 glance_device: "%{hiera('storage2_ip')}:/mnt/glance"
 nfs_share1: "%{hiera('storage3_ip')}:/mnt/cinder"
 
-# Openstack services - VIP mapping
+# Openstack services VIP - network mapping
 ceilometer_vip_admin: "%{hiera('network_admin')}.%{hiera('ceilometer_vip')}"
 ceilometer_vip_internal: "%{hiera('network_internal')}.%{hiera('ceilometer_vip')}"
 ceilometer_vip_public: "%{hiera('network_public')}.%{hiera('ceilometer_vip')}"
@@ -112,20 +114,3 @@ nova_vip_public: "%{hiera('network_public')}.%{hiera('nova_vip')}"
 swift_vip_admin: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
 swift_vip_internal: "%{hiera('network_internal')}.%{hiera('swift_vip')}"
 swift_vip_public: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
-
-# SSL
-ca: '/etc/pki/CA/cacert.pem'
-
-amqp_ca: "%{hiera('ca')}"
-amqp_cert: '/etc/pki/tls/certs/amqp.crt'
-amqp_key: '/etc/pki/tls/private/amqp.key'
-db_ca: "%{hiera('ca')}"
-db_cert: '/etc/pki/tls/certs/db.crt'
-db_key: '/etc/pki/tls/private/db.key'
-horizon_ca: "%{hiera('ca')}"
-horizon_cert: '/etc/pki/tls/certs/horizon.crt'
-horizon_key: '/etc/pki/tls/private/horizon.key'
-mysql_ca: "%{hiera('ca')}"
-mysql_cert: '/etc/pki/tls/certs/mysql.crt'
-mysql_key: '/etc/pki/tls/private/mysql.key'
-

@@ -125,6 +125,17 @@ class quickstack::neutron::all (
   }
   File['/etc/neutron/plugin.ini'] -> Exec['neutron-db-manage upgrade']
 
+# This was moved out of keystone::endpoints and added here so the network replacement of neutron could work
+  class { 'neutron::keystone::auth':
+    password         => $neutron_user_password,
+    public_address   => $neutron_public_real,
+    public_protocol  => $public_protocol,
+    admin_address    => $neutron_admin_real,
+    internal_address => $neutron_internal_real,
+    region           => $region,
+  }
+  contain neutron::keystone::auth
+
   class { '::neutron::server':
     auth_host            => $auth_host,
     auth_password        => $neutron_user_password,

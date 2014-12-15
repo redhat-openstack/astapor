@@ -208,7 +208,7 @@ class quickstack::pacemaker::glance (
       include ::quickstack::pacemaker::ceph_config
       include ::quickstack::firewall::ceph_mon
 
-      Class['quickstack::firewall::ceph_mon'] -> 
+      Class['quickstack::firewall::ceph_mon'] ->
       Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
 
       Class['quickstack::pacemaker::ceph_config'] ->

@@ -55,24 +55,24 @@ quickstack::params::scenarii:
   neutron-client-ML2-OVS:
     desc: "Neutron network layer, ML2 plugin, OVS agent"
     classes:
-    - quickstack::neutron
-    - quickstack::neutron::plugins::ml2
-    - quickstack::neutron::agents::ovs
+    - quickstack::network::base
+    - quickstack::network::plugins::ml2
+    - quickstack::network::agents::ovs
 
   neutron-network-agents:
     desc: "Neutron network agents"
     classes:
-    - quickstack::neutron::agents::dhcp
-    - quickstack::neutron::agents::l3
-    - quickstack::neutron::agents::lbass
-    - quickstack::neutron::services::fwaas
+    - quickstack::network::agents::dhcp
+    - quickstack::network::agents::l3
+    - quickstack::network::agents::lbaas
+    - quickstack::network::services::fwaas
     roles:
     - neutron-client-ML2-OVS
 
   PCS-neutron:
     desc: "Pacemaker Neutron"
     classes:
-    - quickstack::pacemaker::neutron
+    - quickstack::pacemaker::network
     roles:
     - neutron-client-ML2-OVS
 

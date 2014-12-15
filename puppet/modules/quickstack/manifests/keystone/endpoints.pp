@@ -288,18 +288,6 @@ class quickstack::keystone::endpoints (
       contain cinder::keystone::auth
     }
 
-    if $neutron {
-      class { 'neutron::keystone::auth':
-        password         => $neutron_user_password,
-        public_address   => $neutron_public_real,
-        public_protocol  => $public_protocol,
-        admin_address    => $neutron_admin_real,
-        internal_address => $neutron_internal_real,
-        region           => $region,
-      }
-      contain neutron::keystone::auth
-    }
-
     if $ceilometer {
 
       if ! $ceilometer_user_password {
