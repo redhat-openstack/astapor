@@ -30,6 +30,13 @@ class quickstack::amqp::server::rabbitmq (
     default_user          => $amqp_username,
     default_pass          => $amqp_password,
     admin_enable          => false,
+    config_variables      => {"tcp_listen_options" =>
+                              "[binary,{packet,raw},
+                              {reuseaddr, true},
+                              {backlog, 128},
+                              {nodelay, true},
+                              {exit_on_close,false},
+                              {keepalive, true}]"},
     package_provider      => "yum",
     package_source        => undef,
     manage_repos          => false,
