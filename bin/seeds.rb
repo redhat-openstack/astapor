@@ -457,6 +457,7 @@ params = {
   "wsrep_ssl"                     => true,
   "wsrep_ssl_key"                 => "/etc/pki/galera/galera.key",
   "wsrep_ssl_cert"                => "/etc/pki/galera/galera.crt",
+  "keystone_identity_backend"     => "sql",
 }
 
 hostgroups = [
