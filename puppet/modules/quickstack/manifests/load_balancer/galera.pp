@@ -4,7 +4,7 @@ class quickstack::load_balancer::galera (
   $backend_server_addrs,
   $public_port = '3306',
   $public_mode = 'tcp',
-  $timeout = '60s',
+  $timeout = '90m',
   $log = 'tcplog',
 ) {
 
