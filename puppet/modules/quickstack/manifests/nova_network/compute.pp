@@ -1,6 +1,5 @@
 # Quickstack compute node configuration for nova network
 class quickstack::nova_network::compute (
-  $admin_password               = $quickstack::params::admin_password,
   $auth_host                    = '127.0.0.1',
   $ceilometer                   = 'true',
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
@@ -91,7 +90,6 @@ class quickstack::nova_network::compute (
   }
 
   class { 'quickstack::compute_common':
-    admin_password               => $admin_password,
     auth_host                    => $auth_host,
     ceilometer                   => $ceilometer,
     ceilometer_metering_secret   => $ceilometer_metering_secret,
