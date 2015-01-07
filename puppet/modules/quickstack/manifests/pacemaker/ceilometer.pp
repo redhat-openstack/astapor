@@ -1,8 +1,10 @@
 class quickstack::pacemaker::ceilometer (
   $ceilometer_metering_secret,
-  $memcached_port          = '11211',
-  $db_port                 = '27017',
-  $verbose                 = 'false',
+  $memcached_port                = '11211',
+  $db_port                       = '27017',
+  $verbose                       = 'false',
+  $coordination_backend          = 'redis',
+  $coordination_backend_port     = '6379',
 ) {
 
   include quickstack::pacemaker::common
@@ -25,6 +27,25 @@ class quickstack::pacemaker::ceilometer (
     } else {
       $_enabled = false
       $_ensure = undef
+    }
+
+    if $coordination_backend == 'redis' {
+      $_initial_master = $backend_ips[0]
+      $_coordination_url = "redis://${_initial_master}:${coordination_backend_port}"
+
+      if has_interface_with("ipaddress", $_initial_master) {
+        $_slaveof = undef
+      } else {
+        $_slaveof = "${_initial_master} ${coordination_backend_port}"
+      }
+
+      class { '::quickstack::pacemaker::redis':
+        bind_host => map_params("local_bind_addr"),
+        port      => $coordination_backend_port,
+        slaveof  => $_slaveof,
+      }
+    } else {
+      $_coordination_url = undef
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
@@ -104,6 +125,7 @@ class quickstack::pacemaker::ceilometer (
       service_enable             => $_enabled,
       service_ensure             => $_ensure,
       verbose                    => $verbose,
+      coordination_url           => $_coordination_url,
     }
     ->
     exec {"pcs-ceilometer-server-set-up":

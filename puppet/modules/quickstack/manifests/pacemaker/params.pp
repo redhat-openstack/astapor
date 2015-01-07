@@ -110,6 +110,8 @@ class quickstack::pacemaker::params (
   $swift_public_vip             = '',
   $swift_user_password          = '',
   $swift_group                  = 'swift',
+  $redis_group                  = 'redis',
+  $redis_vip                    = '',
 ) {
   $local_bind_addr = find_ip("$private_network",
                             "$private_iface",
