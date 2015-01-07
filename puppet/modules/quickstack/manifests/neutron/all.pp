@@ -172,7 +172,6 @@ class quickstack::neutron::all (
       n1kv_vsm_ip                  => $n1kv_vsm_ip,
       n1kv_vsm_password            => $n1kv_vsm_password,
       n1kv_plugin_additional_params => $n1kv_plugin_additional_params,
-      n1kv_os_ha                  => 'true',
       neutron_core_plugin          => $neutron_core_plugin,
       neutron_db_password          => $neutron_db_password,
       neutron_user_password        => $neutron_user_password,
