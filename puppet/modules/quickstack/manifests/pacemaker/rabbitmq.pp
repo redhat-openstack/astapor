@@ -70,6 +70,11 @@ class quickstack::pacemaker::rabbitmq (
       extra_listen_options => {'option' => ['tcpka','tcplog']},
     }
 
+    if (str2bool_i(map_params('include_mysql'))) {
+      # avoid race condition with galera setup
+      Exec['galera-online'] -> Exec['all-rabbitmq-nodes-are-up']
+    }
+
     Class['::quickstack::firewall::amqp'] ->
     Class['::quickstack::pacemaker::common'] ->
     # below creates just one vip (not three)
@@ -85,7 +90,6 @@ class quickstack::pacemaker::rabbitmq (
       unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA',
       require => Class['::rabbitmq::service'],
     } ->
-    Class['::quickstack::load_balancer::amqp'] ->
 
     exec {"pcs-rabbitmq-server-set-up":
       command => "/usr/sbin/pcs property set rabbitmq=running --force",
@@ -105,7 +109,8 @@ class quickstack::pacemaker::rabbitmq (
     quickstack::pacemaker::resource::service { 'rabbitmq-server':
       monitor_params => {"start-delay" => "35s"},
       clone          => true,
-    }
+    } ->
+    Anchor['pacemaker ordering constraints begin']
 
     $_nodes = map_params('lb_backend_server_addrs')
     $first_node = $_nodes[0]
@@ -145,6 +150,10 @@ class quickstack::pacemaker::rabbitmq (
         unless    => "/tmp/ha-all-in-one-util.bash property_exists rabbitmq",
         require   => Quickstack::Pacemaker::Vips ["$amqp_group"],
         before    => Class['::rabbitmq'],
+      }
+      if (str2bool_i(map_params('include_mysql'))) {
+        # avoid race condition with galera setup
+        Exec['galera-online'] -> Exec['i-am-first-rabbitmq-node-OR-rabbitmq-is-up-on-first-node']
       }
     }
   }

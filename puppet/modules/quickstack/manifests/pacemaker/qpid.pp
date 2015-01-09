@@ -85,6 +85,11 @@ class quickstack::pacemaker::qpid (
                                'stick' => 'on dst'},
     }
 
+    if (str2bool_i(map_params('include_mysql'))) {
+      # avoid race condition with galera setup
+      Exec['galera-online'] -> Exec['all-qpid-nodes-are-up']
+    }
+
     Class['::quickstack::firewall::amqp'] ->
     Class['::qpid::server'] ->
     Class['::quickstack::pacemaker::common'] ->
@@ -107,6 +112,7 @@ class quickstack::pacemaker::qpid (
     } ->
     quickstack::pacemaker::resource::service { 'qpidd':
       clone   => true,
-    }
+    } ->
+    Anchor['pacemaker ordering constraints begin']
   }
 }

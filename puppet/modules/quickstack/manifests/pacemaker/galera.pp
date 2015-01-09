@@ -161,6 +161,8 @@ class quickstack::pacemaker::galera (
       environment => ["AVAILABLE_WHEN_READONLY=0"],
       command => '/usr/bin/clustercheck >/dev/null',
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
 
     # in the bootstrap case, make sure pacemaker galera resource
     # has been created before the final "galera-online" check

@@ -119,6 +119,7 @@ class quickstack::pacemaker::params (
   include quickstack::pacemaker::nova
   include quickstack::pacemaker::cinder
   include quickstack::pacemaker::heat
+  include quickstack::pacemaker::constraints
 
   Class['::quickstack::pacemaker::common'] ->
   Class['::quickstack::pacemaker::load_balancer'] ->
@@ -129,5 +130,7 @@ class quickstack::pacemaker::params (
   Class['::quickstack::pacemaker::glance'] ->
   Class['::quickstack::pacemaker::nova'] ->
   Class['::quickstack::pacemaker::cinder'] ->
-  Class['::quickstack::pacemaker::heat']
+  Class['::quickstack::pacemaker::heat'] ->
+  Class['::quickstack::pacemaker::constraints']
+
 }

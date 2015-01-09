@@ -99,5 +99,7 @@ class quickstack::pacemaker::nosql (
     anchor {'ha mongo ready':
       require => Quickstack::Pacemaker::Resource::Service['mongod'],
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
   }
 }
