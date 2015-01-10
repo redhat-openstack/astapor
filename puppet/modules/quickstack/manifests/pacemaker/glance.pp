@@ -203,6 +203,9 @@ class quickstack::pacemaker::glance (
       target => "openstack-glance-registry-clone",
       score => "INFINITY",
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
+
     if ($backend == 'rbd') {
       include ::quickstack::ceph::client_packages
       include ::quickstack::pacemaker::ceph_config

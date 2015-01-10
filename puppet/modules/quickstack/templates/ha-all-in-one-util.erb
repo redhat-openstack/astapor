@@ -6,7 +6,7 @@ keystone_private_vip=<%= scope.lookupvar("::quickstack::pacemaker::params::keyst
 # These functions adapted from similar logic in jayg's rysnc.pp variables
 get_resource_ip_output() {
   # trailing space is on purpose below to avoid matching Failed actions
-  echo $(/usr/sbin/pcs status | /bin/grep -P "ip-$1\s")
+  echo $(/usr/sbin/pcs status | /bin/grep -P "ip-\S*$1\s")
 }
 which_cluster_ip() {
   line=$(get_resource_ip_output $1)

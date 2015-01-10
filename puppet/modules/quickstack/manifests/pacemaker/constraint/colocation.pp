@@ -1,6 +1,6 @@
 define quickstack::pacemaker::constraint::colocation ($source,
                                           $target,
-                                          $score,
+                                          $score='INFINITY',
                                           $ensure=present) {
   include quickstack::pacemaker::params
 

@@ -190,5 +190,7 @@ class quickstack::pacemaker::nova (
       target => "openstack-nova-conductor-clone",
       score => "INFINITY",
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
   }
 }
