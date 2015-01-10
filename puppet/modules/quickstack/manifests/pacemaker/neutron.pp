@@ -276,5 +276,7 @@ class quickstack::pacemaker::neutron (
       target => "neutron-openvswitch-agent",
       score  => "INFINITY",
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
   }
 }

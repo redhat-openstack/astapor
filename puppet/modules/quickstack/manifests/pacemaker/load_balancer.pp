@@ -10,6 +10,7 @@ class quickstack::pacemaker::load_balancer {
     public_vip  => $loadbalancer_vip,
     private_vip => $loadbalancer_vip,
     admin_vip   => $loadbalancer_vip,
+    haproxy_constraint => false,
   } ->
 
   Service['haproxy'] ->
@@ -25,5 +26,9 @@ class quickstack::pacemaker::load_balancer {
   } ->
   quickstack::pacemaker::resource::service {'haproxy':
     clone => true,
-  }
+  } ->
+  Anchor['pacemaker ordering constraints begin']
+
+  Quickstack::Pacemaker::Resource::Service['haproxy'] ->
+  Quickstack::Pacemaker::Vips<| title != "$loadbalancer_group" |>
 }

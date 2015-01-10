@@ -19,6 +19,6 @@ class quickstack::pacemaker::memcached {
   quickstack::pacemaker::resource::service { 'memcached':
     clone   => true,
     options => 'start-delay=10s',
-  }
-
+  } ->
+  Anchor['pacemaker ordering constraints begin']
 }

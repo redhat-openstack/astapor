@@ -180,7 +180,8 @@ class quickstack::pacemaker::cinder(
       source => "openstack-cinder-scheduler-clone",
       target => "openstack-cinder-api-clone",
       score => "INFINITY",
-    }
+    } ->
+    Anchor['pacemaker ordering constraints begin']
 
     if str2bool_i("$volume") {
       # FIXME(jistr): remove the host override

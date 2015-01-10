@@ -174,6 +174,8 @@ class quickstack::pacemaker::keystone (
       clone   => true,
       options => 'start-delay=10s',
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
     # TODO: Consider if we should pre-emptively purge any directories keystone has
     # created in /tmp
 
