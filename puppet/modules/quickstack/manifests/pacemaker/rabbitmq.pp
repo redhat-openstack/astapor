@@ -72,7 +72,7 @@ class quickstack::pacemaker::rabbitmq (
 
     if (str2bool_i(map_params('include_mysql'))) {
       # avoid race condition with galera setup
-      Exec['galera-online'] -> Exec['all-rabbitmq-nodes-are-up']
+      Anchor['galera-online'] -> Exec['all-rabbitmq-nodes-are-up']
     }
 
     Class['::quickstack::firewall::amqp'] ->
@@ -153,7 +153,7 @@ class quickstack::pacemaker::rabbitmq (
       }
       if (str2bool_i(map_params('include_mysql'))) {
         # avoid race condition with galera setup
-        Exec['galera-online'] -> Exec['i-am-first-rabbitmq-node-OR-rabbitmq-is-up-on-first-node']
+        Anchor['galera-online'] -> Exec['i-am-first-rabbitmq-node-OR-rabbitmq-is-up-on-first-node']
       }
     }
   }

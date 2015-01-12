@@ -23,7 +23,7 @@ class quickstack::pacemaker::nosql (
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['galera-online'] -> Anchor['nosql cluster start']
+      Anchor['galera-online'] -> Anchor['nosql cluster start']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Anchor['nosql cluster start']

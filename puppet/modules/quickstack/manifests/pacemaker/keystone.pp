@@ -55,7 +55,7 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_service<| |> -> Exec['pcs-keystone-server-set-up']
 
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['galera-online'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
+      Anchor['galera-online'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
 
     class {"::quickstack::load_balancer::keystone":

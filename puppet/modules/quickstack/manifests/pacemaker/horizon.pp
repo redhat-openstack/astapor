@@ -34,7 +34,7 @@ class quickstack::pacemaker::horizon (
 
     Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip'] -> Service['httpd']
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['galera-online'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
+      Anchor['galera-online'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']

@@ -65,6 +65,16 @@ class quickstack::pacemaker::galera (
     # if bootstrap, set up mariadb on all nodes
     if str2bool_i($::galera_bootstrap_ok) {
       Class ['::quickstack::firewall::galera'] ->
+      exec {"haproxy resource exists":
+        timeout   => 3600,
+        tries     => 360,
+        try_sleep => 10,
+        command   => "/usr/sbin/pcs resource show haproxy-clone",
+      } ->
+      exec{'disable haproxy during init mysql setup':
+        # it's ok to run this on all nodes, additional calls are no-ops        
+        command => '/usr/sbin/pcs resource disable haproxy'
+      } ->
       class { 'mysql::server':
         #manage_config_file => false,
         #config_file => $mysql_server_config_file,
@@ -117,6 +127,14 @@ class quickstack::pacemaker::galera (
       ->
       Exec['pcs-mysqlinit-server-setup']
       Mysql_grant <| |> -> Exec["pcs-mysqlinit-server-setup"]
+      
+      Exec["all-mysqlinit-nodes-are-up"] ->
+      Exec['galera-online-cmd'] ->
+      exec{'enable haproxy after galera-online':
+        # it's ok to run this on all nodes, additional calls are no-ops        
+        command => '/usr/sbin/pcs resource enable haproxy'
+      } ->
+      Anchor['galera-online']
     }
     Class ['::quickstack::firewall::galera'] ->
     file { '/etc/my.cnf.d/galera.cnf':
@@ -154,13 +172,15 @@ class quickstack::pacemaker::galera (
     }
     ->
     # one last clustercheck to make sure service is up
-    exec {"galera-online":
+    exec {"galera-online-cmd":
       timeout   => 3600,
       tries     => 60,
       try_sleep => 60,
       environment => ["AVAILABLE_WHEN_READONLY=0"],
       command => '/usr/bin/clustercheck >/dev/null',
     }
+    ->
+    anchor{'galera-online':}
     ->
     Anchor['pacemaker ordering constraints begin']
 
@@ -174,7 +194,7 @@ class quickstack::pacemaker::galera (
         try_sleep => 60,
         command    => '/usr/sbin/pcs resource show galera && /bin/sleep 60',
       } ->
-      Exec['galera-online']
+      Exec['galera-online-cmd']
     }
   }
 }

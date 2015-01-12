@@ -28,7 +28,7 @@ class quickstack::pacemaker::ceilometer (
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['galera-online'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+      Anchor['galera-online'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
