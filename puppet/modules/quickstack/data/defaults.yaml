@@ -67,7 +67,7 @@ network_internal: '192.168.2'
 network_public: '192.168.3'
 private_iface: 'eth2'
 private_ip: ''
-private_network: "%{hiera('network_internal')}.0"
+private_network: ''
 public_network: "%{hiera('network_public')}.0"
 tunnel_iface: 'eth2'
 tunnel_network: ''
