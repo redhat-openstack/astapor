@@ -24,7 +24,6 @@ quickstack::params::scenarii:
     roles:
     - HA-controller
     - PCS-neutron
-    - neutron-network-agents
 
   HA-AIO:
     desc: "HA All in One (1), HA Controllers, Neutron network agents, Compute"
@@ -52,14 +51,14 @@ quickstack::params::scenarii:
     - quickstack::pacemaker::horizon
     - quickstack::pacemaker::galera
 
-  neutron-client-ML2-OVS:
+  network-client-ML2-OVS:
     desc: "Neutron network layer, ML2 plugin, OVS agent"
     classes:
     - quickstack::network::base
     - quickstack::network::plugins::ml2
     - quickstack::network::agents::ovs
 
-  neutron-network-agents:
+  network-agents:
     desc: "Neutron network agents"
     classes:
     - quickstack::network::agents::dhcp
@@ -67,14 +66,19 @@ quickstack::params::scenarii:
     - quickstack::network::agents::lbaas
     - quickstack::network::services::fwaas
     roles:
-    - neutron-client-ML2-OVS
+    - network-client-ML2-OVS
 
-  PCS-neutron:
+  PCS-network:
     desc: "Pacemaker Neutron"
     classes:
     - quickstack::pacemaker::network
     roles:
-    - neutron-client-ML2-OVS
+    - network-client-ML2-OVS
+
+  PCS-neutron:
+    desc: "Pacemaker Neutron"
+    classes:
+    - quickstack::pacemaker::neutron
 
   legacy-controller-NHA:
     desc: "NHA Controller (1)"
