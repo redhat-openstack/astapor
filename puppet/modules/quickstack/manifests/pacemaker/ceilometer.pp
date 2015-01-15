@@ -1,8 +1,12 @@
 class quickstack::pacemaker::ceilometer (
   $ceilometer_metering_secret,
-  $memcached_port          = '11211',
-  $db_port                 = '27017',
-  $verbose                 = 'false',
+  $memcached_port                = '11211',
+  $db_port                       = '27017',
+  $verbose                       = 'false',
+  $coordination_backend          = 'redis',
+  $coordination_backend_port     = '6379',
+  $coordination_monitoring_port  = '26379',
+  $coordination_monitoring_group = 'ceilometer-sentinel',
 ) {
 
   include quickstack::pacemaker::common
@@ -25,6 +29,30 @@ class quickstack::pacemaker::ceilometer (
     } else {
       $_enabled = false
       $_ensure = undef
+    }
+
+    if $coordination_backend == 'redis' {
+      $_initial_master = $backend_ips[0]
+      $_fallback_sentinels = split(inline_template('<%= @backend_ips.map {
+          |x| "&sentinel_fallback="+x+":"+@coordination_monitoring_port }.join(",")%>'),",")
+      $coordination_url = "redis://${_initial_master}:${coordination_monitoring_port}?sentinel=${coordination_monitoring_group}${_fallback_sentinels}"
+
+      if has_interface_with("ipaddress", $_initial_master) {
+        $_slaveof = undef
+      } else {
+        $_slaveof = "${_initial_master} ${coordination_backend_port}"
+      }
+
+      class { '::quickstack::pacemaker::redis':
+        bind_host => map_params("local_bind_addr"),
+        port      => $coordination_backend_port,
+        master_host => $_initial_master,
+        monitoring_port => $coordination_monitoring_port,
+        monitoring_group => $coordination_monitoring_group,
+        slaveof  => $_slaveof,
+      }
+    } else {
+      $coordination_url = undef
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
@@ -102,6 +130,7 @@ class quickstack::pacemaker::ceilometer (
       qpid_protocol              => map_params(''),
       service_enable             => $_enabled,
       service_ensure             => $_ensure,
+      coordination_url           => $coordination_url,
     }
     ->
     exec {"pcs-ceilometer-server-set-up":
