@@ -1,0 +1,20 @@
+class quickstack::network::params (
+  $external_network_bridge,
+  $n1kv_plugin_additional_params,
+  $network_device_mtu,
+  $neutron_conf_additional_params,
+  $neutron_database_max_retries,
+  $neutron_metadata_proxy_secret,
+  $neutron_user_password,
+  $neutron_verbose,
+  $neutron_vip_admin,
+  $neutron_vip_internal,
+  $neutron_vip_public,
+  $pcs_setup_neutron,
+  $tunnel_iface,
+  $tunnel_network,
+  $tunnel_types,
+  $veth_mtu,
+  $vxlan_udp_port,
+) inherits quickstack::params {
+}

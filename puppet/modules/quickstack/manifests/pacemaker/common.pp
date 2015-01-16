@@ -40,8 +40,9 @@ class quickstack::pacemaker::common (
   $fence_xvm_port                 = "",
   $fence_xvm_manage_key_file      = "false",
   $fence_xvm_key_file_password    = "",
-) {
-  include quickstack::pacemaker::params
+) inherits quickstack::pacemaker::params {
+
+  include quickstack::pacemaker::base
 
   if has_interface_with("ipaddress", map_params("cluster_control_ip")) {
     $setup_cluster = true
