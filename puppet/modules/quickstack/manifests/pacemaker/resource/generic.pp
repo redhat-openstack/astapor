@@ -18,8 +18,12 @@ define quickstack::pacemaker::resource::generic(
 
     if $clone_opts != undef {
       $_clone_opts = "--clone ${clone_opts}"
+      $_pcs_name = "${title}-clone"
+      $_pcs_update_command = "pcs resource clone ${title} ${clone_opts}"
     } else {
       $_clone_opts = ""
+      $_pcs_name = "${title}"
+      $_pcs_update_command = ""
     }
 
     if $operation_opts != undef {
@@ -35,7 +39,7 @@ define quickstack::pacemaker::resource::generic(
     }
 
     $pcs_command = "/usr/sbin/pcs resource create ${title} \
-    ${resource_type}${_resource_name} ${_resource_params} ${_clone_opts} ${_operation_opts}"
+    ${resource_type}${_resource_name} ${_resource_params} ${_operation_opts}"
 
     anchor { "qprs start $name": }
     ->
@@ -46,17 +50,17 @@ define quickstack::pacemaker::resource::generic(
     ->
     # probably want to move this to puppet-pacemaker eventually
     exec {"create ${title} resource":
-      command   => $pcs_command,
+      command   => "${pcs_command}; ${_pcs_update_command}",
       tries     => $tries,
       try_sleep => 30,
-      unless    => "/usr/sbin/pcs resource show ${title}"
+      unless    => "/usr/sbin/pcs resource show ${_pcs_name}"
     }
     ->
     exec {"wait for ${title} resource":
       timeout   => 3600,
       tries     => 360,
       try_sleep => 10,
-      command   => "/usr/sbin/pcs resource show ${title}",
+      command   => "/usr/sbin/pcs resource show ${_pcs_name}",
     }
     ->
     # FIXME: All I can say is 'ICK'.  But this is what we were told to do by
