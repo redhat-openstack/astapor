@@ -227,7 +227,7 @@ class quickstack::pacemaker::constraints() {
       }     
     }
     if (str2bool_i(map_params('include_nosql'))) {
-      Quickstack::Pacemaker::Resource::Service['mongod'] ->
+      Quickstack::Pacemaker::Resource::Generic['mongod'] ->
       Quickstack::Pacemaker::Resource::Service['openstack-ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'mongod-then-ceilometer-constr' :
         first_resource  => "mongod-clone",
