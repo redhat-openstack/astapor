@@ -14,7 +14,11 @@ class quickstack::pacemaker::rabbitmq (
     $cluster_nodes = regsubst(map_params("lb_backend_server_names"), '\..*', '')
     $server_addrs = map_params("lb_backend_server_addrs")
     $this_addr = map_params("local_bind_addr")
-    $this_node = inline_template('<%= @cluster_nodes[@server_addrs.index(@this_addr)] %>')
+    $this_node = inline_template("<%= if @server_addrs.index(@this_addr) then @cluster_nodes[@server_addrs.index(@this_addr)] else '' end %>")
+
+    if "$this_node" == '' {
+      fail ("Could not determine this_node value")
+    }
 
     if ($::pcs_setup_rabbitmq ==  undef or
         !str2bool_i("$::pcs_setup_rabbitmq")) {
