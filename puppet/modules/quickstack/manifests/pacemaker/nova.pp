@@ -104,6 +104,7 @@ class quickstack::pacemaker::nova (
       amqp_port                     => map_params("amqp_port"),
       amqp_username                 => map_params("amqp_username"),
       amqp_password                 => map_params("amqp_password"),
+      rabbit_hosts                  => map_params("rabbitmq_hosts"),
       rpc_backend                   => amqp_backend('nova', map_params('amqp_provider')),
       scheduler_host_subset_size    => $scheduler_host_subset_size,
       verbose                       => $verbose,

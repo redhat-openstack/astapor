@@ -4,6 +4,7 @@ class quickstack::ceilometer::control(
   $amqp_port                  = '5672',
   $amqp_username,
   $amqp_password,
+  $rabbit_hosts               = undef,
   $auth_host                  = '127.0.0.1',
   $bind_address               = '0.0.0.0',
   $ceilometer_metering_secret,
@@ -48,6 +49,7 @@ class quickstack::ceilometer::control(
     rabbit_port     => $amqp_port,
     rabbit_userid   => $amqp_username,
     rabbit_password => $amqp_password,
+    rabbit_hosts    => $rabbit_hosts,
     rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
     verbose         => str2bool_i("$verbose"),
   }

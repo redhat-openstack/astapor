@@ -77,6 +77,7 @@ class quickstack::neutron::all (
   $amqp_ssl_port                 = '5671',
   $amqp_username                 = '',
   $amqp_password                 = '',
+  $rabbit_hosts                  = undef,
   $rpc_backend                   = 'neutron.openstack.common.rpc.impl_kombu',
   $security_group_api            = 'neutron',
   $tenant_network_type           = 'vlan',
@@ -96,6 +97,11 @@ class quickstack::neutron::all (
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
+  if $rabbit_hosts {
+    neutron_config { 'DEFAULT/rabbit_host': ensure => absent }
+    neutron_config { 'DEFAULT/rabbit_port': ensure => absent }
+  }
+
   class { '::neutron':
     allow_overlapping_ips   => str2bool_i("$allow_overlapping_ips"),
     bind_host               => $neutron_priv_host,
@@ -113,6 +119,7 @@ class quickstack::neutron::all (
     rabbit_user             => $amqp_username,
     rabbit_password         => $amqp_password,
     rabbit_use_ssl          => $ssl,
+    rabbit_hosts            => $rabbit_hosts,
     verbose                 => $verbose,
     network_device_mtu      => $network_device_mtu,
   }

@@ -45,6 +45,7 @@ class quickstack::compute_common (
   $private_network              = '',
   $private_iface                = '',
   $private_ip                   = '',
+  $rabbit_hosts                 = undef,
   $rbd_user                     = 'volumes',
   $rbd_secret_uuid              = '',
   $network_device_mtu           = $quickstack::params::network_device_mtu,
@@ -155,6 +156,11 @@ class quickstack::compute_common (
     $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
   }
 
+  if $rabbit_hosts {
+    nova_config { 'DEFAULT/rabbit_host': ensure => absent }
+    nova_config { 'DEFAULT/rabbit_port': ensure => absent }
+  }
+
   class { '::nova':
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
@@ -170,6 +176,7 @@ class quickstack::compute_common (
     rabbit_userid      => $amqp_username,
     rabbit_password    => $amqp_password,
     rabbit_use_ssl     => $ssl,
+    rabbit_hosts       => $rabbit_hosts,
     verbose            => $verbose,
   }
 
@@ -202,6 +209,7 @@ class quickstack::compute_common (
       qpid_username   => $amqp_username,
       qpid_password   => $amqp_password,
       rabbit_host     => $amqp_host,
+      rabbit_hosts    => $rabbit_hosts,
       rabbit_port     => $real_amqp_port,
       rabbit_userid   => $amqp_username,
       rabbit_password => $amqp_password,

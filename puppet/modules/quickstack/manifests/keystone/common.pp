@@ -45,6 +45,7 @@ class quickstack::keystone::common (
   $admin_token,
   $amqp_host                   = 'localhost',
   $amqp_port                   = '5672',
+  $rabbit_hosts                = undef,
   $bind_host                   = '0.0.0.0',
   $db_host                     = '127.0.0.1',
   $db_name                     = 'keystone',
@@ -75,6 +76,11 @@ class quickstack::keystone::common (
     fail("db_type ${db_type} is not supported")
   }
 
+  if $rabbit_hosts {
+    keystone_config { 'DEFAULT/rabbit_host': ensure => absent }
+    keystone_config { 'DEFAULT/rabbit_port': ensure => absent }
+  }
+
   class { '::keystone':
     admin_token      => $admin_token,
     bind_host        => $bind_host,
@@ -85,6 +91,7 @@ class quickstack::keystone::common (
     log_facility     => $log_facility,
     rabbit_host      => $amqp_host,
     rabbit_port      => $amqp_port,
+    rabbit_hosts     => $rabbit_hosts,
     service_provider => $service_provider,
     sql_connection   => $sql_conn,
     token_driver     => $token_driver,
