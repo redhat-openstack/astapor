@@ -98,6 +98,7 @@ class quickstack::pacemaker::params (
   $amqp_group                = 'amqp',
   $amqp_username             = '',
   $amqp_password             = '',
+  $rabbitmq_use_addrs_not_vip = true,
   $swift_public_vip          = '',
   $swift_user_password       = '',
   $swift_group               = 'swift',
@@ -108,6 +109,14 @@ class quickstack::pacemaker::params (
   $pcmk_bind_addr = find_ip("$pcmk_network",
                             "$pcmk_iface",
                             "$pcmk_ip")
+  $_rabbitmq_use_addrs_not_vip = str2bool_i($rabbitmq_use_addrs_not_vip)
+
+  # a list, e.g [ "backend1:5671", "backend2:5671" ]
+  $rabbitmq_hosts = $_rabbitmq_use_addrs_not_vip ? {
+    false => undef,
+    true  => split(inline_template('<%= @lb_backend_server_addrs.map {
+      |x| x+":"+@amqp_port }.join(",")%>'),",")
+  }
 
   include quickstack::pacemaker::common
   include quickstack::pacemaker::load_balancer

@@ -98,6 +98,7 @@ class quickstack::pacemaker::keystone (
       admin_token  => "$admin_token",
       amqp_host    => map_params("amqp_vip"),
       amqp_port    => map_params("amqp_port"),
+      rabbit_hosts => map_params("rabbitmq_hosts"),
       bind_host    => map_params("local_bind_addr"),
       db_host      => map_params("db_vip"),
       db_name      => "$db_name",

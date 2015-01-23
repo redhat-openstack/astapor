@@ -166,6 +166,7 @@ class quickstack::pacemaker::cinder(
       amqp_username  => map_params('amqp_username'),
       amqp_password  => map_params('amqp_password'),
       qpid_heartbeat => $qpid_heartbeat,
+      rabbit_hosts   => map_params("rabbitmq_hosts"),
       use_syslog     => $use_syslog,
       log_facility   => $log_facility,
       debug          => $debug,

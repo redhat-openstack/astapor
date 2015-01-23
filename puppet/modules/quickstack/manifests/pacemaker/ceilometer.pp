@@ -90,6 +90,7 @@ class quickstack::pacemaker::ceilometer (
       amqp_port                  => map_params('amqp_port'),
       amqp_username              => map_params('amqp_username'),
       amqp_password              => map_params('amqp_password'),
+      rabbit_hosts               => map_params("rabbitmq_hosts"),
       auth_host                  => map_params("keystone_admin_vip"),
       bind_address               => map_params("local_bind_addr"),
       ceilometer_metering_secret => "$ceilometer_metering_secret",

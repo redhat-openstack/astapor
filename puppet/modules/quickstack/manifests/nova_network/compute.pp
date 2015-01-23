@@ -42,6 +42,8 @@ class quickstack::nova_network::compute (
   $amqp_ssl_port                = '5671',
   $amqp_username                = $quickstack::params::amqp_username,
   $amqp_password                = $quickstack::params::amqp_password,
+  $rabbit_hosts                 = [ ],
+  $rabbitmq_use_addrs_not_vip   = true,
   $verbose                      = $quickstack::params::verbose,
   $ssl                          = $quickstack::params::ssl,
   $mysql_ca                     = $quickstack::params::mysql_ca,
@@ -75,6 +77,16 @@ class quickstack::nova_network::compute (
 
   $priv_nic = find_nic("$network_private_network","$network_private_iface","")
   $pub_nic = find_nic("$network_public_network","$network_public_iface","")
+
+  # empty array is true in puppet, so deal with that case the long
+  # way.  the var $rabbitmq_use_addrs_not_vip provided for consistency
+  # with the HA controller.
+  if $rabbit_hosts == [ ]  or ! str2bool_i($rabbitmq_use_addrs_not_vip) {
+    $_rabbit_hosts = undef
+  } else {
+    $_rabbit_hosts = split(inline_template('<%= @rabbit_hosts.map {
+      |x| x+":"+@amqp_port }.join(",")%>'),",")
+  }
 
   class { '::nova::network':
     private_interface => "$priv_nic",
@@ -120,6 +132,7 @@ class quickstack::nova_network::compute (
     amqp_ssl_port                => $amqp_ssl_port,
     amqp_username                => $amqp_username,
     amqp_password                => $amqp_password,
+    rabbit_hosts                 => $_rabbit_hosts,
     verbose                      => $verbose,
     ssl                          => $ssl,
     mysql_ca                     => $mysql_ca,

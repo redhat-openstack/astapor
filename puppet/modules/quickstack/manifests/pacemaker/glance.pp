@@ -143,6 +143,7 @@ class quickstack::pacemaker::glance (
       amqp_username            => map_params("amqp_username"),
       amqp_password            => map_params("amqp_password"),
       amqp_provider            => map_params("amqp_provider"),
+      rabbit_hosts             => map_params("rabbitmq_hosts"),
     }
     ->
     exec {"pcs-glance-server-set-up":

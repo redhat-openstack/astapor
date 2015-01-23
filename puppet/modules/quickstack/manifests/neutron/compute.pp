@@ -40,6 +40,8 @@ class quickstack::neutron::compute (
   $amqp_ssl_port                = '5671',
   $amqp_username                = $quickstack::params::amqp_username,
   $amqp_password                = $quickstack::params::amqp_password,
+  $rabbit_hosts                 = [ ],
+  $rabbitmq_use_addrs_not_vip   = true,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges             = '1:1000',
   $ovs_vxlan_udp_port           = $quickstack::params::ovs_vxlan_udp_port,
@@ -72,6 +74,16 @@ class quickstack::neutron::compute (
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
+  # empty array is true in puppet, so deal with that case the long
+  # way.  the var $rabbitmq_use_addrs_not_vip provided for consistency
+  # with the HA controller.
+  if $rabbit_hosts == [ ]  or ! str2bool_i($rabbitmq_use_addrs_not_vip) {
+    $_rabbit_hosts = undef
+  } else {
+    $_rabbit_hosts = split(inline_template('<%= @rabbit_hosts.map {
+      |x| x+":"+@amqp_port }.join(",")%>'),",")
+  }
+
   class { '::neutron':
     allow_overlapping_ips => true,
     rpc_backend           => amqp_backend('neutron', $amqp_provider),
@@ -85,6 +97,7 @@ class quickstack::neutron::compute (
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
     rabbit_use_ssl        => $ssl,
+    rabbit_hosts          => $_rabbit_hosts,
     verbose               => $verbose,
     network_device_mtu    => $network_device_mtu,
   }
@@ -104,6 +117,11 @@ class quickstack::neutron::compute (
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
+  }
+
+  if $_rabbit_hosts {
+    neutron_config { 'DEFAULT/rabbit_host': ensure => absent }
+    neutron_config { 'DEFAULT/rabbit_port': ensure => absent }
   }
 
   if downcase("$agent_type") == 'ovs' {
@@ -167,6 +185,7 @@ class quickstack::neutron::compute (
     amqp_ssl_port                => $amqp_ssl_port,
     amqp_username                => $amqp_username,
     amqp_password                => $amqp_password,
+    rabbit_hosts                 => $_rabbit_hosts,
     verbose                      => $verbose,
     ssl                          => $ssl,
     mysql_ca                     => $mysql_ca,
