@@ -127,13 +127,16 @@ class quickstack::neutron::plugins::cisco (
     $available_regions           = undef
     $hypervisor_options          = {'can_set_mount_point' => false, 'can_set_password' => true }
     $hypervisor_defaults         = {'can_set_mount_point' => $can_set_mount_point, 'can_set_password'  => false }
+    
     file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
+      require => Class['::quickstack::horizon'],
       content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
     } ~> Service['httpd']
 
     $disable_router    = 'False'
     Neutron_plugin_cisco<||> ->
     file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
+      require => Class['::quickstack::horizon'],
       content => template('quickstack/_40_router.py.erb')
     } ~> Service['httpd']
 
