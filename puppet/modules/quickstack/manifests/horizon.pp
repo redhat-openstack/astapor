@@ -43,6 +43,27 @@ class quickstack::horizon(
     service_ensure => $ensure,
   }
 
+  include ::quickstack::pacemaker::neutron
+  $neutron_core_plugin = $::quickstack::pacemaker::neutron::core_plugin
+
+  if $neutron_core_plugin == "neutron.plugins.cisco.network_plugin.PluginV2" {
+    $_profile_support = 'cisco'
+    $disable_router    = 'False'
+    Neutron_plugin_cisco<||> ->
+    file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
+      content => template('quickstack/_40_router.py.erb')
+    } ~> Service['httpd']
+  } else {
+    $_profile_support = 'none'
+  }
+
+  $neutron_options   = {'enable_lb' => true,
+                        'enable_firewall' => true,
+                        'enable_quotas' => false,
+                        'enable_security_group' => false,
+                        'enable_vpn' => true,
+                        'profile_support' => $_profile_support }
+
   class {'::horizon':
     bind_address          => $bind_address,
     cache_server_ip       => $cache_server_ip,
@@ -54,6 +75,7 @@ class quickstack::horizon(
     horizon_key           => $horizon_key,
     horizon_ca            => $horizon_ca,
     listen_ssl            => str2bool_i("$listen_ssl"),
+    neutron_options       => $neutron_options,
     secret_key            => $horizon_secret_key,
   }
 
@@ -71,33 +93,4 @@ class quickstack::horizon(
 
   class {'::quickstack::firewall::horizon':}
 
-  $neutron_core_plugin = $::quickstack::neutron::plugins::cisco::neutron_core_plugin
-
-  if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-    $neutron_defaults                   = {'enable_lb' => false, 'enable_firewall' => false, 'enable_quotas' => true, 'enable_security_group' => true, 'enable_vpn' => false, 'profile_support' => 'None' }
-    $neutron_options                    = {'enable_lb' => true, 'enable_firewall' => true, 'enable_quotas' => false, 'enable_security_group' => false, 'enable_vpn' => true, 'profile_support' => 'cisco' }
-    $openstack_endpoint_type            = undef
-    $compress_offline                   = True
-    $file_upload_temp_dir               = '/tmp'
-    $available_regions                  = undef
-    $hypervisor_options                 = {'can_set_mount_point' => false, 'can_set_password' => true }
-    $hypervisor_defaults                = {'can_set_mount_point' => $can_set_mount_point, 'can_set_password'  => false }
-    $django_debug                       = 'False'
-    $api_result_limit                   = '1000'
-    $help_url                           = 'http://docs.openstack.org'
-    $keystone_port                      = '5000'
-    $keystone_scheme                    = 'http'
-    $can_set_mount_point                = 'True'
-    $log_level                          = 'DEBUG'
-    $horizon_app_links                  = 'False'
-    file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
-      content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
-    } ~> Service['httpd']
-
-    $disable_router    = 'False'
-    Neutron_plugin_cisco<||> ->
-    file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
-      content => template('quickstack/_40_router.py.erb')
-    } ~> Service['httpd']
-  }
 }
