@@ -19,23 +19,7 @@ class quickstack::neutron::plugins::cisco (
   $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
   $controller_priv_host         = $quickstack::params::controller_priv_host,
   $controller_admin_host        = $quickstack::params::controller_admin_host,
-  $cache_server_ip              = $quickstack::params::cache_server_ip,
-  $cache_server_port            = $quickstack::params::cache_server_port,
-  $can_set_mount_point          = $quickstack::params::can_set_mount_point,
   $controller_pub_host          = $quickstack::params::controller_pub_host,
-  $django_debug                 = $quickstack::params::django_debug,
-  $enable_server                = true,
-  $enable_ovs_agent             = false,
-  $help_url                     = $quickstack::params::help_url,
-  $horizon_secret_key           = $quickstack::params::horizon_secret_key,
-  $horizon_ca                   = $quickstack::params::horizon_ca,
-  $horizon_cert                 = $quickstack::params::horizon_cert,
-  $horizon_key                  = $quickstack::params::horizon_key,
-  $horizon_app_links            = $quickstack::params::horizon_app_links,
-  $keystone_port                = $quickstack::params::keystone_port,
-  $keystone_scheme              = $quickstack::params::keystone_scheme,
-  $keystone_default_role        = $quickstack::params::keystone_default_role,
-  $log_level                    = $quickstack::params::log_level,
   $mysql_host                   = $quickstack::params::mysql_host,
   $mysql_ca                     = $quickstack::params::mysql_ca,
   $n1kv_vsm_ip                  = $quickstack::params::n1kv_vsm_ip,
@@ -104,41 +88,6 @@ class quickstack::neutron::plugins::cisco (
       keystone_auth_url => "http://${controller_priv_host}:35357/v2.0/",
       vswitch_plugin    => $cisco_vswitch_plugin,
     }
-
-    $listen_ssl                  = str2bool_i("$ssl")
-    $neutron_defaults            = {'enable_lb' => false,
-                                    'enable_firewall' => false,
-                                    'enable_quotas' => true,
-                                    'enable_security_group' => true,
-                                    'enable_vpn' => false,
-                                    'profile_support' => 'None' }
-    $neutron_options             = {'enable_lb' => true,
-                                    'enable_firewall' => true,
-                                    'enable_quotas' => false,
-                                    'enable_security_group' => false,
-                                    'enable_vpn' => true,
-                                    'profile_support' => 'cisco' }
-    $secret_key                  = $horizon_secret_key
-    $keystone_host               = $controller_priv_host
-    $fqdn                        = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
-    $openstack_endpoint_type     = undef
-    $compress_offline            = True
-    $file_upload_temp_dir        = '/tmp'
-    $available_regions           = undef
-    $hypervisor_options          = {'can_set_mount_point' => false, 'can_set_password' => true }
-    $hypervisor_defaults         = {'can_set_mount_point' => $can_set_mount_point, 'can_set_password'  => false }
-    
-    file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
-      require => Class['::quickstack::horizon'],
-      content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
-    } ~> Service['httpd']
-
-    $disable_router    = 'False'
-    Neutron_plugin_cisco<||> ->
-    file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
-      require => Class['::quickstack::horizon'],
-      content => template('quickstack/_40_router.py.erb')
-    } ~> Service['httpd']
 
     $default_policy_profile      = $n1kv_plugin_additional_params[default_policy_profile]
     $network_node_policy_profile = $n1kv_plugin_additional_params[network_node_policy_profile]
