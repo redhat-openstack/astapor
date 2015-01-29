@@ -72,8 +72,10 @@ class quickstack::pacemaker::neutron (
     if ($::pcs_setup_neutron ==  undef or
         !str2bool_i("$::pcs_setup_neutron")) {
       $_enabled = true
+      $_neutron_server_not_running = '/bin/true'
     } else {
       $_enabled = false
+      $_neutron_server_not_running = '/bin/false'
     }
     if (str2bool_i("$l3_ha")) {
       $_dhcp_agents_per_network  = size($_backend_server_addrs)
@@ -206,8 +208,17 @@ class quickstack::pacemaker::neutron (
     ->
     quickstack::pacemaker::resource::generic {'neutron-server':
       clone_opts       => "interleave=true",
-      operation_opts   => "start timeout=90",
+      operation_opts   => "start timeout=180",
       # monitor_params => { 'start-delay'     => '10s' },
+    }
+    ->
+    # FIXME: This is a work around for
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1181041
+    # Once that is released, we should consider removing this to see how it
+    # behaves.  The service failure was most consistent when using qpid.
+    exec { 'cleanup neutron-server':
+      command => '/usr/sbin/pcs resource cleanup neutron-server',
+      unless  => "${_neutron_server_not_running}",
     }
     ->
     # NOTE: ocf resources in current version of pcs do not accept arguements
