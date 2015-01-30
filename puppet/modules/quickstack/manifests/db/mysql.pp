@@ -101,12 +101,15 @@ class quickstack::db::mysql (
   # Install and configure MySQL Server
   class { '::mysql::server':
     override_options   => {
-      'bind_address'   => $mysql_bind_address,
-      'default_engine' => $mysql_default_engine,
-      'ssl'            => $mysql_ssl,
-      'ssl_ca'         => $mysql_ca,
-      'ssl_cert'       => $mysql_cert,
-      'ssl_key'        => $mysql_key,
+      'mysqld' => { 'bind-address'   => $mysql_bind_address,
+                    default_storage_engine => $mysql_default_engine,
+                    max_connections  => "1024",
+                    open_files_limit => '-1',
+                    'ssl'            => $mysql_ssl,
+                    'ssl-ca'         => $mysql_ca,
+                    'ssl-cert'       => $mysql_cert,
+                    'ssl-key'        => $mysql_key,
+      },
     },
     root_password => $mysql_root_password,
     package_name  => 'mariadb-galera-server',
