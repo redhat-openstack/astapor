@@ -30,6 +30,9 @@ class quickstack::neutron::networker (
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $network_device_mtu            = $quickstack::params::network_device_mtu,
   $veth_mtu                      = $quickstack::params::veth_mtu,
+  $ml2_mechanism_drivers         = ['openvswitch','l2population'],
+  $odl_controller_ip             = '',
+
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -91,6 +94,20 @@ class quickstack::neutron::networker (
       tunnel_types     => $ovs_tunnel_types,
       vxlan_udp_port   => $ovs_vxlan_udp_port,
       veth_mtu         => $veth_mtu,
+    }
+
+    # check if opendaylight needs to be configured.
+    if ('opendaylight' in $ml2_mechanism_drivers) {
+      # OVS manager
+      exec { 'Set OVS Manager to OpenDaylight':
+        command => "/usr/bin/ovs-vsctl set-manager tcp:${odl_controller_ip}:6640",
+        unless  => "/usr/bin/ovs-vsctl show | /usr/bin/grep 'Manager \"tcp:${odl_controller_ip}:6640\"'",
+      }
+      # local ip
+      exec { 'Set local_ip Other Option':
+        command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=$::ipaddress",
+        unless  => "/usr/bin/ovs-vsctl list Open_vSwitch | /usr/bin/grep 'local_ip=\"$::ipaddress\"'",
+      }
     }
   }
 
