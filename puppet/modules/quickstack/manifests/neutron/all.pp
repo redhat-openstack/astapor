@@ -138,6 +138,11 @@ class quickstack::neutron::all (
     path => ['/usr/bin','/bin'],
   } -> Service['neutron-server']
 
+  neutron_config {
+    'DEFAULT/service_plugins':
+      value => join(['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin',]),
+  }
+
   class { '::neutron::server':
     auth_host                => $auth_host,
     auth_password            => $neutron_user_password,
@@ -155,11 +160,6 @@ class quickstack::neutron::all (
 
   if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {
 
-    neutron_config {
-      'DEFAULT/service_plugins':
-        value => join(['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin',]),
-    }
-    ->
     class { '::neutron::plugins::ml2':
       type_drivers          => $ml2_type_drivers,
       tenant_network_types  => $ml2_tenant_network_types,
