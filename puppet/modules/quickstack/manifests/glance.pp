@@ -40,6 +40,7 @@ class quickstack::glance (
   $amqp_password            = '',
   $amqp_provider            = 'rabbitmq',
   $rabbit_use_ssl           = false,
+  $rabbit_hosts             = undef,
 ) {
 
   # Configure the db string
@@ -54,6 +55,11 @@ class quickstack::glance (
   $show_image_direct_url = $backend ? {
     'rbd' => true,
     default => false,
+  }
+
+  if $rabbit_hosts {
+    glance_api_config { 'DEFAULT/rabbit_host': ensure => absent }
+    glance_api_config { 'DEFAULT/rabbit_port': ensure => absent }
   }
 
   # Install and configure glance-api
@@ -122,6 +128,7 @@ class quickstack::glance (
       rabbit_host     => $amqp_host,
       rabbit_port     => $amqp_port,
       rabbit_use_ssl  => $rabbit_use_ssl,
+      rabbit_hosts    => $rabbit_hosts,
     }
   }
 

@@ -21,6 +21,7 @@ class quickstack::cinder(
   $qpid_heartbeat = '60',
   $qpid_protocol  = 'tcp',
   $rabbit_use_ssl = false,
+  $rabbit_hosts   = undef,
 
   $enabled        = true,
   $manage_service = true,
@@ -45,6 +46,11 @@ class quickstack::cinder(
     }
   }
 
+  if $rabbit_hosts {
+    cinder_config { 'DEFAULT/rabbit_host': ensure => absent }
+    cinder_config { 'DEFAULT/rabbit_port': ensure => absent }
+  }
+
   if str2bool_i("$db_ssl") {
     $sql_connection = "mysql://${db_user}:${db_password}@${db_host}/${db_name}?ssl_ca=${db_ssl_ca}"
   } else {
@@ -64,6 +70,7 @@ class quickstack::cinder(
     rabbit_userid   => $amqp_username,
     rabbit_password => $amqp_password_safe_for_cinder,
     rabbit_use_ssl  => $rabbit_use_ssl,
+    rabbit_hosts    => $rabbit_hosts,
     sql_connection  => $sql_connection,
     verbose         => str2bool_i("$verbose"),
     use_syslog      => str2bool_i("$use_syslog"),

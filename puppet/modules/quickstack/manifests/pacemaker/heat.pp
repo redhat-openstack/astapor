@@ -109,6 +109,7 @@ class quickstack::pacemaker::heat(
       amqp_username           => map_params("amqp_username"),
       amqp_password           => map_params("amqp_password"),
       amqp_provider           => map_params("amqp_provider"),
+      rabbit_hosts            => map_params("rabbitmq_hosts"),
       cfn_host                => map_params("heat_cfn_admin_vip"),
       cloudwatch_host         => map_params("heat_admin_vip"),
       use_syslog              => $use_syslog,

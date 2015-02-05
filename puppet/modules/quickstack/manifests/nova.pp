@@ -113,6 +113,7 @@ class quickstack::nova (
   $amqp_port                    = '5672',
   $amqp_username                = '',
   $amqp_password                = '',
+  $rabbit_hosts                 = undef,
   $auth_host                    = 'localhost',
   $auto_assign_floating_ip      = 'true',
   $bind_address                 = '0.0.0.0',
@@ -159,10 +160,16 @@ class quickstack::nova (
       rabbit_host        => $amqp_hostname,
       rabbit_userid      => $amqp_username,
       rabbit_password    => $amqp_password,
+      rabbit_hosts       => $rabbit_hosts,
     }
 
     nova_config { 'DEFAULT/default_floating_pool':
       value => $default_floating_pool;
+    }
+
+    if $rabbit_hosts {
+      nova_config { 'DEFAULT/rabbit_host': ensure => absent }
+      nova_config { 'DEFAULT/rabbit_port': ensure => absent }
     }
 
     if $max_retries {

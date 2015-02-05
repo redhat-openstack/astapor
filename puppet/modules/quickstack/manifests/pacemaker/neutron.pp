@@ -181,6 +181,7 @@ class quickstack::pacemaker::neutron (
       amqp_port                      => map_params("amqp_port"),
       amqp_username                  => map_params("amqp_username"),
       amqp_password                  => map_params("amqp_password"),
+      rabbit_hosts                   => map_params("rabbitmq_hosts"),
       tenant_network_type            => $tenant_network_type,
       security_group_api             => $security_group_api,
       nexus_config                   => $nexus_config,
