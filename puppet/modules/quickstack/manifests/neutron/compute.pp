@@ -1,6 +1,5 @@
 # Quickstack compute node configuration for neutron (OpenStack Networking)
 class quickstack::neutron::compute (
-  $admin_password               = $quickstack::params::admin_password,
   $agent_type                   = 'ovs',
   $auth_host                    = '127.0.0.1',
   $ceilometer                   = 'true',
@@ -156,7 +155,6 @@ class quickstack::neutron::compute (
 
 
   class { 'quickstack::compute_common':
-    admin_password               => $admin_password,
     auth_host                    => $auth_host,
     ceilometer                   => $ceilometer,
     ceilometer_metering_secret   => $ceilometer_metering_secret,
