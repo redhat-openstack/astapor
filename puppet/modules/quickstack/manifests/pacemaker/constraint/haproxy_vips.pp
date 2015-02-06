@@ -10,8 +10,8 @@ define quickstack::pacemaker::constraint::haproxy_vips(
 
   Quickstack::Pacemaker::Resource::Generic['haproxy'] ->
   quickstack::pacemaker::constraint::typical{ "haproxy-${pcmk_group}-pub-const" :
-    first_resource  => "haproxy-clone",
-    second_resource => "ip-${pcmk_group}-pub-${public_vip}",
+    first_resource  => "ip-${pcmk_group}-pub-${public_vip}",
+    second_resource => "haproxy-clone",
   }
   Quickstack::Pacemaker::Resource::Ip["ip-${pcmk_group}-pub"] ->
   Quickstack::Pacemaker::Constraint::Typical["haproxy-${pcmk_group}-pub-const"]
@@ -19,8 +19,8 @@ define quickstack::pacemaker::constraint::haproxy_vips(
   if ( $public_vip != $private_vip ) {
     Quickstack::Pacemaker::Resource::Generic['haproxy'] ->
     quickstack::pacemaker::constraint::typical{ "haproxy-${pcmk_group}-prv-const" :
-      first_resource  => "haproxy-clone",
-      second_resource => "ip-${pcmk_group}-prv-${private_vip}",
+      first_resource  => "ip-${pcmk_group}-prv-${private_vip}",
+      second_resource => "haproxy-clone",
     }
     Quickstack::Pacemaker::Resource::Ip["ip-${pcmk_group}-prv"] ->
     Quickstack::Pacemaker::Constraint::Typical["haproxy-${pcmk_group}-prv-const"]
@@ -29,8 +29,8 @@ define quickstack::pacemaker::constraint::haproxy_vips(
   if ( ($admin_vip != $private_vip) and ($admin_vip != $public_vip) ) {
     Quickstack::Pacemaker::Resource::Generic['haproxy'] ->
     quickstack::pacemaker::constraint::typical{ "haproxy-${pcmk_group}-adm-const" :
-      first_resource  => "haproxy-clone",
-      second_resource => "ip-${pcmk_group}-adm-${admin_vip}",
+      first_resource  => "ip-${pcmk_group}-adm-${admin_vip}",
+      second_resource => "haproxy-clone",
     }
     Quickstack::Pacemaker::Resource::Ip["ip-${pcmk_group}-adm"] ->
     Quickstack::Pacemaker::Constraint::Typical["haproxy-${pcmk_group}-adm-const"]
