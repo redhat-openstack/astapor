@@ -45,8 +45,9 @@ class quickstack::horizon(
 
   include ::quickstack::pacemaker::neutron
   $neutron_core_plugin = $::quickstack::pacemaker::neutron::core_plugin
+  $ml2_mechanism_drivers = $::quickstack::pacemaker::neutron::ml2_mechanism_drivers
 
-  if $neutron_core_plugin == "neutron.plugins.cisco.network_plugin.PluginV2" {
+  if ($neutron_core_plugin == "neutron.plugins.cisco.network_plugin.PluginV2") or ('cisco_n1kv' in $ml2_mechanism_drivers) {
     $_profile_support = 'cisco'
     $disable_router    = 'False'
     Neutron_plugin_cisco<||> ->
