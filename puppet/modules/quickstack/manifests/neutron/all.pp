@@ -132,19 +132,6 @@ class quickstack::neutron::all (
     verbose                 => $verbose,
     network_device_mtu      => $network_device_mtu,
   }
-  ->
-  # FIXME: This really should be handled by the neutron-puppet module, which has
-  # a review request open right now: https://review.openstack.org/#/c/50162/
-  # If and when that is merged (or similar), the below can be removed.
-  exec { 'neutron-db-manage upgrade':
-    command     => 'neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugin.ini upgrade head',
-    path        => '/usr/bin',
-    user        => 'neutron',
-    logoutput   => 'on_failure',
-    before      => Service['neutron-server'],
-    require     => [Neutron_config['database/connection'], Neutron_config['DEFAULT/core_plugin']],
-  }
-  File['/etc/neutron/plugin.ini'] -> Exec['neutron-db-manage upgrade']
 
   # short-term workaround for BZ 1181592
   package{'bind-utils': } ->
@@ -166,6 +153,8 @@ class quickstack::neutron::all (
     }
   }
 
+  anchor {'quickstack-neutron-server-first':}
+  ->
   class { '::neutron::server':
     auth_host                => $auth_host,
     auth_password            => $neutron_user_password,
@@ -178,8 +167,10 @@ class quickstack::neutron::all (
     manage_service           => str2bool_i("$manage_service"),
     max_l3_agents_per_router => $max_l3_agents_per_router,
     min_l3_agents_per_router => $min_l3_agents_per_router,
+    sync_db                  => true,
   }
-  contain neutron::server
+  ->
+  anchor {'quickstack-neutron-server-last':}
 
   if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {
 
