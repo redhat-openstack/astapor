@@ -30,6 +30,7 @@ class quickstack::compute_common (
   $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_nfs           = 'false',
   $cinder_backend_rbd           = 'false',
+  $cinder_catalog_info          = 'volume:cinder:internalURL',
   $glance_host                  = '127.0.0.1',
   $glance_backend_rbd           = 'false',
   $libvirt_images_rbd_pool      = 'volumes',
@@ -143,6 +144,10 @@ class quickstack::compute_common (
     nova_config {
       'DEFAULT/libvirt_inject_partition':     value => '-1';
     }
+  }
+
+  nova_config {
+    'DEFAULT/cinder_catalog_info': value => $cinder_catalog_info;
   }
 
   if str2bool_i("$ssl") {
