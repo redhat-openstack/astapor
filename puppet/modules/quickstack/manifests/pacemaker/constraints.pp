@@ -160,12 +160,12 @@ class quickstack::pacemaker::constraints() {
     if (str2bool_i(map_params('include_keystone'))) {
       quickstack::pacemaker::constraint::typical{ 'keystone-then-cinder-constr' :
         first_resource  => "keystone-clone",
-        second_resource => "cinder-api",
+        second_resource => "cinder-api-clone",
         colocation      => false,
       }
     } else {
       quickstack::pacemaker::constraint::base_services{"base-then-cinder-constr" :
-        target_resource => "cinder-api",
+        target_resource => "cinder-api-clone",
       }
     }
   }
