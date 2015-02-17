@@ -113,8 +113,11 @@ class quickstack::pacemaker::cinder(
     }
 
     if (str2bool_i("$backend_nfs")) {
-      $_volume_clone_opts = "interleave=true"
-      $_cinder_volume_resource_name = "cinder-volume-clone"
+      $_volume_clone_opts = undef
+      $_cinder_volume_resource_name = "cinder-volume"
+      # TODO: once cinder can work A/A, use the following values instead
+      # $_volume_clone_opts = "interleave=true"
+      # $_cinder_volume_resource_name = "cinder-volume-clone"
     } else {
       $_volume_clone_opts = undef
       $_cinder_volume_resource_name = "cinder-volume"
@@ -189,23 +192,21 @@ class quickstack::pacemaker::cinder(
       command   => "/tmp/ha-all-in-one-util.bash all_members_include cinder",
     } ->
     quickstack::pacemaker::resource::generic {'cinder-api':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-cinder-api",
     } ->
     quickstack::pacemaker::resource::generic {'cinder-scheduler':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-cinder-scheduler",
     } ->
     quickstack::pacemaker::constraint::base { 'cinder-api-scheduler-constr' :
       constraint_type => "order",
-      first_resource  => "cinder-api-clone",
-      second_resource => "cinder-scheduler-clone",
+      first_resource  => "cinder-api",
+      second_resource => "cinder-scheduler",
       first_action    => "start",
       second_action   => "start",
     } ->
     quickstack::pacemaker::constraint::colocation { 'cinder-api-scheduler-colo' :
-      source => "cinder-scheduler-clone",
-      target => "cinder-api-clone",
+      source => "cinder-scheduler",
+      target => "cinder-api",
       score => "INFINITY",
     } ->
     Anchor['pacemaker ordering constraints begin']
@@ -288,7 +289,7 @@ class quickstack::pacemaker::cinder(
       ->
       quickstack::pacemaker::constraint::base { 'cinder-scheduler-volume-constr' :
         constraint_type => "order",
-        first_resource  => "cinder-scheduler-clone",
+        first_resource  => "cinder-scheduler",
         second_resource => "$_cinder_volume_resource_name",
         first_action    => "start",
         second_action   => "start",
@@ -296,7 +297,7 @@ class quickstack::pacemaker::cinder(
       ->
       quickstack::pacemaker::constraint::colocation { 'cinder-scheduler-volume-colo' :
         source => "$_cinder_volume_resource_name",
-        target => "cinder-scheduler-clone",
+        target => "cinder-scheduler",
         score => "INFINITY",
       }
     }
