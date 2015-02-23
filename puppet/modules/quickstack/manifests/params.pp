@@ -63,7 +63,7 @@ class quickstack::params (
   $cinder_eqlx_chap_login       = ['chapadmin'],
   $cinder_eqlx_chap_password    = ['CHANGEME'],
   #  Cinder NetApp
-  $cinder_netapp_hostname          = ['netatap1.example.com'],
+  $cinder_netapp_hostname          = ['netapp1.example.com'],
   $cinder_netapp_login             = ['admin'],
   $cinder_netapp_password          = ['CHANGEME'],
   $cinder_netapp_server_port       = ['80'],
