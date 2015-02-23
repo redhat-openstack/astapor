@@ -66,7 +66,7 @@ class quickstack::cinder_volume_types(
     Exec['wait-for-cinder-api-being-reachable'] ->
     quickstack::cinder::multi_instance_type { "netapp-${netapp_last_index}":
       index           => $netapp_last_index,
-      resource_prefix => "netapp",
+      resource_prefix => 'netapp',
       backend_names   => $backend_netapp_name,
     }
   }
