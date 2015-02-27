@@ -20,7 +20,7 @@ define quickstack::cinder::multi_instance_type (
     $next = $index - 1
     quickstack::cinder::multi_instance_type { "${resource_prefix}-${next}":
       index           => $next,
-      resource_prefix => 'eqlx',
+      resource_prefix => $resource_prefix,
       backend_names   => $backend_names,
     }
   }

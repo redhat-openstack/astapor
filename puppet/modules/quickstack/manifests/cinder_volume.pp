@@ -124,15 +124,15 @@ class quickstack::cinder_volume(
       }
     } elsif str2bool_i("$backend_netapp") {
       class { '::cinder::volume::netapp':
-        netapp_hostname          => $netapp_hostname[0],
+        netapp_server_hostname   => $netapp_hostname[0],
         netapp_login             => $netapp_login[0],
         netapp_password          => $netapp_password[0],
         netapp_server_port       => $netapp_server_port[0],
         netapp_storage_family    => $netapp_storage_family[0],
         netapp_transport_type    => $netapp_transport_type[0],
         netapp_storage_protocol  => $netapp_storage_protocol[0],
-        netapp_nfs_shares        => $netapp_nfs_shares[0],
-        netapp_nfs_shares_config => $netapp_nfs_shares_config[0],
+        nfs_shares               => $netapp_nfs_shares[0],
+        nfs_shares_config        => $netapp_nfs_shares_config[0],
         netapp_volume_list       => $netapp_volume_list[0],
         netapp_vfiler            => $netapp_vfiler[0],
         netapp_vserver           => $netapp_vserver[0],
@@ -241,7 +241,7 @@ class quickstack::cinder_volume(
       quickstack::netapp::volume { $last:
         index => $last,
         backend_section_name_array     => $netapp_backends,
-        backend_eqlx_name_array        => $backend_netapp_name,
+        backend_netapp_name_array      => $backend_netapp_name,
         netapp_hostname_array          => $netapp_hostname,
         netapp_login_array             => $netapp_login,
         netapp_password_array          => $netapp_password,
@@ -291,6 +291,7 @@ class quickstack::cinder_volume(
       'glusterfs_backends',
       'nfs_backends',
       'eqlx_backends',
+      'netapp_backends',
       'rbd_backends',
       'iscsi_backends')
     if $enabled_backends == [] {
