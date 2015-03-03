@@ -61,14 +61,14 @@ class quickstack::neutron::all (
                                     enable_sync_on_start => 'True',
                                     restrict_policy_profiles => 'False',
                                     },
-  $n1kv_ml2_plugin_additional_params = { default_policy_profile => 'default-pp',
-                                         default_vlan_network_profile => 'default-vlan-np',
-                                         default_vxlan_network_profile => 'default-vxlan-np',
-                                         poll_duration => '60',
-                                         http_pool_size => '4',
-                                         http_timeout => '15',
-                                         restrict_policy_profiles => 'False',
-                                         },
+  $n1kv_ml2_plugin_additional_params = {default_policy_profile => 'default-pp',
+                                        default_vlan_network_profile => 'default-vlan-np',
+                                        default_vxlan_network_profile => 'default-vxlan-np',
+                                        poll_duration => '60',
+                                        http_pool_size => '4',
+                                        http_timeout => '15',
+                                        restrict_policy_profiles => 'False',
+                                        },
   $n1kv_vsm_ip                   = undef,
   $n1kv_vsm_password             = undef,
   $n1kv_vsm_username             = undef,
@@ -276,10 +276,6 @@ class quickstack::neutron::all (
     manage_service => str2bool_i("$manage_service"),
     metadata_ip    => $neutron_priv_host,
     shared_secret  => $neutron_metadata_proxy_secret,
-  }
-
-  neutron_config {
-    'DEFAULT/host': value => 'neutron-n-0';
   }
 
   include quickstack::neutron::notifications
