@@ -200,12 +200,14 @@ class quickstack::pacemaker::constraints() {
 
   if (str2bool_i(map_params('include_neutron'))) {
     if (str2bool_i(map_params('include_keystone'))) {
+      Quickstack::Pacemaker::Resource::Generic[neutron-server] ->
       quickstack::pacemaker::constraint::typical{ 'keystone-then-neutron-constr' :
         first_resource  => "keystone-clone",
         second_resource => "neutron-server-clone",
         colocation      => false,
       }
     } else {
+      Quickstack::Pacemaker::Resource::Generic[neutron-server] ->
       quickstack::pacemaker::constraint::base_services{"base-then-neutron-constr" :
         target_resource => "neutron-server-clone",
       }
