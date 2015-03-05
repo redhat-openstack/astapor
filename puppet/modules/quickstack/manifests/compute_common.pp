@@ -4,7 +4,11 @@
 #
 # === Parameters
 # [*nova_host*]
-#   The public network ip for the controller, or nova VIP, if HA.
+#   The private network ip for the controller, or nova VIP, if HA.
+# [*vncproxy_host*]
+#   The ip or hostname to use for constructing the VNC console base URL.
+#   Typically the public network ip or hostname for the controller, or nova VIP, if HA.
+#   Defaults to the value of nova_host if unset.
 
 class quickstack::compute_common (
   $amqp_host                    = $quickstack::params::amqp_host,
@@ -60,6 +64,7 @@ class quickstack::compute_common (
   $ssl                          = $quickstack::params::ssl,
   $verbose                      = $quickstack::params::verbose,
   $vnc_keymap                   = 'en-us',
+  $vncproxy_host                = undef,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -217,7 +222,7 @@ class quickstack::compute_common (
                         "$private_ip")
   class { '::nova::compute':
     enabled                       => true,
-    vncproxy_host                 => $nova_host,
+    vncproxy_host                 => pick($vncproxy_host, $nova_host),
     vncserver_proxyclient_address => $compute_ip,
     network_device_mtu            => $network_device_mtu,
     vnc_keymap                    => $vnc_keymap,
