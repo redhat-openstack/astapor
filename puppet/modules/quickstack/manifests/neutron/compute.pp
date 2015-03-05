@@ -72,6 +72,7 @@ class quickstack::neutron::compute (
   $network_device_mtu           = undef,
   $veth_mtu                     = undef,
   $vnc_keymap                   = 'en-us',
+  $vncproxy_host                = undef,
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -197,6 +198,7 @@ class quickstack::neutron::compute (
     mysql_host                   => $mysql_host,
     nova_db_password             => $nova_db_password,
     nova_host                    => $nova_host,
+    vncproxy_host                => pick($vncproxy_host, $nova_host),
     nova_user_password           => $nova_user_password,
     amqp_provider                => $amqp_provider,
     amqp_host                    => $amqp_host,
