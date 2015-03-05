@@ -108,4 +108,6 @@ class quickstack::ceilometer::control(
     command => "sleep $((\$RANDOM % 86400)) &&
                 ${::ceilometer::params::expirer_command}"
   }
+
+  class {'::quickstack::firewall::ceilometer':}
 }
