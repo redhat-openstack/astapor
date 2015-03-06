@@ -54,7 +54,8 @@ class quickstack::pacemaker::rabbitmq (
                                 {backlog, 128},
                                 {nodelay, true},
                                 {exit_on_close, false},
-                                {keepalive, true}]"
+                                {keepalive, true}]",
+        'cluster_partition_handling' => 'pause_minority'
       },
     }
 
