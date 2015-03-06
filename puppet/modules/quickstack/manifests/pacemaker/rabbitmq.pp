@@ -1,6 +1,9 @@
 class quickstack::pacemaker::rabbitmq (
   $haproxy_timeout       = '900m',
-  $inet_dist_listen      = '35672'
+  $inet_dist_listen      = '35672',
+  # need to override connect_options and set listen_options
+  # for TCP_USER_TIMEOUT
+  $erl_args              = "\"+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true},{raw,6,18,<<5000:64/native>>}] -kernel inet_default_listen_options [{raw,6,18,<<5000:64/native>>}]\""
 ) {
 
   include quickstack::pacemaker::common
@@ -40,7 +43,8 @@ class quickstack::pacemaker::rabbitmq (
       package_source           => undef,
       manage_repos             => false,
       environment_variables   => {
-        'RABBITMQ_NODENAME'     => "rabbit@$this_node",
+        'RABBITMQ_NODENAME'        => "rabbit@$this_node",
+        'RABBITMQ_SERVER_ERL_ARGS' => "${erl_args}",
       },
       service_manage           => $_enabled,
       # set the parameter tcp_keepalive to false -- but don't be misled!
