@@ -52,6 +52,12 @@ class quickstack::glance (
 
   $_auth_url = "http://${keystone_host}:5000/v2.0"
 
+  if ($backend == 'file') {
+    $_backend = 'filesystem'
+  } else {
+    $_backend = $backend
+  }
+
   $show_image_direct_url = $backend ? {
     'rbd' => true,
     default => false,
@@ -75,6 +81,7 @@ class quickstack::glance (
     keystone_tenant       => 'services',
     keystone_user         => 'glance',
     keystone_password     => $user_password,
+    known_stores          => ["glance.store.${_backend}.Store"],
     sql_connection        => $sql_connection,
     sql_idle_timeout      => $sql_idle_timeout,
     use_syslog            => $use_syslog,
