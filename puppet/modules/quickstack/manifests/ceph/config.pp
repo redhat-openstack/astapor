@@ -26,41 +26,93 @@
 
 
 class quickstack::ceph::config (
-  $fsid                  = '',
-  $mon_initial_members   = [ ],
-  $mon_host              = [ ],
-  $cluster_network       = '',
-  $public_network        = '',
-  $images_key            = '',
-  $volumes_key           = '',
-  $osd_pool_default_size = '',
-  $osd_journal_size      = '',
+  $manage_ceph_conf        = true,
+  $fsid                    = '',
+  $mon_initial_members     = [ ],
+  $mon_host                = [ ],
+  $cluster_network         = '',
+  $public_network          = '',
+  $images_key              = '',
+  $volumes_key             = '',
+  $rgw_key                 = '',
+  $conf_include_osd_global = true,
+  $osd_pool_default_size   = '',
+  $osd_journal_size        = '',
+  $osd_mkfs_options_xfs    = '-f -i size=2048 -n size=64k',
+  $osd_mount_options_xfs   = '-o inode64,noatime,logbsize=256k',
+  $conf_include_rgw        = false,
+  $rgw_hostnames           = [ ],
+  $extra_conf_lines        = [ ],
 ) {
 
-  file { "etc-ceph":
-    path    => "/etc/ceph",
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    ensure => directory,
+  if $rgw_hostnames == [ ] {
+    $_rgw_hostnames = [$::hostname]
+  } else {
+    $_rgw_hostnames = $rgw_hostnames
   }
 
-  file { "etc-ceph-conf":
-    path    => "/etc/ceph/ceph.conf",
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => template('quickstack/ceph-conf.erb'),
+  file { 'etc-ceph':
+    ensure => directory,
+    path   => '/etc/ceph',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+  }
+
+  if str2bool_i("$manage_ceph_conf") {
+    File['etc-ceph'] ->
+    file { 'etc-ceph-conf':
+      path    => '/etc/ceph/ceph.conf',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => template('quickstack/ceph-conf.erb'),
+    }
+  }
+
+  if $conf_include_rgw {
+    file { 'var-lib-ceph':
+      ensure => directory,
+      path   => '/var/lib/ceph',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    } ->
+    file { 'var-lib-ceph-radosgw':
+      ensure => directory,
+      path   => '/var/lib/ceph/radosgw',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    } ->
+    file { 'var-lib-ceph-radosgw-ceph-radosgw.gateway':
+      ensure => directory,
+      path   => '/var/lib/ceph/radosgw/ceph-radosgw.gateway',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
   }
 
   if $images_key {
-    ::quickstack::ceph::keyring_config{ "images":
+    File['etc-ceph'] ->
+    ::quickstack::ceph::keyring_config{ 'images':
       key => $images_key,
     }
   }
   if $volumes_key {
-    ::quickstack::ceph::keyring_config{ "volumes":
+    File['etc-ceph'] ->
+    ::quickstack::ceph::keyring_config{ 'volumes':
       key => $volumes_key,
+    }
+  }
+  if $rgw_key {
+    File['etc-ceph'] ->
+    ::quickstack::ceph::keyring_config{ "rados.gateway":
+      key              => $rgw_key,
+      caps_mon         => 'allow rwx',
+      caps_osd         => 'allow rwx',
+      keyring_filename => '/etc/ceph/ceph.client.radosgw.keyring',
     }
   }
 }

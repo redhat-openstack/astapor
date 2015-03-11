@@ -1,4 +1,4 @@
 [client.<%= @keyring_name %>]
       key = <%= @key %>
-      caps mon = "allow r"
-      caps osd = "allow class-read object_prefix rbd_children, allow rwx pool=<%= @keyring_name %>"
+      caps mon = "<%= @caps_mon %>"
+      caps osd = "<%= @caps_osd %>"
