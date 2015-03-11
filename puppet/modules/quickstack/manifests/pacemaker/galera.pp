@@ -1,4 +1,5 @@
 class quickstack::pacemaker::galera (
+  $limit_no_file            ="16384",
   $max_connections         = "1024",
   $mysql_root_password     = '',
   $open_files_limit        = '-1',
@@ -168,7 +169,8 @@ class quickstack::pacemaker::galera (
     }
     ->
     quickstack::pacemaker::resource::galera {'galera':
-      gcomm_addrs => map_params("pcmk_server_names")
+      gcomm_addrs   => map_params("pcmk_server_names"),
+      limit_no_file => $limit_no_file,
     }
     ->
     # one last clustercheck to make sure service is up
