@@ -10,11 +10,26 @@ filestore_xattr_use_omap = true
 @chunk = ''
 @chunk = @public_network.length > 0 ? @chunk + "public_network = #{@public_network}\n" : @chunk
 @chunk = @cluster_network.length > 0 ? @chunk + "cluster_network = #{@cluster_network}\n" : @chunk
-@chunk = @osd_pool_default_size.length > 0 ? @chunk + "osd_pool_default_size = #{@osd_pool_default_size}\n" : @chunk
-@chunk = @osd_journal_size.length > 0 ? @chunk + "osd_journal_size = #{@osd_journal_size}\n" : @chunk %>
+if @conf_include_osd_global
+  @chunk = @chunk + "\n[osd]\n"
+  @chunk = @osd_pool_default_size.length > 0 ? @chunk + "osd_pool_default_size = #{@osd_pool_default_size}\n" : @chunk
+  @chunk = @osd_journal_size.length > 0 ? @chunk + "osd_journal_size = #{@osd_journal_size}\n" : @chunk
+  @chunk = @osd_mkfs_options_xfs.length > 0 ? @chunk + "osd_mkfs_options_xfs = #{@osd_mkfs_options_xfs}\n" : @chunk
+  @chunk = @osd_mount_options_xfs.length > 0 ? @chunk + "osd_mount_options_xfs = #{@osd_mount_options_xfs}\n" : @chunk
+end
+%>
 <%= @chunk %><% if @images_key.length > 0 %>
 [client.images]
 keyring = /etc/ceph/ceph.client.images.keyring<% end %>
 <% if @volumes_key.length > 0 %>
 [client.volumes]
 keyring = /etc/ceph/ceph.client.volumes.keyring<% end %>
+<% if @conf_include_rgw %><% @_rgw_hostnames.each do |rgw_hostname| %>
+[client.radosgw.<%= rgw_hostname %>]
+host = <%= rgw_hostname %>
+keyring = /etc/ceph/ceph.client.radosgw.keyring
+rgw socket path = /var/run/ceph/ceph.radosgw.<%= rgw_hostname %>.fastcgi.sock
+log file = /var/log/radosgw/client.radosgw.<%= rgw_hostname %>.log
+rgw print continue = false
+<% end %><% end %><% if @extra_conf_lines.length > 0 %>
+<%= @extra_conf_lines.to_a.join("\n")%><% end %>
