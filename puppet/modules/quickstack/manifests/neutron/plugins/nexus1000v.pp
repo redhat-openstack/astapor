@@ -53,7 +53,13 @@
 # policy profiles.
 # Default value: False, indicating all tenants can access all policy profiles.
 # restrict_policy_profiles = False
-
+#
+#[*enable_vif_type_n1kv*]
+# (Optional) If set to True, the VIF type for portbindings is set to N1KV.
+# Otherwise the VIF type is set to OVS.
+# Default value: False, indicating that the VIF type will be set to OVS.
+# enable_vif_type_n1kv = False
+#
 class quickstack::neutron::plugins::nexus1000v (
   $default_policy_profile		= 'default-pp',
   $default_vlan_network_profile		= 'default-vlan-np',
@@ -64,7 +70,8 @@ class quickstack::neutron::plugins::nexus1000v (
   $n1kv_vsm_ip                          = undef,
   $n1kv_vsm_password                    = undef,
   $n1kv_vsm_username                    = undef,
-  $restrict_policy_profiles		= 'False',
+  $restrict_policy_profiles             = 'False',
+  $enable_vif_type_n1kv                 = 'False',
 )
 {
   package { 'cisco-n1kv-ml2-driver':
@@ -84,5 +91,6 @@ class quickstack::neutron::plugins::nexus1000v (
     'ml2_cisco_n1kv/n1kv_vsm_ips'                    : value => $n1kv_vsm_ip;
     'ml2_cisco_n1kv/username'                        : value => $n1kv_vsm_username;
     'ml2_cisco_n1kv/password'                        : value => $n1kv_vsm_password;
+    'ml2_cisco_n1kv/enable_vif_type_n1kv'            : value => $enable_vif_type_n1kv;
   }
 }
