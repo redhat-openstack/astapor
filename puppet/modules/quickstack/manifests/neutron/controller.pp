@@ -137,6 +137,8 @@ class quickstack::neutron::controller (
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
   $ml2_security_group            = 'true',
+  $odl_controller_ip             = '',
+  $odl_controller_port           = '8080',
   $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -343,7 +345,6 @@ class quickstack::neutron::controller (
   }
 
   if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {
-
     neutron_config {
       'DEFAULT/service_plugins':
         value => join(['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin',]),
@@ -367,6 +368,16 @@ class quickstack::neutron::controller (
       class { 'neutron::plugins::ml2::cisco::nexus':
         nexus_config        => $nexus_config,
       }
+    }
+
+    # check if opendaylight needs to be configured.
+    if ('opendaylight' in $ml2_mechanism_drivers) {
+      neutron_plugin_ml2 {
+        'ml2_odl/username':         value => 'admin';
+        'ml2_odl/password':         value => 'admin';
+        'ml2_odl/url':              value => "http://${odl_controller_ip}:${odl_controller_port}/controller/nb/v2/neutron";
+      }
+
     }
   }
 
