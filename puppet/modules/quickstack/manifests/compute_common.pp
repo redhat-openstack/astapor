@@ -180,22 +180,22 @@ class quickstack::compute_common (
   }
 
   class { '::nova':
-    sql_connection     => $nova_sql_connection,
-    image_service      => 'nova.image.glance.GlanceImageService',
-    glance_api_servers => "http://${glance_host}:9292/v1",
-    rpc_backend        => amqp_backend('nova', $amqp_provider),
-    qpid_hostname      => $amqp_host,
-    qpid_protocol      => $qpid_protocol,
-    qpid_port          => $real_amqp_port,
-    qpid_username      => $amqp_username,
-    qpid_password      => $amqp_password,
-    rabbit_host        => $amqp_host,
-    rabbit_port        => $real_amqp_port,
-    rabbit_userid      => $amqp_username,
-    rabbit_password    => $amqp_password,
-    rabbit_use_ssl     => $ssl,
-    rabbit_hosts       => $rabbit_hosts,
-    verbose            => $verbose,
+    database_connection => $nova_sql_connection,
+    image_service       => 'nova.image.glance.GlanceImageService',
+    glance_api_servers  => "http://${glance_host}:9292/v1",
+    rpc_backend         => amqp_backend('nova', $amqp_provider),
+    qpid_hostname       => $amqp_host,
+    qpid_protocol       => $qpid_protocol,
+    qpid_port           => $real_amqp_port,
+    qpid_username       => $amqp_username,
+    qpid_password       => $amqp_password,
+    rabbit_host         => $amqp_host,
+    rabbit_port         => $real_amqp_port,
+    rabbit_userid       => $amqp_username,
+    rabbit_password     => $amqp_password,
+    rabbit_use_ssl      => $ssl,
+    rabbit_hosts        => $rabbit_hosts,
+    verbose             => $verbose,
   }
 
   if str2bool_i($kvm_capable) {
