@@ -140,27 +140,28 @@ class quickstack::nova (
 ) {
 
     # TODO: add ssl config here
+    # bring over the ssl/not chunk from
+    # controller_common, that maybe should go in a function
     $nova_sql_connection = "mysql://${db_user}:${db_password}@${db_host}/${db_name}"
     $glance_api_uri =  "http://${glance_host}:${glance_port}/v1"
 
     class { '::nova':
-      sql_connection => $nova_sql_connection, #bring over the ssl/not chunk from
-      #    controller_common, that maybe should go in a function
-      image_service      => $image_service,
-      glance_api_servers => $glance_api_uri,
-      memcached_servers  => $memcached_servers,
-      rpc_backend        => $rpc_backend,
-      verbose            => $verbose,
-      qpid_port          => $amqp_port,
-      qpid_hostname      => $amqp_hostname,
-      qpid_heartbeat     => $qpid_heartbeat,
-      qpid_username      => $amqp_username,
-      qpid_password      => $amqp_password,
-      rabbit_port        => $amqp_port,
-      rabbit_host        => $amqp_hostname,
-      rabbit_userid      => $amqp_username,
-      rabbit_password    => $amqp_password,
-      rabbit_hosts       => $rabbit_hosts,
+      database_connection => $nova_sql_connection,
+      image_service       => $image_service,
+      glance_api_servers  => $glance_api_uri,
+      memcached_servers   => $memcached_servers,
+      rpc_backend         => $rpc_backend,
+      verbose             => $verbose,
+      qpid_port           => $amqp_port,
+      qpid_hostname       => $amqp_hostname,
+      qpid_heartbeat      => $qpid_heartbeat,
+      qpid_username       => $amqp_username,
+      qpid_password       => $amqp_password,
+      rabbit_port         => $amqp_port,
+      rabbit_host         => $amqp_hostname,
+      rabbit_userid       => $amqp_username,
+      rabbit_password     => $amqp_password,
+      rabbit_hosts        => $rabbit_hosts,
     }
 
     nova_config { 'DEFAULT/default_floating_pool':

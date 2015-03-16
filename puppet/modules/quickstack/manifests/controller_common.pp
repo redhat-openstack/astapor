@@ -272,22 +272,22 @@ class quickstack::controller_common (
 
   # Configure Nova
   class { '::nova':
-    sql_connection     => $nova_sql_connection,
-    image_service      => 'nova.image.glance.GlanceImageService',
-    glance_api_servers => "http://${controller_priv_host}:9292/v1",
-    rpc_backend        => amqp_backend('nova', $amqp_provider),
-    qpid_hostname      => $amqp_host,
-    qpid_username      => $amqp_username,
-    qpid_password      => $amqp_password,
-    rabbit_host        => $amqp_host,
-    rabbit_userid      => $amqp_username,
-    rabbit_password    => $amqp_password,
-    rabbit_port        => $amqp_port,
-    rabbit_use_ssl     => $ssl,
-    verbose            => $verbose,
-    qpid_protocol      => $qpid_protocol,
-    qpid_port          => $amqp_port,
-    require            => Class['quickstack::db::mysql', 'quickstack::amqp::server'],
+    database_connection => $nova_sql_connection,
+    image_service       => 'nova.image.glance.GlanceImageService',
+    glance_api_servers  => "http://${controller_priv_host}:9292/v1",
+    rpc_backend         => amqp_backend('nova', $amqp_provider),
+    qpid_hostname       => $amqp_host,
+    qpid_username       => $amqp_username,
+    qpid_password       => $amqp_password,
+    rabbit_host         => $amqp_host,
+    rabbit_userid       => $amqp_username,
+    rabbit_password     => $amqp_password,
+    rabbit_port         => $amqp_port,
+    rabbit_use_ssl      => $ssl,
+    verbose             => $verbose,
+    qpid_protocol       => $qpid_protocol,
+    qpid_port           => $amqp_port,
+    require             => Class['quickstack::db::mysql', 'quickstack::amqp::server'],
   }
 
   nova_config {
