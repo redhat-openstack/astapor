@@ -36,7 +36,8 @@ class quickstack::pacemaker::common (
   $fence_ipmilan_hostlist         = "",
   $fence_ipmilan_host_to_address  = [],
   $fence_ipmilan_expose_lanplus   = "true",
-  $fence_ipmilan_lanplus_options  = "",
+  $fence_ipmilan_lanplus_options  = "1",
+  $fence_ipmilan_resource_params  = "cipher=1",
   $fence_xvm_port                 = "",
   $fence_xvm_manage_key_file      = "false",
   $fence_xvm_key_file_password    = "",
@@ -101,6 +102,7 @@ class quickstack::pacemaker::common (
       host_to_address => $fence_ipmilan_host_to_address,
       lanplus         => str2bool_i("$fence_ipmilan_expose_lanplus"),
       lanplus_options => $fence_ipmilan_lanplus_options,
+      resource_params => $fence_ipmilan_resource_params,
     }
   }
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
