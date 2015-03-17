@@ -5,8 +5,9 @@ class quickstack::pacemaker::stonith::ipmilan (
   $interval        = "60s",
   $ensure          = "present",
   $lanplus         = false,
-  $lanplus_options = '',
+  $lanplus_options = "",
   $pcmk_host_list  = "",
+  $resource_params = "",
   $host_to_address = [],
   ) {
 
@@ -53,12 +54,16 @@ class quickstack::pacemaker::stonith::ipmilan (
       ''      => '',
       default => "lanplus=\"${lanplus_options}\"",
     }
+    $_resource_params = $resource_params ? {
+      ''      => '',
+      default => "${resource_params}",
+    }
 
     package { "ipmitool":
       ensure => installed,
     } ->
     exec { "Creating stonith::ipmilan":
-      command => "/usr/sbin/pcs stonith create stonith-ipmilan-${real_address} fence_ipmilan ${pcmk_host_list_chunk} ipaddr=${real_address} ${username_chunk} ${password_chunk} ${lanplus_chunk} op monitor interval=${interval}",
+      command => "/usr/sbin/pcs stonith create stonith-ipmilan-${real_address} fence_ipmilan ${pcmk_host_list_chunk} ipaddr=${real_address} ${username_chunk} ${password_chunk} ${lanplus_chunk} ${_resource_params} op monitor interval=${interval}",
       unless  => "/usr/sbin/pcs stonith show stonith-ipmilan-${real_address} > /dev/null 2>&1",
       require => Class['pacemaker::corosync'],
     } ->
