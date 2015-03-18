@@ -18,7 +18,7 @@ EOS
         
        retval = []
        array.each do |i|
-         retval += (prefix+i.to_s).to_a
+         retval += (prefix+i.to_s).lines.to_a
        end
        return retval      
    end
