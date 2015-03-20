@@ -136,6 +136,7 @@ class quickstack::compute_common (
       'DEFAULT/rbd_secret_uuid':              value => $rbd_secret_uuid;
     }
 
+    Package['nova-common'] ->
     # the rest of this if block is borrowed from ::nova::compute::rbd
     # which we can't use due to a duplicate package declaration
     file { '/etc/nova/secret.xml':
