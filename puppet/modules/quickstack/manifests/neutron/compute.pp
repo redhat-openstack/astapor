@@ -71,6 +71,7 @@ class quickstack::neutron::compute (
   $private_network              = '',
   $network_device_mtu           = undef,
   $veth_mtu                     = undef,
+  $vnc_keymap                   = 'en-us',
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -218,6 +219,7 @@ class quickstack::neutron::compute (
     private_ip                   => $private_ip,
     private_network              => $private_network,
     network_device_mtu           => $network_device_mtu,
+    vnc_keymap                   => $vnc_keymap,
   }
 
   class {'quickstack::neutron::firewall::gre':}

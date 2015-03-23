@@ -67,6 +67,7 @@ class quickstack::nova_network::compute (
   $private_ip                   = '',
   $private_network              = '',
   $network_device_mtu           = undef,
+  $vnc_keymap                   = 'en-us',
 ) inherits quickstack::params {
 
   # Configure Nova
@@ -165,5 +166,6 @@ class quickstack::nova_network::compute (
     private_ip                   => $private_ip,
     private_network              => $private_network,
     network_device_mtu           => $network_device_mtu,
+    vnc_keymap                   => $vnc_keymap,
   }
 }

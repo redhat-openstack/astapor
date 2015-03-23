@@ -60,6 +60,7 @@ class quickstack::compute_common (
   $network_device_mtu           = $quickstack::params::network_device_mtu,
   $ssl                          = $quickstack::params::ssl,
   $verbose                      = $quickstack::params::verbose,
+  $vnc_keymap                   = 'en-us',
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -220,6 +221,7 @@ class quickstack::compute_common (
     vncproxy_host                 => $nova_host,
     vncserver_proxyclient_address => $compute_ip,
     network_device_mtu            => $network_device_mtu,
+    vnc_keymap                    => $vnc_keymap,
   }
 
   if str2bool_i("$ceilometer") {
