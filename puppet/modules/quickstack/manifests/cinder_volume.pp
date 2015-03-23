@@ -123,6 +123,18 @@ class quickstack::cinder_volume(
         eqlx_chap_password => $eqlx_chap_password[0],
       }
     } elsif str2bool_i("$backend_netapp") {
+
+      # If NetApp nfs_shares parameter is empty ([]), set to undef.
+      # Otherwise, it will be interpreted as a real value and interfere with
+      # a non-NFS deployment
+      if ($netapp_nfs_shares[0] == [] or
+          $netapp_nfs_shares[0] == [''] ){
+        $_netapp_nfs_shares_sanitized = undef
+      }
+      else {
+        $_netapp_nfs_shares_sanitized = $netapp_nfs_shares[0]
+      }
+
       class { '::cinder::volume::netapp':
         netapp_server_hostname   => $netapp_hostname[0],
         netapp_login             => $netapp_login[0],
@@ -131,7 +143,7 @@ class quickstack::cinder_volume(
         netapp_storage_family    => $netapp_storage_family[0],
         netapp_transport_type    => $netapp_transport_type[0],
         netapp_storage_protocol  => $netapp_storage_protocol[0],
-        nfs_shares               => $netapp_nfs_shares[0],
+        nfs_shares               => $_netapp_nfs_shares_sanitized,
         nfs_shares_config        => $netapp_nfs_shares_config[0],
         netapp_volume_list       => $netapp_volume_list[0],
         netapp_vfiler            => $netapp_vfiler[0],

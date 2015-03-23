@@ -39,6 +39,16 @@ define quickstack::netapp::volume (
     $netapp_sa_password       = $netapp_sa_password_array[$index]
     $netapp_storage_pools     = $netapp_storage_pools_array[$index]
 
+    # If NetApp nfs_shares parameter is empty ([]), set to undef.
+    # Otherwise, it will be interpreted as a real value and interfere with
+    # a non-NFS deployment
+    if ($netapp_nfs_shares == []){
+      $_netapp_nfs_shares_sanitized = undef
+    }
+    else {
+      $_netapp_nfs_shares_sanitized = $netapp_nfs_shares
+    }
+
     cinder::backend::netapp { $backend_section_name:
       volume_backend_name       => $backend_netapp_name,
       netapp_server_hostname    => $netapp_hostname,
@@ -48,7 +58,7 @@ define quickstack::netapp::volume (
       netapp_storage_family     => $netapp_storage_family,
       netapp_transport_type     => $netapp_transport_type,
       netapp_storage_protocol   => $netapp_storage_protocol,
-      nfs_shares                => $netapp_nfs_shares,
+      nfs_shares                => $_netapp_nfs_shares_sanitized,
       nfs_shares_config         => $netapp_nfs_shares_config,
       netapp_volume_list        => $netapp_volume_list,
       netapp_vfiler             => $netapp_vfiler,
