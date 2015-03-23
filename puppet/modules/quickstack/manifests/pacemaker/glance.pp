@@ -159,12 +159,12 @@ class quickstack::pacemaker::glance (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
     quickstack::pacemaker::resource::generic {'glance-registry':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-glance-registry",
+      resource_params => "clone interleave=true",
     } ->
     quickstack::pacemaker::resource::generic {'glance-api':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-glance-api",
+      resource_params => "clone interleave=true",
     }
 
     if str2bool_i("$pcmk_fs_manage") {
