@@ -120,10 +120,10 @@ class quickstack::pacemaker::horizon (
     }
     ->
     quickstack::pacemaker::resource::generic {"horizon":
-      clone_opts            => "interleave=true",
       resource_name         => "$::horizon::params::http_service",
-      resource_params       => 'start-delay=10s',
+      resource_params       => 'clone interleave=true',
       #      monitor_params => {'start-delay'     => '20s'},
+      operation_opts  => "monitor start-delay=10s",
     }
   }
 }

@@ -140,15 +140,15 @@ class quickstack::pacemaker::heat(
     }
     ->
     quickstack::pacemaker::resource::generic {'heat-api':
-      clone_opts      => "interleave=true",
       resource_name   => "openstack-heat-api",
-      resource_params => 'start-delay=10s',
+      resource_params => "clone interleave=true",
+      operation_opts  => "monitor start-delay=10s",
     }
     ->
     quickstack::pacemaker::resource::service {'openstack-heat-engine':
       group => "$heat_group",
       clone => false,
-      options => 'start-delay=10s',
+      monitor_params => { 'start-delay' => '10s' },
       interval => '60s',
     }
 
@@ -166,9 +166,9 @@ class quickstack::pacemaker::heat(
       Quickstack::Pacemaker::Resource::Service['openstack-heat-engine']
       ->
       quickstack::pacemaker::resource::generic {"heat-api-cfn":
-        clone_opts      => "interleave=true",
         resource_name   => "openstack-heat-api-cfn",
-        resource_params => 'start-delay=10s',
+        resource_params => "clone interleave=true",
+        operation_opts  => "monitor start-delay=10s",
       }
       ->
       quickstack::pacemaker::constraint::base { 'heat-api-cfn-constr' :
@@ -190,9 +190,9 @@ class quickstack::pacemaker::heat(
       Quickstack::Pacemaker::Resource::Service['openstack-heat-engine']
       ->
       quickstack::pacemaker::resource::generic {"heat-api-cloudwatch":
-        clone_opts      => "interleave=true",
         resource_name   => "openstack-heat-api-cloudwatch",
-        resource_params => "start-delay=10s",
+        resource_params => "clone interleave=true",
+        operation_opts  => "monitor start-delay=10s",
       }
       if str2bool_i($heat_cfn_enabled) {
         Quickstack::Pacemaker::Resource::Generic['heat-api-cfn'] ->

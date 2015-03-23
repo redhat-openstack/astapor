@@ -233,7 +233,7 @@ class quickstack::pacemaker::neutron (
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-server':
-      clone_opts       => "interleave=true",
+      resource_params => "clone interleave=true",
       operation_opts   => "start timeout=90",
       # monitor_params => { 'start-delay'     => '10s' },
     }
@@ -259,22 +259,22 @@ class quickstack::pacemaker::neutron (
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-openvswitch-agent':
-      clone_opts    => "interleave=true",
+      resource_params => "clone interleave=true",
       #      monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-dhcp-agent':
-      clone_opts    => "interleave=true",
+      resource_params => "clone interleave=true",
       # monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-l3-agent':
-      clone_opts    => "interleave=true",
+      resource_params => "clone interleave=true",
       # monitor_params => { 'start-delay' => '10s' },
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-metadata-agent':
-      clone_opts    => "interleave=true",
+      resource_params => "clone interleave=true",
       #monitor_params => { 'start-delay' => '10s' },
     }
     ->

@@ -119,7 +119,8 @@ class quickstack::pacemaker::cinder(
       # $_volume_clone_opts = "interleave=true"
       # $_cinder_volume_resource_name = "cinder-volume-clone"
     } else {
-      $_volume_clone_opts = undef
+      #$_volume_clone_opts = undef
+      $_volume_resource_params = undef
       $_cinder_volume_resource_name = "cinder-volume"
     }
 
@@ -192,12 +193,12 @@ class quickstack::pacemaker::cinder(
       command   => "/tmp/ha-all-in-one-util.bash all_members_include cinder",
     } ->
     quickstack::pacemaker::resource::generic {'cinder-api':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-cinder-api",
+      resource_params => "clone interleave=true",
     } ->
     quickstack::pacemaker::resource::generic {'cinder-scheduler':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-cinder-scheduler",
+      resource_params => "clone interleave=true",
     } ->
     quickstack::pacemaker::constraint::base { 'cinder-api-scheduler-constr' :
       constraint_type => "order",
@@ -284,9 +285,10 @@ class quickstack::pacemaker::cinder(
       quickstack::pacemaker::resource::generic {'cinder-volume':
         # FIXME(jayg): clone only if backend is nfs
         # https://bugs.launchpad.net/cinder/+bug/1322190
-        clone_opts      => $_volume_clone_opts,
         resource_name   => "openstack-cinder-volume",
-        resource_params => 'start-delay=10s',
+        #resource_params => 'start-delay=10s',
+        resource_params => '$_volume_resource_params',
+        operation_opts  => "monitor start-delay=10s",
       }
       ->
       quickstack::pacemaker::constraint::base { 'cinder-scheduler-volume-constr' :

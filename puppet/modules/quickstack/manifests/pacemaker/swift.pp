@@ -93,8 +93,8 @@ class quickstack::pacemaker::swift (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include swift",
     } ->
     quickstack::pacemaker::resource::generic {'swift-proxy':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-swift-proxy",
+      resource_params => "clone interleave=true",
     } ->
     quickstack::pacemaker::resource::service {'openstack-swift-object-expirer':
       group => "$swift_group",
