@@ -58,6 +58,9 @@ class quickstack::glance (
     $_backend = $backend
   }
 
+  $_stores  = [ "glance.store.${_backend}.Store",
+                "glance.store.http.Store"]
+
   $show_image_direct_url = $backend ? {
     'rbd' => true,
     default => false,
@@ -81,7 +84,7 @@ class quickstack::glance (
     keystone_tenant       => 'services',
     keystone_user         => 'glance',
     keystone_password     => $user_password,
-    known_stores          => ["glance.store.${_backend}.Store"],
+    known_stores          => $_stores,
     sql_connection        => $sql_connection,
     sql_idle_timeout      => $sql_idle_timeout,
     use_syslog            => $use_syslog,
