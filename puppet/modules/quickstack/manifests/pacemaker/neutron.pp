@@ -83,6 +83,19 @@ class quickstack::pacemaker::neutron (
     if ($::pcs_setup_neutron ==  undef or
         !str2bool_i("$::pcs_setup_neutron")) {
       $_enabled = true
+
+      # this only happens on the first puppet run on the node that is
+      # the vip.  we need neutron-server to start up on only one node
+      # the first time around so as not to run into a db race
+      # condition.
+      Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip'] ->
+      Exec['neutron-db-sync'] ->
+      exec{"start-and-stop-neutron-server-on-vip":
+        command   => "/usr/sbin/service neutron-server start && \
+                      /usr/sbin/service neutron-server stop",
+        onlyif    => "/tmp/ha-all-in-one-util.bash i_am_vip $neutron_public_vip",
+      } ->
+      Exec['pcs-neutron-server-set-up']
     } else {
       $_enabled = false
     }
