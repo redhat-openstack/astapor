@@ -269,8 +269,6 @@ class quickstack::pacemaker::keystone (
         controller_admin_host => map_params("keystone_admin_vip"),
       }
     }
-    # not ready yet
-#        user_enabled_invert                 => $ldap_user_enabled_invert,
     if $keystone_identity_backend == 'ldap' {
       class {'::keystone::ldap':
         url                                 => empty_to_undef($ldap_url),
@@ -288,6 +286,7 @@ class quickstack::pacemaker::keystone (
         user_enabled_attribute              => empty_to_undef($ldap_user_enabled_attribute),
         user_enabled_mask                   => empty_to_undef($ldap_user_enabled_mask),
         user_enabled_default                => empty_to_undef($ldap_user_enabled_default),
+        user_enabled_invert                 => str2bool_i($ldap_user_enabled_invert),
         user_attribute_ignore               => empty_to_undef($ldap_user_attribute_ignore),
         user_default_project_id_attribute   => empty_to_undef($ldap_user_default_project_id_attribute),
         user_allow_create                   => str2bool_i($ldap_user_allow_create),
