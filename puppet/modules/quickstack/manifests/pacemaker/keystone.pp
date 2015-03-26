@@ -120,6 +120,7 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup'] -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user<| |> -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user_role<| |> -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_role<| |> -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_endpoint<| |> -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_tenant<| |> -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_service<| |> -> Exec['pcs-keystone-server-set-up']
