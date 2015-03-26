@@ -123,6 +123,11 @@ class quickstack::pacemaker::cinder(
       $_cinder_volume_resource_name = "cinder-volume"
     }
 
+    if (str2bool_i("$backend_netapp")) {
+      $_netapp_backend_count = size($netapp_hostname)
+      $_backend_netapp_name = produce_array_with_prefix("netapp", 1, $_netapp_backend_count)
+    }
+
     class {"::quickstack::load_balancer::cinder":
       frontend_pub_host    => map_params("cinder_public_vip"),
       frontend_priv_host   => map_params("cinder_private_vip"),
@@ -228,7 +233,7 @@ class quickstack::pacemaker::cinder(
         backend_iscsi          => $backend_iscsi,
         backend_iscsi_name     => $backend_iscsi_name,
         backend_netapp         => $backend_netapp,
-        backend_netapp_name    => $backend_netapp_name,
+        backend_netapp_name    => $_backend_netapp_name,
         backend_nfs            => $backend_nfs,
         backend_nfs_name       => $backend_nfs_name,
         backend_eqlx           => $backend_eqlx,
@@ -313,7 +318,7 @@ class quickstack::pacemaker::cinder(
         backend_iscsi          => $backend_iscsi,
         backend_iscsi_name     => $backend_iscsi_name,
         backend_netapp         => $backend_netapp,
-        backend_netapp_name    => $backend_netapp_name,
+        backend_netapp_name    => $_backend_netapp_name,
         backend_nfs            => $backend_nfs,
         backend_nfs_name       => $backend_nfs_name,
         backend_eqlx           => $backend_eqlx,
