@@ -39,7 +39,6 @@ class quickstack::params (
   $cinder_backend_eqlx          = false,
   $cinder_backend_eqlx_name     = ['eqlx'],
   $cinder_backend_netapp        = false,
-  $cinder_backend_netapp_name   = ['netapp'],
   $cinder_multiple_backends     = false,
   $cinder_backend_rbd           = false,
   $cinder_backend_rbd_name      = 'rbd',
@@ -78,6 +77,7 @@ class quickstack::params (
   $cinder_netapp_controller_ips    = ['192.168.1.3'],
   $cinder_netapp_sa_password       = ['CHANGEME'],
   $cinder_netapp_storage_pools     = ['pool1'],
+  $cinder_backend_netapp_name      = produce_array_with_prefix("netapp", 1, size($cinder_netapp_hostname)),
   #  Cinder RBD
   $cinder_rbd_pool              = 'volumes',
   $cinder_rbd_ceph_conf         = '/etc/ceph/ceph.conf',
