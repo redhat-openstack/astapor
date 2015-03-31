@@ -27,6 +27,7 @@
 #
 
 class quickstack::pacemaker::common (
+  $hacluster_pwd,
   $pacemaker_cluster_name         = "openstack",
   $fencing_type                   = "disabled",
   $fence_ipmilan_address          = "",
@@ -48,6 +49,10 @@ class quickstack::pacemaker::common (
     $setup_cluster = true
   } else {
     $setup_cluster = false
+  }
+
+  if !$hacluster_pwd {
+    fail("A password for the cluster must be set")
   }
 
   $pacemaker_members = join(map_params("pcmk_server_names")," ")
@@ -75,7 +80,10 @@ class quickstack::pacemaker::common (
     enable => true,
     ensure => 'running',
   } ->
-  class {'pacemaker::corosync':
+  class {'::pacemaker':
+    hacluster_pwd => $hacluster_pwd,
+  } ->
+  class {'::pacemaker::corosync':
     cluster_name    => $pacemaker_cluster_name,
     cluster_members => $pacemaker_members,
     setup_cluster   => $setup_cluster,
