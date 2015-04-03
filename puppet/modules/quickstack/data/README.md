@@ -1,4 +1,4 @@
-# Hiera built-in data for Quicsktack
+# Hiera built-in data for Quickstack
 
 ## Setup  
 * Install Puppet and Git RPMs  
