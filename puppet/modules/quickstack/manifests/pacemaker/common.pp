@@ -29,6 +29,7 @@
 #
 
 class quickstack::pacemaker::common (
+  $hacluster_pwd,
   $pacemaker_cluster_name         = "openstack",
   $pacemaker_cluster_members      = "192.168.200.10 192.168.200.11 192.168.200.12",
   $fencing_type                   = "disabled",
@@ -52,12 +53,19 @@ class quickstack::pacemaker::common (
     $setup_cluster = false
   }
 
+  if !$hacluster_pwd {
+    fail("A password for the cluster must be set")
+  }
+
   package {'rpcbind': } ->
   service {'rpcbind':
     enable => true,
     ensure => 'running',
   } ->
-  class {'pacemaker::corosync':
+  class {'::pacemaker':
+    hacluster_pwd => $hacluster_pwd,
+  } ->
+  class {'::pacemaker::corosync':
     cluster_name    => $pacemaker_cluster_name,
     cluster_members => $pacemaker_cluster_members,
     setup_cluster   => $setup_cluster,
