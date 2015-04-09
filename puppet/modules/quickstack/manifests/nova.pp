@@ -34,6 +34,10 @@
 #   (optional) Address to bind api service to.
 #   Defaults to  '0.0.0.0'.
 #
+# [*cpu_allocation_ratio*]
+#   (optional) CPU allocation ratio.
+#   Defaults to '16'.
+#
 # [*db_host*]
 #   (optional) Nova's database host.
 #   Defaults to 'localhost'.
@@ -95,6 +99,10 @@
 #   (optional) Seconds between connection keepalive heartbeats
 #   Defaults to '60'.
 #
+# [*ram_allocation_ratio*]
+#   (optional) RAM allocation ratio.
+#   Defaults to '1.5'.
+#
 # [*rpc_backend*]
 #   (optional) The rpc backend implementation to use.
 #   Defaults to 'nova.openstack.common.rpc.impl_kombu'.
@@ -136,6 +144,8 @@ class quickstack::nova (
   $qpid_heartbeat               = '60',
   $rpc_backend                  = 'nova.openstack.common.rpc.impl_kombu',
   $scheduler_host_subset_size   = '1',
+  $ram_allocation_ratio         = '1.5',
+  $cpu_allocation_ratio         = '16',
   $verbose                      = 'false',
 ) {
 
@@ -212,6 +222,8 @@ class quickstack::nova (
     }
     class {'::nova::scheduler::filter':
       scheduler_host_subset_size => $scheduler_host_subset_size,
+      ram_allocation_ratio       =>  $ram_allocation_ratio,
+      cpu_allocation_ratio       =>  $cpu_allocation_ratio,  
     }
     class {'::nova::cert':
       enabled => str2bool_i("$enabled"),
