@@ -19,7 +19,7 @@ class quickstack::pacemaker::keystone (
   $use_syslog                               = "false",
   $log_facility                             = 'LOG_USER',
   $verbose                                  = 'false',
-  $ceilometer                               = "false",
+  $ceilometer                               = 'true',
   $cinder                                   = "true",
   $glance                                   = "true",
   $heat                                     = "true",
@@ -100,7 +100,6 @@ class quickstack::pacemaker::keystone (
 ) {
 
   include quickstack::pacemaker::common
-
   if (str2bool_i(map_params('include_keystone'))) {
     $keystone_group = map_params("keystone_group")
     $keystone_private_vip = map_params("keystone_private_vip")
@@ -135,7 +134,7 @@ class quickstack::pacemaker::keystone (
         $_extra_admin_roles = []
       }
     } else {
-        $_extra_admin_roles = []
+      $_extra_admin_roles = []
     }
 
     class {"::quickstack::load_balancer::keystone":
