@@ -1,6 +1,5 @@
 define quickstack::netapp::volume (
   $index,
-  $backend_section_name_array,
   $backend_netapp_name_array,
   $netapp_hostname_array,
   $netapp_login_array,
@@ -21,7 +20,6 @@ define quickstack::netapp::volume (
 
   if($index >= 0)
   {
-    $backend_section_name     = $backend_section_name_array[$index]
     $backend_netapp_name      = $backend_netapp_name_array[$index]
     $netapp_hostname          = $netapp_hostname_array[$index]
     $netapp_login             = $netapp_login_array[$index]
@@ -46,11 +44,10 @@ define quickstack::netapp::volume (
       $_netapp_nfs_shares_sanitized = undef
     }
     else {
-      $_netapp_nfs_shares_sanitized = $netapp_nfs_shares
+      $_netapp_nfs_shares_sanitized = split($netapp_nfs_shares, ',')
     }
 
-    cinder::backend::netapp { $backend_section_name:
-      volume_backend_name       => $backend_netapp_name,
+    cinder::backend::netapp { $backend_netapp_name:
       netapp_server_hostname    => $netapp_hostname,
       netapp_login              => $netapp_login,
       netapp_password           => $netapp_password,
@@ -72,7 +69,6 @@ define quickstack::netapp::volume (
     $next = $index -1
     quickstack::netapp::volume {$next:
       index => $next,
-      backend_section_name_array      => $backend_section_name_array,
       backend_netapp_name_array       => $backend_netapp_name_array,
       netapp_hostname_array           => $netapp_hostname_array,
       netapp_login_array              => $netapp_login_array,

@@ -132,7 +132,7 @@ class quickstack::cinder_volume(
         $_netapp_nfs_shares_sanitized = undef
       }
       else {
-        $_netapp_nfs_shares_sanitized = $netapp_nfs_shares[0]
+        $_netapp_nfs_shares_sanitized = split($netapp_nfs_shares[0][0], ',')
       }
 
       class { '::cinder::volume::netapp':
@@ -246,13 +246,11 @@ class quickstack::cinder_volume(
     if str2bool_i("$backend_netapp") {
 
       $count = size($backend_netapp_name)
-      $last = $count -1
-      $netapp_backends = produce_array_with_prefix("netapp",1,$count)  #Initialize with section headers
+      $last = $count - 1
 
       # FIXME: with newer parser we should use `each` (with index) instead
       quickstack::netapp::volume { $last:
         index => $last,
-        backend_section_name_array     => $netapp_backends,
         backend_netapp_name_array      => $backend_netapp_name,
         netapp_hostname_array          => $netapp_hostname,
         netapp_login_array             => $netapp_login,
@@ -303,7 +301,7 @@ class quickstack::cinder_volume(
       'glusterfs_backends',
       'nfs_backends',
       'eqlx_backends',
-      'netapp_backends',
+      'backend_netapp_name',
       'rbd_backends',
       'iscsi_backends')
     if $enabled_backends == [] {
