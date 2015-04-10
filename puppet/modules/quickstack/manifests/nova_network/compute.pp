@@ -67,6 +67,7 @@ class quickstack::nova_network::compute (
   $private_network              = '',
   $network_device_mtu           = undef,
   $vnc_keymap                   = 'en-us',
+  $vncproxy_host                = undef,
 ) inherits quickstack::params {
 
   # Configure Nova
@@ -142,6 +143,7 @@ class quickstack::nova_network::compute (
     mysql_host                   => $mysql_host,
     nova_db_password             => $nova_db_password,
     nova_host                    => $nova_host,
+    vncproxy_host                => pick($vncproxy_host, $nova_host),
     nova_user_password           => $nova_user_password,
     amqp_provider                => $amqp_provider,
     amqp_host                    => $amqp_host,
