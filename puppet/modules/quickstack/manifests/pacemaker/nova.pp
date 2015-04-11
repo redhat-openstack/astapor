@@ -11,6 +11,8 @@ class quickstack::pacemaker::nova (
   $qpid_heartbeat             = '60',
   $rpc_backend                = 'nova.openstack.common.rpc.impl_kombu',
   $scheduler_host_subset_size = '30',
+  $ram_allocation_ratio         = '1.5',
+  $cpu_allocation_ratio         = '16',
   $verbose                    = 'false',
 ) {
 
@@ -107,6 +109,8 @@ class quickstack::pacemaker::nova (
       rabbit_hosts                  => map_params("rabbitmq_hosts"),
       rpc_backend                   => amqp_backend('nova', map_params('amqp_provider')),
       scheduler_host_subset_size    => $scheduler_host_subset_size,
+      ram_allocation_ratio          => $ram_allocation_ratio,
+      cpu_allocation_ratio          => $cpu_allocation_ratio,
       verbose                       => $verbose,
     }
     ->
