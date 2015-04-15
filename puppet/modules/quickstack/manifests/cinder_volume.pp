@@ -131,8 +131,11 @@ class quickstack::cinder_volume(
           $netapp_nfs_shares[0] == [''] ){
         $_netapp_nfs_shares_sanitized = undef
       }
+      elsif is_string($netapp_nfs_shares[0]) {
+        $_netapp_nfs_shares_sanitized = split($netapp_nfs_shares[0], ',')
+      }
       else {
-        $_netapp_nfs_shares_sanitized = split($netapp_nfs_shares[0][0], ',')
+        $_netapp_nfs_shares_sanitized = $netapp_nfs_shares[0]
       }
 
       class { '::cinder::volume::netapp':

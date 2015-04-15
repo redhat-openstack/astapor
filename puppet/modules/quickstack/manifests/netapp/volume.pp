@@ -40,11 +40,15 @@ define quickstack::netapp::volume (
     # If NetApp nfs_shares parameter is empty ([]), set to undef.
     # Otherwise, it will be interpreted as a real value and interfere with
     # a non-NFS deployment
-    if ($netapp_nfs_shares == []){
+    if ($netapp_nfs_shares == [] or
+        $netapp_nfs_shares == [''] ){
       $_netapp_nfs_shares_sanitized = undef
     }
-    else {
+    elsif is_string($netapp_nfs_shares) {
       $_netapp_nfs_shares_sanitized = split($netapp_nfs_shares, ',')
+    }
+    else {
+      $_netapp_nfs_shares_sanitized = $netapp_nfs_shares
     }
 
     cinder::backend::netapp { $backend_netapp_name:
