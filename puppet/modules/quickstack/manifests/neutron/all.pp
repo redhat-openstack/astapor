@@ -240,6 +240,13 @@ class quickstack::neutron::all (
                       "")
     }
 
+    if str2bool_i("$l3_ha") {
+      $_ovs_l2_population = 'False'
+    } else {
+      $_ovs_l2_population = 'True'
+    }
+    neutron_plugin_ovs {'AGENT/l2_population': value => "$_ovs_l2_population"; }
+
     class { '::neutron::agents::ovs':
       bridge_mappings  => $ovs_bridge_mappings,
       bridge_uplinks   => $ovs_bridge_uplinks,
