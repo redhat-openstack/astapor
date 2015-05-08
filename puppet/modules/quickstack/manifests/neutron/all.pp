@@ -73,6 +73,11 @@ class quickstack::neutron::all (
   $n1kv_vsm_ip                   = undef,
   $n1kv_vsm_password             = undef,
   $n1kv_vsm_username             = undef,
+  $plumgrid_director_vip         = undef,
+  $plumgrid_username             = undef,
+  $plumgrid_password             = undef,
+  $plumgrid_nova_metadata_ip     = '127.0.0.1',
+  $plumgrid_nova_metadata_port   = '8775',
   $ovs_bridge_mappings           = [],
   $ovs_bridge_uplinks            = [],
   $ovs_tunnel_iface              = '',
@@ -146,6 +151,10 @@ class quickstack::neutron::all (
     neutron_config {
       'DEFAULT/service_plugins':
         value => join(['cisco_n1kv_profile','neutron.services.l3_router.l3_router_plugin.L3RouterPlugin'], ','),
+    }
+  } elsif ($neutron_core_plugin == 'plumgrid') {
+    neutron_config {
+      'DEFAULT/service_plugins': ensure => absent,
     }
   } else {
     neutron_config {
@@ -229,6 +238,18 @@ class quickstack::neutron::all (
       provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
       tenant_network_type          => $tenant_network_type,
     }
+  } elsif ($neutron_core_plugin == 'plumgrid') {
+    class { '::neutron::plugins::plumgrid':
+      director_server              => $plumgrid_director_vip,
+      username                     => $plumgrid_username,
+      password                     => $plumgrid_password,
+      admin_password               => $quickstack::pacemaker::keystone::admin_password,
+      controller_priv_host         => $quickstack::pacemaker::params::keystone_admin_vip,
+      connection                   => $sql_connection,
+      nova_metadata_ip             => $plumgrid_nova_metadata_ip,
+      nova_metadata_port           => $plumgrid_nova_metadata_port,
+      metadata_proxy_shared_secret => $neutron_metadata_proxy_secret,
+    }
   } else {
     if ('cisco_n1kv' in $ml2_mechanism_drivers) {
       $_enable_tunneling  = false
@@ -273,26 +294,28 @@ class quickstack::neutron::all (
     $_interface_driver = "neutron.agent.linux.interface.OVSInterfaceDriver"
   }
 
-  class { '::neutron::agents::dhcp':
-    enabled          => str2bool_i("$enabled"),
-    manage_service   => str2bool_i("$manage_service"),
-    interface_driver => $_interface_driver,
-  }
+  if ($neutron_core_plugin != 'plumgrid') {
+    class { '::neutron::agents::dhcp':
+      enabled          => str2bool_i("$enabled"),
+      manage_service   => str2bool_i("$manage_service"),
+      interface_driver => $_interface_driver,
+    }
 
-  class { '::neutron::agents::l3':
-    enabled                 => str2bool_i("$enabled"),
-    external_network_bridge => $external_network_bridge,
-    manage_service          => str2bool_i("$manage_service"),
-    interface_driver        => $_interface_driver,
-  }
+    class { '::neutron::agents::l3':
+      enabled                 => str2bool_i("$enabled"),
+      external_network_bridge => $external_network_bridge,
+      manage_service          => str2bool_i("$manage_service"),
+      interface_driver        => $_interface_driver,
+    }
 
-  class { 'neutron::agents::metadata':
-    auth_password  => $neutron_user_password,
-    auth_url       => "http://${auth_host}:35357/v2.0",
-    enabled        => str2bool_i("$enabled"),
-    manage_service => str2bool_i("$manage_service"),
-    metadata_ip    => $neutron_priv_host,
-    shared_secret  => $neutron_metadata_proxy_secret,
+    class { 'neutron::agents::metadata':
+      auth_password  => $neutron_user_password,
+      auth_url       => "http://${auth_host}:35357/v2.0",
+      enabled        => str2bool_i("$enabled"),
+      manage_service => str2bool_i("$manage_service"),
+      metadata_ip    => $neutron_priv_host,
+      shared_secret  => $neutron_metadata_proxy_secret,
+    }
   }
 
   include quickstack::neutron::notifications

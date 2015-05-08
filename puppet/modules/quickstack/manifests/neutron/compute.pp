@@ -34,6 +34,7 @@ class quickstack::neutron::compute (
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   $neutron_host                 = '127.0.0.1',
+  $neutron_metadata_secret      = $quickstack::params::neutron_metadata_proxy_secret,
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
   $ovs_bridge_mappings          = $quickstack::params::ovs_bridge_mappings,
@@ -164,6 +165,28 @@ class quickstack::neutron::compute (
       tunnel_types     => $ovs_tunnel_types,
       vxlan_udp_port   => $ovs_vxlan_udp_port,
     }
+  } elsif downcase("$agent_type") == 'plumgrid' {
+    # forward all ipv4 traffic
+    # this is required for the vms to pass through the gateways public interface
+    sysctl::value { 'net.ipv4.ip_forward': value => '1' }
+
+    # ifc_ctl_pp needs to be invoked by root as part of the vif.py when a VM is powered on
+    file { '/etc/sudoers.d/ifc_ctl_sudoers':
+      ensure  => file,
+      owner   => root,
+      group   => root,
+      mode    => '0440',
+      content => "nova ALL=(root) NOPASSWD: /opt/pg/bin/ifc_ctl_pp *\n",
+    }
+
+    class { '::nova::api':
+      enabled                              => true,
+      admin_password                       => $nova_user_password,
+      auth_host                            => $nova_host,
+      neutron_metadata_proxy_shared_secret => $neutron_metadata_secret,
+    }
+
+    class {'::quickstack::firewall::nova':}
   }
 
   class { '::nova::network::neutron':
