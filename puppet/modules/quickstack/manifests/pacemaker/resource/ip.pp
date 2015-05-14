@@ -1,25 +1,23 @@
-define quickstack::pacemaker::resource::ip($ip_address,
-                               $cidr_netmask=32,
-                               $nic='',
-                               $group='',
-                               $interval='30s',
-                               $monitor_params=undef,
-                               $ensure='present') {
+define quickstack::pacemaker::resource::ip(
+  $ensure       = 'present',
+  $ip_address   = undef,
+  $cidr_netmask = 32,
+  $nic          = '',
+  $group_params = undef,
+) {
   include quickstack::pacemaker::params
 
-  if has_interface_with("ipaddress", map_params("cluster_control_ip")){
+  if has_interface_with('ipaddress', map_params('cluster_control_ip')){
     $nic_option = $nic ? {
         ''      => '',
-        default => " nic=$nic"
+        default => " nic=${nic}"
     }
-  
-    pcmk_resource { "$title-${ip_address}":
+
+    pcmk_resource { "${title}-${ip_address}":
       ensure          => $ensure,
       resource_type   => 'IPaddr2',
       resource_params => "ip=${ip_address} cidr_netmask=${cidr_netmask}${nic_option}",
-      group           => $group,
-      interval        => $interval,
-      monitor_params  => $monitor_params,
+      group_params    => $group_params,
     }
   }
 }

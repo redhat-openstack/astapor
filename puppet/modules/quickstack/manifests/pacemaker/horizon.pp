@@ -122,8 +122,10 @@ class quickstack::pacemaker::horizon (
     quickstack::pacemaker::resource::generic {"horizon":
       clone_opts            => "interleave=true",
       resource_name         => "$::horizon::params::http_service",
-      resource_params       => 'start-delay=10s',
-      #      monitor_params => {'start-delay'     => '20s'},
+      # FIXME: ideally would use the below params if the apache ocf agent
+      # could derive server-status url correctly from the apache config
+      #   resource_name         => ''
+      #   resource_type         => 'apache',
     }
   }
 }

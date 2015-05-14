@@ -188,12 +188,12 @@ class quickstack::pacemaker::constraints() {
     if (str2bool_i(map_params('include_keystone'))) {
       quickstack::pacemaker::constraint::typical{ 'keystone-then-nova-constr' :
         first_resource  => "keystone-clone",
-        second_resource => "openstack-nova-consoleauth-clone",
+        second_resource => "nova-consoleauth-clone",
         colocation      => false,
       }
     } else {
       quickstack::pacemaker::constraint::base_services{"base-then-nova-constr" :
-        target_resource => "openstack-nova-consoleauth-clone",
+        target_resource => "nova-consoleauth-clone",
       }
     }
   }
@@ -216,24 +216,24 @@ class quickstack::pacemaker::constraints() {
 
   if (str2bool_i(map_params('include_ceilometer'))) {
     if (str2bool_i(map_params('include_keystone'))) {
-      Quickstack::Pacemaker::Resource::Service['openstack-ceilometer-central'] ->
+      Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'keystone-then-ceilometer-constr' :
         first_resource  => "keystone-clone",
-        second_resource => "openstack-ceilometer-central",
+        second_resource => "ceilometer-central",
         colocation      => false,
       }
     } else {
-      Quickstack::Pacemaker::Resource::Service['openstack-ceilometer-central'] ->
+      Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::base_services{"base-then-ceilo-constr" :
-        target_resource => "openstack-ceilometer-central",
+        target_resource => "ceilometer-central",
       }
     }
     if (str2bool_i(map_params('include_nosql'))) {
-      Quickstack::Pacemaker::Resource::Service['mongod'] ->
-      Quickstack::Pacemaker::Resource::Service['openstack-ceilometer-central'] ->
+      Quickstack::Pacemaker::Resource::Generic['mongod'] ->
+      Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'mongod-then-ceilometer-constr' :
         first_resource  => "mongod-clone",
-        second_resource => "openstack-ceilometer-central",
+        second_resource => "ceilometer-central",
         colocation      => false,
       }
     }

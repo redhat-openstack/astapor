@@ -254,7 +254,7 @@ class quickstack::pacemaker::keystone (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
     quickstack::pacemaker::resource::generic {'keystone':
-      clone_opts    => "interleave=true",
+      clone_opts    => '',
       resource_name => "openstack-keystone",
     }
     ->

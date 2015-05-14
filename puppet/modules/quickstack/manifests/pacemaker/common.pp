@@ -175,7 +175,7 @@ class quickstack::pacemaker::common (
     Exec['stonith-setup-complete']
     ->
     exec {"pcs-resource-default":
-      command => "/usr/sbin/pcs resource defaults resource-stickiness=100",
+      command => "/usr/sbin/pcs resource defaults resource-stickiness=INFINITY",
     }
   }
 }

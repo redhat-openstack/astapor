@@ -1,24 +1,23 @@
-define quickstack::pacemaker::resource::filesystem($device,
-                                       $directory,
-                                       $fsoptions='',
-                                       $fstype,
-                                       $group='',
-                                       $clone=false,
-                                       $interval='30s',
-                                       $monitor_params=undef,
-                                       $ensure='present') {
+define quickstack::pacemaker::resource::filesystem(
+  $ensure         = 'present',
+  $device         = undef,
+  $directory      = undef,
+  $fsoptions      = '',
+  $fstype         = undef,
+  $group_params   = undef,
+  $clone_params   = undef,
+) {
   include quickstack::pacemaker::params
 
-  if has_interface_with("ipaddress", map_params("cluster_control_ip")){  
-    ::pacemaker::resource::filesystem{ "$name":
-                                       device         => $device,
-                                       directory      => $directory,
-                                       fsoptions      => $fsoptions,
-                                       fstype         => $fstype,
-                                       group          => $group,
-                                       clone          => $clone,
-                                       interval       => $interval,
-                                       monitor_params => $monitor_params,
-                                       ensure         => $ensure}
+  if has_interface_with("ipaddress", map_params("cluster_control_ip")){
+    ::pacemaker::resource::filesystem{ "${title}":
+    ensure         => $ensure,
+    device         => $device,
+    directory      => $directory,
+    fsoptions      => $fsoptions,
+    fstype         => $fstype,
+    group_params   => $group_params,
+    clone_params   => $clone_params,
+    }
   }
 }

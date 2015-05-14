@@ -150,49 +150,46 @@ class quickstack::pacemaker::ceilometer (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include ceilometer",
     }
     ->
-    quickstack::pacemaker::resource::service {'openstack-ceilometer-central':
-      clone          => false,
-      options        => 'start-delay=10s',
-      monitor_params => {'start-delay'     => '10s'},
+    quickstack::pacemaker::resource::generic { 'ceilometer-central':
+      resource_name   => "openstack-ceilometer-central",
     }
     ->
     quickstack::pacemaker::resource::generic {
-      ["openstack-ceilometer-collector",
-      "openstack-ceilometer-api",
-      "openstack-ceilometer-alarm-evaluator",
-      "openstack-ceilometer-alarm-notifier",
-      "openstack-ceilometer-notification"]:
+      [ 'ceilometer-collector',
+        'ceilometer-api',
+        'ceilometer-alarm-evaluator',
+        'ceilometer-alarm-notifier',
+        'ceilometer-notification' ]:
+      resource_name_prefix => 'openstack-',
       clone_opts      => "interleave=true",
-      resource_params => 'start-delay=10s',
-      #monitor_params  => {'start-delay'     => '10s'},
     }
     ->
-    # Delay doesnt support --clone in our version of pcs, just like ocf
     quickstack::pacemaker::resource::generic { "ceilometer-delay":
       resource_name   => "",
-      resource_params => "startdelay=10 clone interleave=true",
       resource_type   => "Delay",
+      resource_params => "startdelay=10",
+      clone_opts      => 'interleave=true',
     }
     ->
     quickstack::pacemaker::constraint::base { "central-collector-constr":
       constraint_type => "order",
-      first_resource  => "openstack-ceilometer-central",
-      second_resource => "openstack-ceilometer-collector-clone",
+      first_resource  => "ceilometer-central",
+      second_resource => "ceilometer-collector-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::base { "collector-api-constr":
       constraint_type => "order",
-      first_resource  => "openstack-ceilometer-collector-clone",
-      second_resource => "openstack-ceilometer-api-clone",
+      first_resource  => "ceilometer-collector-clone",
+      second_resource => "ceilometer-api-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::base { "api-delay-constr":
       constraint_type => "order",
-      first_resource  => "openstack-ceilometer-api-clone",
+      first_resource  => "ceilometer-api-clone",
       second_resource => "ceilometer-delay-clone",
       first_action    => "start",
       second_action   => "start",
@@ -201,23 +198,23 @@ class quickstack::pacemaker::ceilometer (
     quickstack::pacemaker::constraint::base { "delay-evaluator-constr":
       constraint_type => "order",
       first_resource  => "ceilometer-delay-clone",
-      second_resource => "openstack-ceilometer-alarm-evaluator-clone",
+      second_resource => "ceilometer-alarm-evaluator-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::base { "evaluator-notifier-constr":
       constraint_type => "order",
-      first_resource  => "openstack-ceilometer-alarm-evaluator-clone",
-      second_resource => "openstack-ceilometer-alarm-notifier-clone",
+      first_resource  => "ceilometer-alarm-evaluator-clone",
+      second_resource => "ceilometer-alarm-notifier-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::base { "notifier-notification-constr":
       constraint_type => "order",
-      first_resource  => "openstack-ceilometer-alarm-notifier-clone",
-      second_resource => "openstack-ceilometer-notification-clone",
+      first_resource  => "ceilometer-alarm-notifier-clone",
+      second_resource => "ceilometer-notification-clone",
       first_action    => "start",
       second_action   => "start",
     }

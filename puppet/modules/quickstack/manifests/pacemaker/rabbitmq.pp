@@ -112,8 +112,8 @@ class quickstack::pacemaker::rabbitmq (
     quickstack::pacemaker::resource::generic { 'rabbitmq-server':
       resource_type   => "rabbitmq-cluster",
       resource_name   => "",
-      # not using the clone parameter since must use "clone" not "--clone"
-      resource_params => 'set_policy=\'HA ^(?!amq\.).* {"ha-mode":"all"}\' clone ordered=true',
+      resource_params => 'set_policy=\'HA ^(?!amq\.).* {"ha-mode":"all"}\'',
+      clone_opts      => 'ordered=true interleave=true',
     } ->
     exec { 'wait for rabbitmq cluster':
       timeout   => 3600,
