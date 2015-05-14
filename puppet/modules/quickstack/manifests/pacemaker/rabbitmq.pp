@@ -1,9 +1,10 @@
 class quickstack::pacemaker::rabbitmq (
   $haproxy_timeout       = '900m',
   $inet_dist_listen      = '35672',
+  $cookie                = 'EWKOWWGETETZSHWEYXCV',
   # need to override connect_options and set listen_options
   # for TCP_USER_TIMEOUT
-  $erl_args              = "\"+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true},{raw,6,18,<<5000:64/native>>}] -kernel inet_default_listen_options [{raw,6,18,<<5000:64/native>>}]\""
+  $erl_args              = "\"+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true},{raw,6,18,<<5000:64/native>>}] -kernel inet_default_listen_options [{raw,6,18,<<5000:64/native>>}]\"",
 ) {
 
   include quickstack::pacemaker::common
@@ -96,7 +97,7 @@ class quickstack::pacemaker::rabbitmq (
       owner   => 'rabbitmq',
       group   => 'rabbitmq',
       mode    => '0400',
-      content => $::rabbitmq::erlang_cookie,
+      content => $cookie,
       replace => true,
     } ->
     Exec['pcs-rabbitmq-server-set-up']
