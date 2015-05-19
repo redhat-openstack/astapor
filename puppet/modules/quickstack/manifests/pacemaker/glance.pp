@@ -1,5 +1,5 @@
 class quickstack::pacemaker::glance (
-  $sql_idle_timeout         = '3600',
+  $db_idle_timeout          = '3600',
   $db_ssl                   = false,
   $db_ssl_ca                = undef,
   $db_user                  = 'glance',
@@ -117,7 +117,7 @@ class quickstack::pacemaker::glance (
       db_password              => map_params("glance_db_password"),
       db_host                  => map_params("db_vip"),
       keystone_host            => map_params("keystone_admin_vip"),
-      sql_idle_timeout         => $sql_idle_timeout,
+      db_idle_timeout          => $db_idle_timeout,
       registry_host            => map_params("local_bind_addr"),
       bind_host                => map_params("local_bind_addr"),
       db_ssl                   => $db_ssl,
