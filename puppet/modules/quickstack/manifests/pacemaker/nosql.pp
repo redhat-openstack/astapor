@@ -80,16 +80,25 @@ class quickstack::pacemaker::nosql (
       tries     => 360,
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include nosql",
+    } ->
+    # make sure we have one Primary node (state is 1)
+    exec {"nosql-includes-a-primary-node":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "bash -c \"echo 'rs.status()' | mongo ${_bind_host}:${nosql_port} | grep -q 'state\\\" : 1'\"",
+      path      => '/usr/bin',
     }
 
     if has_interface_with("ipaddress", map_params("cluster_control_ip")){
       Exec['all-nosql-nodes-are-up'] ->
       mongodb_replset{'ceilometer':
         members => $nosql_servers_arr,
-      }
+      } ->
+      Exec['nosql-includes-a-primary-node']
     }
 
-    Exec['all-nosql-nodes-are-up'] ->
+    Exec['nosql-includes-a-primary-node'] ->
 
     quickstack::pacemaker::resource::service {'mongod':
       options        => 'start timeout=10s',
