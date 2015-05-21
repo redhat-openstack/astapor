@@ -12,6 +12,8 @@ class quickstack::horizon(
     $keystone_host         = '127.0.0.1',
     $listen_ssl            = 'false',
     $memcached_servers     = undef,
+    $server_status         = true,
+    $status_allow_from     = ['127.0.0.1','::1'],
     $secret_key,
 ) {
 
@@ -78,6 +80,12 @@ class quickstack::horizon(
     listen_ssl            => str2bool_i("$listen_ssl"),
     neutron_options       => $neutron_options,
     secret_key            => $horizon_secret_key,
+  }
+
+  class { 'apache::mod::status':
+    allow_from      => $status_allow_from,
+    extended_status => 'Off',
+    status_path     => '/server-status',
   }
 
 # Concat::Fragment['Apache ports header'] ->

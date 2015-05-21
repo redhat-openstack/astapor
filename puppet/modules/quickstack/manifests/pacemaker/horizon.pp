@@ -22,6 +22,20 @@ class quickstack::pacemaker::horizon (
         ','
     )
 
+    # subnets allowed to acces /server-status
+    # i.e. [ '192.168.200' , '192.168.100' ]
+    $_local_bind_addr = map_params("local_bind_addr")
+    $_lb_backend_subnet = inline_template(
+      '<%= @_local_bind_addr.split(".")[0..-2].join(".") %>')
+    $_pcmk_bind_addr = map_params("pcmk_bind_addr")
+    $_pcmk_backend_subnet = inline_template(
+      '<%= @_pcmk_bind_addr.split(".")[0..-2].join(".") %>')
+    if $_lb_backend_subnet == $_pcmk_backend_subnet {
+      $_status_allow_from = [ $_lb_backend_subnet ]
+    } else {
+      $_status_allow_from = [ $_lb_backend_subnet, $_pcmk_backend_subnet ]
+    }
+
     # TODO: extract this into a helper function
     if ($::pcs_setup_horizon ==  undef or
         !str2bool_i("$::pcs_setup_horizon")) {
@@ -100,6 +114,7 @@ class quickstack::pacemaker::horizon (
       keystone_host         => map_params("keystone_admin_vip"),
       memcached_servers     => $memcached_servers,
       secret_key            => $secret_key,
+      status_allow_from     => $_status_allow_from,
     }
     ->
     Service['httpd']
@@ -121,11 +136,8 @@ class quickstack::pacemaker::horizon (
     ->
     quickstack::pacemaker::resource::generic {"horizon":
       clone_opts            => "interleave=true",
-      resource_name         => "$::horizon::params::http_service",
-      # FIXME: ideally would use the below params if the apache ocf agent
-      # could derive server-status url correctly from the apache config
-      #   resource_name         => ''
-      #   resource_type         => 'apache',
+      resource_name         => '',
+      resource_type         => 'apache',
     }
   }
 }
