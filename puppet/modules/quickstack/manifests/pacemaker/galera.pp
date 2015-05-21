@@ -111,11 +111,25 @@ class quickstack::pacemaker::galera (
         neutron_db_password  => map_params("neutron_db_password"),
       }
       ->
-      class {'::galera::monitor':
-        mysql_username => $galera_monitor_username,
-        mysql_password => $galera_monitor_password,
-        mysql_host     => 'localhost',
-        create_mysql_user => false,
+      file { '/etc/sysconfig/clustercheck' :
+        ensure  => file,
+        content => "MYSQL_USERNAME=${galera_monitor_username}\n
+                    MYSQL_PASSWORD=${galera_monitor_password}\n
+                    MYSQL_HOST=localhost\n
+                    MYSQL_PORT=3306",
+      }
+      ->
+      xinetd::service { 'galera-monitor' :
+        port           => '9200',
+        server         => '/usr/bin/clustercheck',
+        per_source     => 'UNLIMITED',
+        log_on_success => '',
+        log_on_failure => 'HOST',
+        flags          => 'REUSE',
+        service_type   => 'UNLISTED',
+        user           => 'root',
+        group          => 'root',
+        require        => File['/etc/sysconfig/clustercheck'],
       }
       ->
       exec {'stop mariadb after one-time initial start':
