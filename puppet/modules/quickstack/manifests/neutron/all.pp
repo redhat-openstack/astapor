@@ -161,7 +161,7 @@ class quickstack::neutron::all (
     auth_password            => $neutron_user_password,
     auth_tenant              => $auth_tenant,
     auth_user                => $auth_user,
-    connection               => $sql_connection,
+    database_connection      => $sql_connection,
     database_max_retries     => $database_max_retries,
     enabled                  => str2bool_i("$enabled"),
     l3_ha                    => str2bool_i("$l3_ha"),
