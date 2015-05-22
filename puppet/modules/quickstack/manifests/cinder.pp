@@ -46,11 +46,6 @@ class quickstack::cinder(
     }
   }
 
-  if $rabbit_hosts {
-    cinder_config { 'DEFAULT/rabbit_host': ensure => absent }
-    cinder_config { 'DEFAULT/rabbit_port': ensure => absent }
-  }
-
   if str2bool_i("$db_ssl") {
     $sql_connection = "mysql://${db_user}:${db_password}@${db_host}/${db_name}?ssl_ca=${db_ssl_ca}"
   } else {
@@ -58,23 +53,23 @@ class quickstack::cinder(
   }
 
   class {'::cinder':
-    rpc_backend     => $rpc_backend,
-    qpid_hostname   => $amqp_host,
-    qpid_port       => $amqp_port,
-    qpid_username   => $amqp_username,
-    qpid_password   => $amqp_password_safe_for_cinder,
-    qpid_heartbeat  => $qpid_heartbeat,
-    qpid_protocol   => $qpid_protocol,
-    rabbit_host     => $amqp_host,
-    rabbit_port     => $amqp_port,
-    rabbit_userid   => $amqp_username,
-    rabbit_password => $amqp_password_safe_for_cinder,
-    rabbit_use_ssl  => $rabbit_use_ssl,
-    rabbit_hosts    => $rabbit_hosts,
-    sql_connection  => $sql_connection,
-    verbose         => str2bool_i("$verbose"),
-    use_syslog      => str2bool_i("$use_syslog"),
-    log_facility    => $log_facility,
+    rpc_backend         => $rpc_backend,
+    qpid_hostname       => $amqp_host,
+    qpid_port           => $amqp_port,
+    qpid_username       => $amqp_username,
+    qpid_password       => $amqp_password_safe_for_cinder,
+    qpid_heartbeat      => $qpid_heartbeat,
+    qpid_protocol       => $qpid_protocol,
+    rabbit_host         => $amqp_host,
+    rabbit_port         => $amqp_port,
+    rabbit_userid       => $amqp_username,
+    rabbit_password     => $amqp_password_safe_for_cinder,
+    rabbit_use_ssl      => $rabbit_use_ssl,
+    rabbit_hosts        => $rabbit_hosts,
+    database_connection => $sql_connection,
+    verbose             => str2bool_i("$verbose"),
+    use_syslog          => str2bool_i("$use_syslog"),
+    log_facility        => $log_facility,
   }
   # FIXME: after we drop support for Puppet <= 3.6, we can use
   # `contain ::cinder` instead of the anchors here, and use fully qualified
