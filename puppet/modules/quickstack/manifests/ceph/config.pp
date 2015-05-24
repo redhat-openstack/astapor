@@ -39,7 +39,7 @@ class quickstack::ceph::config (
   $osd_pool_default_size   = '',
   $osd_journal_size        = '',
   $osd_mkfs_options_xfs    = '-f -i size=2048 -n size=64k',
-  $osd_mount_options_xfs   = '-o inode64,noatime,logbsize=256k',
+  $osd_mount_options_xfs   = 'inode64,noatime,logbsize=256k',
   $conf_include_rgw        = false,
   $rgw_hostnames           = [ ],
   $extra_conf_lines        = [ ],
