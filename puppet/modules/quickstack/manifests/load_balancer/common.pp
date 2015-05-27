@@ -13,7 +13,10 @@ class quickstack::load_balancer::common {
       'retries'      => '3',
       'option'       => [ 'tcplog', 'redispatch' ],
       'log'          => '127.0.0.1 local2 warning',
-      'timeout'      => [ 'connect 5s', 'client 30s', 'server 30s' ],
+      'timeout'      => [ 'connect 10s',
+                          'client 60s',
+                          'server 60s',
+                          'check 10s' ],
     },
   }
 
