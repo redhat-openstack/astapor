@@ -6,7 +6,7 @@ class quickstack::load_balancer::horizon (
   $backend_server_addrs,
   $port = '80',
   $mode = 'http',
-  $log = 'httplog',
+  $log = 'tcplog',
 ) {
 
   include quickstack::load_balancer::common
@@ -20,6 +20,7 @@ class quickstack::load_balancer::horizon (
     listen_options => {
       'option'     => [ "$log" ],
       'cookie'     => 'SERVERID insert indirect nocache',
+      'timeout'    => [ 'client 180s' ],
     },
     member_options       => [ 'check inter 1s' ],
     define_cookies       => true,

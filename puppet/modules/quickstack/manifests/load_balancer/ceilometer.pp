@@ -17,7 +17,10 @@ class quickstack::load_balancer::ceilometer (
                               $frontend_admin_host ],
     port                 => "$api_port",
     mode                 => "$api_mode",
-    listen_options       => { 'option' => [ "$log" ] },
+    listen_options       => {
+      'option'  => [ "$log" ],
+      'timeout' => ['client 90s' ],
+    },
     member_options       => [ 'check inter 1s' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
