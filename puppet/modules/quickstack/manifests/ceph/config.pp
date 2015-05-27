@@ -104,6 +104,7 @@ class quickstack::ceph::config (
     File['etc-ceph'] ->
     ::quickstack::ceph::keyring_config{ 'volumes':
       key => $volumes_key,
+      caps_osd => 'allow class-read object_prefix rbd_children, allow rx pool=images, allow rwx pool=volumes',
     }
   }
   if $rgw_key {
