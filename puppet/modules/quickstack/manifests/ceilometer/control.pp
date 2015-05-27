@@ -18,6 +18,7 @@ class quickstack::ceilometer::control(
   $service_enable             = true,
   $service_ensure             = 'running',
   $verbose                    = false,
+  $coordination_url           = undef,
 ) {
 
   validate_array($db_hosts)
@@ -71,8 +72,9 @@ class quickstack::ceilometer::control(
   }
 
   class { '::ceilometer::agent::central':
-    enabled        => $service_enable,
-    manage_service => $service_enable,
+    enabled          => $service_enable,
+    manage_service   => $service_enable,
+    coordination_url => $coordination_url,
   }
 
   class { '::ceilometer::alarm::notifier':
@@ -81,8 +83,9 @@ class quickstack::ceilometer::control(
   }
 
   class { '::ceilometer::alarm::evaluator':
-    enabled        => $service_enable,
-    manage_service => $service_enable,
+    enabled          => $service_enable,
+    manage_service   => $service_enable,
+    coordination_url => $coordination_url,
   }
 
   class { '::ceilometer::api':
