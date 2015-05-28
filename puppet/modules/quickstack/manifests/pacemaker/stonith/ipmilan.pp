@@ -11,16 +11,16 @@ class quickstack::pacemaker::stonith::ipmilan (
   $host_to_address = [],
   ) {
 
-  # a string that looks like "cluster_ip1,address1,cluster_ip1,adress2,...,"
+  # a string that looks like
+  # "cluster_node_name1,ipmilan_address1,cluster_node_name2,ipmilan_address2,..."
   # with any errant single quotes, double quotes, or white space removed
   # and ":" replaced with ","
   $host_to_address_string = inline_template('<%= @host_to_address.map {
     |x| x.gsub(/\s+/, "").gsub("\'", "").gsub("\"", "").gsub(":",",")}.join(",") +"," %>')
 
-  # this nastiness exist because this puppet manifest doesn't know
-  # during compilation what its cluster IP is, and therefore wouldn't
-  # know which address to pick out of $host_to_address.  so we defer
-  # it to bash.
+  # at runtime, determine what the relevant ipmilan address is based
+  # on the current node's cluster node name.  the pattern here is that every
+  # node is adding its own stonith device.
   $real_address = $address ? {
       ''      => "$(/bin/echo $host_to_address_string | /usr/bin/perl -p -e \"s/.*$(/usr/sbin/crm_node -n),(.*?),.*/\\\$1/\")",
       default => "${address}",
