@@ -7,6 +7,8 @@ class quickstack::pacemaker::neutron (
   $enabled                    = true,
   $external_network_bridge    = '',
   $enable_vif_type_n1kv       = false,
+  $haproxy_timeout            = ['client 30s', 'server 30s',
+                                'http-request 30s'],
   $l3_ha                      = true,
   $ml2_type_drivers           = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
   $ml2_tenant_network_types   = ['vxlan', 'vlan', 'gre', 'flat'],
@@ -140,10 +142,11 @@ class quickstack::pacemaker::neutron (
 
     class {"::quickstack::load_balancer::neutron":
       frontend_pub_host    => map_params("neutron_public_vip"),
-      frontend_priv_host    => map_params("neutron_private_vip"),
-      frontend_admin_host    => map_params("neutron_admin_vip"),
+      frontend_priv_host   => map_params("neutron_private_vip"),
+      frontend_admin_host  => map_params("neutron_admin_vip"),
       backend_server_names => $_backend_server_names,
       backend_server_addrs => $_backend_server_addrs,
+      timeout              => $haproxy_timeout,
     }
 
     Class['::quickstack::pacemaker::common']
