@@ -17,7 +17,7 @@ class quickstack::nova_network::compute (
   $ceph_osd_pool_size           = '',
   $ceph_osd_journal_size        = '',
   $ceph_osd_mkfs_options_xfs    = '-f -i size=2048 -n size=64k',
-  $ceph_osd_mount_options_xfs   = '-o inode64,noatime,logbsize=256k',
+  $ceph_osd_mount_options_xfs   = 'inode64,noatime,logbsize=256k',
   $ceph_conf_include_rgw        = false,
   $ceph_rgw_hostnames           = [ ],
   $ceph_extra_conf_lines        = [ ],
