@@ -123,7 +123,7 @@ class quickstack::pacemaker::common (
       default =>  "$fence_xvm_port",
     }
     class {'::quickstack::firewall::fence_xvm':} ->
-    class {'pacemaker::stonith::fence_xvm':
+    class {'pacemaker::stonith::xvm':
       name              => "$::hostname",
       manage_key_file   => str2bool_i("$fence_xvm_manage_key_file"),
       key_file_password => $fence_xvm_key_file_password,
@@ -159,7 +159,7 @@ class quickstack::pacemaker::common (
       Class['pacemaker::stonith'] -> Class['quickstack::pacemaker::stonith::ipmilan'] -> Exec['stonith-setup-complete']
     }
     elsif ($fencing_type == "fence_xvm") {
-      Class['pacemaker::stonith'] -> Class['pacemaker::stonith::fence_xvm'] -> Exec['stonith-setup-complete']
+      Class['pacemaker::stonith'] -> Class['pacemaker::stonith::xvm'] -> Exec['stonith-setup-complete']
     }
   }
 
