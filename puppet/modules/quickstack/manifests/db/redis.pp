@@ -18,14 +18,18 @@ class quickstack::db::redis(
   $bind_host             = '127.0.0.1',
   $port                  = '6379',
   $slaveof               = undef,
+  $service_enable        = false,
+  $service_ensure        = undef,
 ) {
 
   class { '::redis':
-    bind       => $bind_host,
-    port       => $port,
-    appendonly => true,
-    daemonize  => false,
-    slaveof    => $slaveof,
+    bind           => $bind_host,
+    port           => $port,
+    appendonly     => true,
+    daemonize      => false,
+    slaveof        => $slaveof,
+    service_enable => $service_enable,
+    service_ensure => $service_ensure,
   }
 
 }
