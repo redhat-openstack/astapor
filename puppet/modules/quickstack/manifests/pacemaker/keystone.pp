@@ -254,8 +254,8 @@ class quickstack::pacemaker::keystone (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
     quickstack::pacemaker::resource::generic {'keystone':
-      clone_opts    => "interleave=true",
       resource_name => "openstack-keystone",
+      resource_params => "clone interleave=true",
     }
     ->
     Anchor['pacemaker ordering constraints begin']

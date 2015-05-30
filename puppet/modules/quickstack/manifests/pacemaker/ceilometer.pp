@@ -155,9 +155,9 @@ class quickstack::pacemaker::ceilometer (
       "openstack-ceilometer-alarm-evaluator",
       "openstack-ceilometer-alarm-notifier",
       "openstack-ceilometer-notification"]:
-      clone_opts      => "interleave=true",
-      resource_params => 'start-delay=10s',
       #monitor_params  => {'start-delay'     => '10s'},
+      resource_params => "clone interleave=true",
+      operation_opts  => "monitor start-delay=10s",
     }
     ->
     # Delay doesnt support --clone in our version of pcs, just like ocf

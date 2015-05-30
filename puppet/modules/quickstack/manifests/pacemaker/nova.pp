@@ -49,10 +49,12 @@ class quickstack::pacemaker::nova (
     }
 
     if ($scheduler_host_subset_size == '1') {
-      $sched_clone = ""
+      #$sched_clone = ""
+      $sched_resource_params = ""
       $_nova_scheduler_resource = "openstack-nova-scheduler"
     } else {
-      $sched_clone = "interleave=true"
+      #$sched_clone = "interleave=true"
+      $sched_resource_params = "clone interleave=true"
       $_nova_scheduler_resource = "openstack-nova-scheduler-clone"
     }
 
@@ -131,13 +133,13 @@ class quickstack::pacemaker::nova (
                               'openstack-nova-novncproxy',
                               'openstack-nova-api',
                               'openstack-nova-conductor' ]:
-      clone_opts      => "interleave=true",
-      resource_params => 'start-delay=10s',
+      resource_params => 'clone interleave=true',
+      operation_opts  => "monitor start-delay=10s",
     }
     ->
     quickstack::pacemaker::resource::generic {'openstack-nova-scheduler':
-      clone_opts      => $sched_clone,
-      resource_params => 'start-delay=10s',
+      resource_params => $sched_resource_params,
+      operation_opts  => "monitor start-delay=10s",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-console-vnc-constr' :
