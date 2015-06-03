@@ -28,6 +28,7 @@ class quickstack::pacemaker::redis(
   }
 
   $_redis_vip = map_params('redis_vip')
+  validate_string($_redis_vip)
 
   anchor {'redis-begin': }
   ->

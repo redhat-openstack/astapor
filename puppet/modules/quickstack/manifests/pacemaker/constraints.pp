@@ -219,13 +219,13 @@ class quickstack::pacemaker::constraints() {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'keystone-then-ceilometer-constr' :
         first_resource  => "keystone-clone",
-        second_resource => "ceilometer-central",
+        second_resource => "ceilometer-central-clone",
         colocation      => false,
       }
     } else {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::base_services{"base-then-ceilo-constr" :
-        target_resource => "ceilometer-central",
+        target_resource => "ceilometer-central-clone",
       }
     }
     if (str2bool_i(map_params('include_nosql'))) {
@@ -233,7 +233,7 @@ class quickstack::pacemaker::constraints() {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'mongod-then-ceilometer-constr' :
         first_resource  => "mongod-clone",
-        second_resource => "ceilometer-central",
+        second_resource => "ceilometer-central-clone",
         colocation      => false,
       }
     }

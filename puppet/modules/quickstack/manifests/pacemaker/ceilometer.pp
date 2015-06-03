@@ -30,8 +30,10 @@ class quickstack::pacemaker::ceilometer (
     }
 
     if $coordination_backend == 'redis' {
+      $_redis_vip = map_params('redis_vip')
       $_initial_master = $backend_ips[0]
-      $_coordination_url = "redis://${_initial_master}:${coordination_backend_port}"
+      $_coordination_url = "redis://${_redis_vip}:${coordination_backend_port}"
+      $_ceilo_central_clone = "interleave=true"
 
       if has_interface_with("ipaddress", $_initial_master) {
         $_slaveof = undef
@@ -51,6 +53,7 @@ class quickstack::pacemaker::ceilometer (
       Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
     } else {
       $_coordination_url = undef
+      $_ceilo_central_clone = undef
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
@@ -152,6 +155,7 @@ class quickstack::pacemaker::ceilometer (
     ->
     quickstack::pacemaker::resource::generic { 'ceilometer-central':
       resource_name   => "openstack-ceilometer-central",
+      clone_opts      => $_ceilo_central_clone,
     }
     ->
     quickstack::pacemaker::resource::generic {
@@ -173,7 +177,7 @@ class quickstack::pacemaker::ceilometer (
     ->
     quickstack::pacemaker::constraint::base { "central-collector-constr":
       constraint_type => "order",
-      first_resource  => "ceilometer-central",
+      first_resource  => "ceilometer-central-clone",
       second_resource => "ceilometer-collector-clone",
       first_action    => "start",
       second_action   => "start",
