@@ -291,7 +291,6 @@ class quickstack::pacemaker::cinder(
         # https://bugs.launchpad.net/cinder/+bug/1322190
         clone_opts      => $_volume_clone_opts,
         resource_name   => "openstack-cinder-volume",
-        resource_params => 'start-delay=10s',
       }
       ->
       quickstack::pacemaker::constraint::base { 'cinder-scheduler-volume-constr' :

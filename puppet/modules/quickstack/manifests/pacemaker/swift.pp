@@ -96,10 +96,7 @@ class quickstack::pacemaker::swift (
       clone_opts    => "interleave=true",
       resource_name => "openstack-swift-proxy",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-swift-object-expirer':
-      group => "$swift_group",
-      clone => false,
-    }
+    quickstack::pacemaker::resource::generic {'openstack-swift-object-expirer': }
     ->
     quickstack::pacemaker::constraint::base { 'swift-object-expirer-constr' :
       constraint_type => "order",

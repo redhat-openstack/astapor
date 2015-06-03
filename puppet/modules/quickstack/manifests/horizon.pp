@@ -71,7 +71,7 @@ class quickstack::horizon(
     cache_server_port     => $cache_server_port,
     fqdn                  => $fqdn,
     keystone_default_role => $keystone_default_role,
-    keystone_host         => $keystone_host,
+    keystone_url          => "http://${keystone_host}:5000/v2.0",
     horizon_cert          => $horizon_cert,
     horizon_key           => $horizon_key,
     horizon_ca            => $horizon_ca,

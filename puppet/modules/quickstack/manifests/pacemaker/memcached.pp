@@ -17,7 +17,7 @@ class quickstack::pacemaker::memcached {
     command   => "/tmp/ha-all-in-one-util.bash all_members_include memcached",
   } ->
   quickstack::pacemaker::resource::generic { 'memcached':
-    clone_opts => "interleave=true",
+    clone_opts => '',
   } ->
   Anchor['pacemaker ordering constraints begin']
 }

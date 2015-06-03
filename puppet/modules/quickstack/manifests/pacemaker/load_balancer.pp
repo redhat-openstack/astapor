@@ -24,7 +24,8 @@ class quickstack::pacemaker::load_balancer {
 
   } ->
   quickstack::pacemaker::resource::generic {'haproxy':
-    clone_opts => "interleave=true",
+    clone_opts      => '',
+    operation_opts => 'monitor start-delay=10s',
   } ->
   Anchor['pacemaker ordering constraints begin']
 }

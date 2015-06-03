@@ -48,14 +48,6 @@ class quickstack::pacemaker::nova (
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
 
-    if ($scheduler_host_subset_size == '1') {
-      $sched_clone = ""
-      $_nova_scheduler_resource = "openstack-nova-scheduler"
-    } else {
-      $sched_clone = "interleave=true"
-      $_nova_scheduler_resource = "openstack-nova-scheduler-clone"
-    }
-
     class {"::quickstack::load_balancer::nova":
       frontend_pub_host    => map_params("nova_public_vip"),
       frontend_priv_host   => map_params("nova_private_vip"),
@@ -127,72 +119,70 @@ class quickstack::pacemaker::nova (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include nova",
     }
     ->
-    quickstack::pacemaker::resource::generic {['openstack-nova-consoleauth',
-                              'openstack-nova-novncproxy',
-                              'openstack-nova-api',
-                              'openstack-nova-conductor' ]:
-      clone_opts      => "interleave=true",
-      resource_params => 'start-delay=10s',
-    }
-    ->
-    quickstack::pacemaker::resource::generic {'openstack-nova-scheduler':
-      clone_opts      => $sched_clone,
-      resource_params => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {
+      [ 'nova-consoleauth',
+        'nova-novncproxy',
+        'nova-api',
+        'nova-scheduler',
+        'nova-conductor' ]:
+      resource_name_prefix => 'openstack-',
+      clone_opts           => '',
+      operation_opts       => 'monitor start-delay=10s',
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-console-vnc-constr' :
       constraint_type => "order",
-      first_resource  => "openstack-nova-consoleauth-clone",
-      second_resource => "openstack-nova-novncproxy-clone",
+      first_resource  => "nova-consoleauth-clone",
+      second_resource => "nova-novncproxy-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-console-vnc-colo' :
-      source => "openstack-nova-novncproxy-clone",
-      target => "openstack-nova-consoleauth-clone",
+      source => "nova-novncproxy-clone",
+      target => "nova-consoleauth-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-vnc-api-constr' :
       constraint_type => "order",
-      first_resource  => "openstack-nova-novncproxy-clone",
-      second_resource => "openstack-nova-api-clone",
+      first_resource  => "nova-novncproxy-clone",
+      second_resource => "nova-api-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-vnc-api-colo' :
-      source => "openstack-nova-api-clone",
-      target => "openstack-nova-novncproxy-clone",
+      source => "nova-api-clone",
+      target => "nova-novncproxy-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-api-scheduler-constr' :
       constraint_type => "order",
-      first_resource  => "openstack-nova-api-clone",
-      second_resource => $_nova_scheduler_resource,
+      first_resource  => "nova-api-clone",
+      second_resource => 'nova-scheduler-clone',
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-api-scheduler-colo' :
-      source => $_nova_scheduler_resource,
-      target => "openstack-nova-api-clone",
+      source => 'nova-scheduler-clone',
+      target => "nova-api-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-scheduler-conductor-constr' :
       constraint_type => "order",
-      first_resource  => $_nova_scheduler_resource,
-      second_resource => "openstack-nova-conductor-clone",
+      first_resource  => 'nova-scheduler-clone',
+      second_resource => "nova-conductor-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-conductor-scheduler-colo' :
-      source => $_nova_scheduler_resource,
-      target => "openstack-nova-conductor-clone",
+      source => 'nova-scheduler-clone',
+      target => "nova-conductor-clone",
       score => "INFINITY",
     }
     ->

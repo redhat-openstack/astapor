@@ -255,14 +255,13 @@ class quickstack::keystone::endpoints (
     contain keystone::roles::admin
 
     # Setup the Keystone Identity Endpoint
-    class { 'keystone::endpoint':
-      public_address   => $public_address,
-      public_protocol  => $public_protocol,
-      admin_address    => $admin_real,
-      internal_address => $internal_real,
-      region           => $region,
+    keystone::resource::service_identity {'identity_endpoint':
+      public_url   => "http://${public_address}:5000/v2.0",
+      admin_url    => "http://${admin_real}:35357/v2.0",
+      internal_url => "http://${internal_real}:5000/v2.0",
+      region       => $region,
+      service_type => 'identity',
     }
-    contain keystone::endpoint
 
     # Configure Glance endpoint in Keystone
     if $glance {

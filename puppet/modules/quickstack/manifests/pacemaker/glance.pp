@@ -1,5 +1,5 @@
 class quickstack::pacemaker::glance (
-  $sql_idle_timeout         = '3600',
+  $db_idle_timeout          = '3600',
   $db_ssl                   = false,
   $db_ssl_ca                = undef,
   $db_user                  = 'glance',
@@ -73,11 +73,11 @@ class quickstack::pacemaker::glance (
         Exec['stonith-setup-complete']
         ->
         quickstack::pacemaker::resource::filesystem { "glance-fs":
-          device => $pcmk_fs_device,
-          directory => $pcmk_fs_dir,
-          fstype => $pcmk_fs_type,
-          fsoptions => $pcmk_fs_options,
-          clone  => true,
+          device       => $pcmk_fs_device,
+          directory    => $pcmk_fs_dir,
+          fstype       => $pcmk_fs_type,
+          fsoptions    => $pcmk_fs_options,
+          clone_params => '',
         }
         ->
         Class['::quickstack::glance']
@@ -117,7 +117,7 @@ class quickstack::pacemaker::glance (
       db_password              => map_params("glance_db_password"),
       db_host                  => map_params("db_vip"),
       keystone_host            => map_params("keystone_admin_vip"),
-      sql_idle_timeout         => $sql_idle_timeout,
+      db_idle_timeout          => $db_idle_timeout,
       registry_host            => map_params("local_bind_addr"),
       bind_host                => map_params("local_bind_addr"),
       db_ssl                   => $db_ssl,
@@ -159,11 +159,11 @@ class quickstack::pacemaker::glance (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
     quickstack::pacemaker::resource::generic {'glance-registry':
-      clone_opts    => "interleave=true",
+      clone_opts    => '',
       resource_name => "openstack-glance-registry",
     } ->
     quickstack::pacemaker::resource::generic {'glance-api':
-      clone_opts    => "interleave=true",
+      clone_opts    => '',
       resource_name => "openstack-glance-api",
     }
 

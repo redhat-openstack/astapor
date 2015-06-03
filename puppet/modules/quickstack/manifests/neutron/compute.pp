@@ -136,7 +136,6 @@ class quickstack::neutron::compute (
 
   if downcase("$agent_type") == 'ovs' {
     class { '::neutron::plugins::ovs':
-      sql_connection      => $sql_connection,
       tenant_network_type => $tenant_network_type,
       network_vlan_ranges => $ovs_vlan_ranges,
       tunnel_id_ranges    => $tunnel_id_ranges,

@@ -238,24 +238,22 @@ class quickstack::pacemaker::neutron (
       # monitor_params => { 'start-delay'     => '10s' },
     }
     ->
-    # NOTE: ocf resources in current version of pcs do not accept arguements
-    # with --clone, so for now pass them as resource params.
     quickstack::pacemaker::resource::generic {'neutron-scale':
-      resource_name   => 'neutron:NeutronScale',
-      resource_params => "clone globally-unique=true clone-max=${_clone_max} interleave=true",
-      resource_type   => 'ocf',
+      resource_name => 'neutron:NeutronScale',
+      clone_opts    => "globally-unique=true clone-max=${_clone_max} interleave=true",
+      resource_type => 'ocf',
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-ovs-cleanup':
       resource_name   => 'neutron:OVSCleanup',
-      resource_params => "clone interleave=true",
+      clone_opts      => 'interleave=true',
       resource_type   => 'ocf',
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-netns-cleanup':
-      resource_name   => 'neutron:NetnsCleanup',
-      resource_params => "clone interleave=true",
-      resource_type   => 'ocf',
+      resource_name => 'neutron:NetnsCleanup',
+      clone_opts    => 'interleave=true',
+      resource_type => 'ocf',
     }
     ->
     quickstack::pacemaker::resource::generic {'neutron-openvswitch-agent':

@@ -213,8 +213,8 @@ class quickstack::compute_common (
   }
 
   class { '::nova::compute::libvirt':
-    libvirt_type => $libvirt_type,
-    vncserver_listen => '0.0.0.0',
+    libvirt_virt_type => $libvirt_type,
+    vncserver_listen  => '0.0.0.0',
   }
 
   $compute_ip = find_ip("$private_network",

@@ -142,14 +142,10 @@ class quickstack::pacemaker::heat(
     quickstack::pacemaker::resource::generic {'heat-api':
       clone_opts      => "interleave=true",
       resource_name   => "openstack-heat-api",
-      resource_params => 'start-delay=10s',
     }
     ->
-    quickstack::pacemaker::resource::service {'openstack-heat-engine':
-      group => "$heat_group",
-      clone => false,
-      options => 'start-delay=10s',
-      interval => '60s',
+    quickstack::pacemaker::resource::generic {'heat-engine':
+      resource_name   => "openstack-heat-engine",
     }
 
     if str2bool_i($heat_cfn_enabled) {
@@ -163,12 +159,11 @@ class quickstack::pacemaker::heat(
       ->
       Exec["i-am-heat-vip-OR-heat-is-up-on-vip"] ->
       Service[openstack-heat-api-cfn] ->
-      Quickstack::Pacemaker::Resource::Service['openstack-heat-engine']
+      Quickstack::Pacemaker::Resource::Generic['heat-engine']
       ->
       quickstack::pacemaker::resource::generic {"heat-api-cfn":
         clone_opts      => "interleave=true",
         resource_name   => "openstack-heat-api-cfn",
-        resource_params => 'start-delay=10s',
       }
       ->
       quickstack::pacemaker::constraint::base { 'heat-api-cfn-constr' :
@@ -187,12 +182,11 @@ class quickstack::pacemaker::heat(
     }
 
     if str2bool_i($heat_cloudwatch_enabled) {
-      Quickstack::Pacemaker::Resource::Service['openstack-heat-engine']
+      Quickstack::Pacemaker::Resource::Generic['heat-engine']
       ->
       quickstack::pacemaker::resource::generic {"heat-api-cloudwatch":
         clone_opts      => "interleave=true",
         resource_name   => "openstack-heat-api-cloudwatch",
-        resource_params => "start-delay=10s",
       }
       if str2bool_i($heat_cfn_enabled) {
         Quickstack::Pacemaker::Resource::Generic['heat-api-cfn'] ->
@@ -214,13 +208,13 @@ class quickstack::pacemaker::heat(
         quickstack::pacemaker::constraint::base { 'heat-cloudwatch-engine-constr' :
           constraint_type => "order",
           first_resource  => "heat-api-cloudwatch-clone",
-          second_resource => "openstack-heat-engine",
+          second_resource => "heat-engine",
           first_action    => "start",
           second_action   => "start",
         }
         ->
         quickstack::pacemaker::constraint::colocation { 'heat-cloudwatch-engine-colo' :
-          source => "openstack-heat-engine",
+          source => "heat-engine",
           target => "heat-api-cloudwatch-clone",
           score => "INFINITY",
         }
