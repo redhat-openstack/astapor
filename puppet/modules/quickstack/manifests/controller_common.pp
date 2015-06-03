@@ -378,7 +378,7 @@ class quickstack::controller_common (
     include ::quickstack::ceph::client_packages
     # hack around the glance package declaration if needed
     if ($glance_backend != 'rbd') {
-      package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
+      package {'python-rbd': } -> Class['quickstack::ceph::client_packages']
     }
     if $ceph_fsid {
       class { '::quickstack::ceph::config':
