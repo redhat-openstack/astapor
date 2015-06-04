@@ -125,7 +125,7 @@ class quickstack::compute_common (
         extra_conf_lines        => $ceph_extra_conf_lines,
       } -> Class['quickstack::ceph::client_packages']
     }
-    package {'python-ceph': } ->
+    package {'python-rbd': } ->
     Class['quickstack::ceph::client_packages'] -> Package['nova-compute']
   }
 
