@@ -95,7 +95,7 @@ if [ "$FOREMAN_PROVISIONING" = "true" ]; then
   FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
 fi
 
-# start with a subscribed RHEL6 box.  hint:
+# start with a subscribed RHEL box.  hint:
 #    subscription-manager register
 #    subscription-manager subscribe --auto
 
@@ -209,7 +209,6 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=prod
 # TODO don't hit yum unless packages are not installed
 cat >/tmp/foreman_client.sh <<EOF
 
-# start with a subscribed RHEL6 box needs optional channels and epel
 yum install -y augeas puppet nc
 
 # Puppet configuration
