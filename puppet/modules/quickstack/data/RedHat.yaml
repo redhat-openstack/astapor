@@ -42,6 +42,8 @@ quickstack::nova_network::compute::ssl: 'false'
 
 quickstack::pacemaker::ceilometer::ceilometer_metering_secret: "%{hiera('ceilometer_metering_secret')}"
 
+quickstack::pacemaker::cinder::backend_dell_sc: 'false'
+quickstack::pacemaker::cinder::backend_dell_sc_name: ['dell_sc_backend']
 quickstack::pacemaker::cinder::backend_eqlx: 'false'
 quickstack::pacemaker::cinder::backend_eqlx_name: ['eqlx_backend']
 quickstack::pacemaker::cinder::backend_netapp: 'false'
@@ -57,6 +59,14 @@ quickstack::pacemaker::cinder::backend_rbd_name: rbd_backend
 quickstack::pacemaker::cinder::db_ssl: 'false'
 quickstack::pacemaker::cinder::db_ssl_ca: "%{hiera('db_ca')}"
 quickstack::pacemaker::cinder::debug: 'false'
+quickstack::pacemaker::cinder::dell_sc_san_ip: ['']
+quickstack::pacemaker::cinder::dell_sc_san_login: ['Admin']
+quickstack::pacemaker::cinder::dell_sc_iscsi_ip_address: ['192.168.0.20']
+quickstack::pacemaker::cinder::dell_sc_iscsi_port: ['3260']
+quickstack::pacemaker::cinder::dell_sc_ssn: ['64702']
+quickstack::pacemaker::cinder::dell_sc_api_port: ['3033']
+quickstack::pacemaker::cinder::dell_sc_server_folder: ['server']
+quickstack::pacemaker::cinder::dell_sc_volume_folder: ['volume']
 quickstack::pacemaker::cinder::eqlx_chap_login: ['chapadmin']
 quickstack::pacemaker::cinder::eqlx_group_name: ['group-0']
 quickstack::pacemaker::cinder::eqlx_pool: ['default']

@@ -25,6 +25,8 @@ cinder_backend_iscsi: false
 cinder_backend_iscsi_name: iscsi_backend
 cinder_backend_nfs: false
 cinder_backend_nfs_name: nfs_backend
+cinder_backend_dell_sc: false
+cinder_backend_dell_sc_name: dell_sc_backend
 cinder_backend_eqlx: false
 cinder_backend_eqlx_name: eqlx_backend
 cinder_backend_netapp: false
@@ -41,6 +43,15 @@ cinder_gluster_shares:
 cinder_nfs_shares:
 - 192.168.0.4:/cinder
 cinder_nfs_mount_options: ''
+cinder_dell_sc_san_ip: 172.23.8.101
+cinder_dell_sc_san_login: Admin
+cinder_dell_sc_san_password: <%= passwd_auto %>
+cinder_dell_sc_iscsi_ip_address:192.168.0.20
+cinder_dell_sc_iscsi_port:3260
+cinder_dell_sc_ssn:64702
+cinder_dell_sc_api_port:3033
+cinder_dell_sc_server_folder:server
+cinder_dell_sc_volume_folder:volume
 cinder_san_ip: 192.168.124.11
 cinder_san_login: grpadmin
 cinder_san_password: <%= passwd_auto %>

@@ -36,6 +36,8 @@ class quickstack::params (
   $cinder_backend_iscsi_name    = 'iscsi',
   $cinder_backend_nfs           = false,
   $cinder_backend_nfs_name      = 'nfs',
+  $cinder_backend_dell_sc       = false,
+  $cinder_backend_dell_sc_name  = ['dell_sc'],
   $cinder_backend_eqlx          = false,
   $cinder_backend_eqlx_name     = ['eqlx'],
   $cinder_backend_netapp        = false,
@@ -51,6 +53,16 @@ class quickstack::params (
   # Cinder nfs
   $cinder_nfs_shares            = [ '192.168.0.4:/cinder' ],
   $cinder_nfs_mount_options     = '',
+  # Cinder Dell Storage Center ISCSI
+  $cinder_dell_sc_san_ip           = ['172.23.8.101'],
+  $cinder_dell_sc_san_login        = ['Admin'],
+  $cinder_dell_sc_san_password     = ['CHANGEME'],
+  $cinder_dell_sc_iscsi_ip_address = ['192.168.0.20'],
+  $cinder_dell_sc_iscsi_port       = [3260],
+  $cinder_dell_sc_ssn              = ['64702'],
+  $cinder_dell_sc_api_port         = [3033],
+  $cinder_dell_sc_server_folder    = ['server'],
+  $cinder_dell_sc_volume_folder    = ['volume'],
   # Cinder Dell EqualLogic
   $cinder_san_ip                = ['192.168.124.11'],
   $cinder_san_login             = ['grpadmin'],
