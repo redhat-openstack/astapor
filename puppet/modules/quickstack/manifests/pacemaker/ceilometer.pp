@@ -34,6 +34,7 @@ class quickstack::pacemaker::ceilometer (
       $_initial_master = $backend_ips[0]
       $_coordination_url = "redis://${_redis_vip}:${coordination_backend_port}"
       $_ceilo_central_clone = "interleave=true"
+      $_ceilo_central_resource = 'ceilometer-central-clone'
 
       if has_interface_with("ipaddress", $_initial_master) {
         $_slaveof = undef
@@ -54,6 +55,7 @@ class quickstack::pacemaker::ceilometer (
     } else {
       $_coordination_url = undef
       $_ceilo_central_clone = undef
+      $_ceilo_central_resource = 'ceilometer-central'
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
@@ -177,7 +179,7 @@ class quickstack::pacemaker::ceilometer (
     ->
     quickstack::pacemaker::constraint::base { "central-collector-constr":
       constraint_type => "order",
-      first_resource  => "ceilometer-central-clone",
+      first_resource  => $_ceilo_central_resource,
       second_resource => "ceilometer-collector-clone",
       first_action    => "start",
       second_action   => "start",
