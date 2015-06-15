@@ -126,8 +126,7 @@ class quickstack::pacemaker::nova (
         'nova-scheduler',
         'nova-conductor' ]:
       resource_name_prefix => 'openstack-',
-      clone_opts           => '',
-      operation_opts       => 'monitor start-delay=10s',
+      clone_opts           => "interleave=true",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-console-vnc-constr' :
