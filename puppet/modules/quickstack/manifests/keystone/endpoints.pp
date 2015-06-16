@@ -261,6 +261,8 @@ class quickstack::keystone::endpoints (
       internal_url => "http://${internal_real}:5000/v2.0",
       region       => $region,
       service_type => 'identity',
+      password     => $admin_password,
+      tenant       => $admin_tenant,
     }
 
     # Configure Glance endpoint in Keystone
