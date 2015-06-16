@@ -2,6 +2,7 @@
 
 define quickstack::pacemaker::constraint::base_services(
   $target_resource = '',
+  $first_action    = 'start',
 ) {
 
   include quickstack::pacemaker::common
@@ -20,6 +21,7 @@ define quickstack::pacemaker::constraint::base_services(
     quickstack::pacemaker::constraint::typical{ "galera-then-${target_resource}-constr" :
       first_resource  => "galera-master",
       second_resource => $target_resource,
+      first_action    => $first_action,
       colocation      => false,
     }
   }
