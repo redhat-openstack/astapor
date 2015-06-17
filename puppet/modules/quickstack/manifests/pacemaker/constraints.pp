@@ -139,6 +139,7 @@ class quickstack::pacemaker::constraints() {
   if (str2bool_i(map_params('include_keystone'))) {
     quickstack::pacemaker::constraint::base_services{"base-then-keystone-constr" :
       target_resource => "keystone-clone",
+      first_action    => 'promote',
     }
   }
 
