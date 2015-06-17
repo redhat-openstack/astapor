@@ -159,11 +159,11 @@ class quickstack::pacemaker::glance (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
     quickstack::pacemaker::resource::generic {'glance-registry':
-      clone_opts    => '',
+      clone_opts    => "interleave=true",
       resource_name => "openstack-glance-registry",
     } ->
     quickstack::pacemaker::resource::generic {'glance-api':
-      clone_opts    => '',
+      clone_opts    => "interleave=true",
       resource_name => "openstack-glance-api",
     }
 
