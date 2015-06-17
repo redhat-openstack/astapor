@@ -215,17 +215,23 @@ class quickstack::pacemaker::constraints() {
   }
 
   if (str2bool_i(map_params('include_ceilometer'))) {
+    include quickstack::pacemaker::ceilometer
+    if ($::quickstack::pacemaker::ceilometer::coordination_backend == 'redis') {
+      $_ceilo_central_clone = 'ceilometer-central-clone'
+    } else {
+      $_ceilo_central_clone = 'ceilometer-central'
+    }
     if (str2bool_i(map_params('include_keystone'))) {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'keystone-then-ceilometer-constr' :
         first_resource  => "keystone-clone",
-        second_resource => "ceilometer-central-clone",
+        second_resource => $_ceilo_central_clone,
         colocation      => false,
       }
     } else {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::base_services{"base-then-ceilo-constr" :
-        target_resource => "ceilometer-central-clone",
+        target_resource => $_ceilo_central_clone,
       }
     }
     if (str2bool_i(map_params('include_nosql'))) {
@@ -233,7 +239,7 @@ class quickstack::pacemaker::constraints() {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::typical{ 'mongod-then-ceilometer-constr' :
         first_resource  => "mongod-clone",
-        second_resource => "ceilometer-central-clone",
+        second_resource => $_ceilo_central_clone,
         colocation      => false,
       }
     }
