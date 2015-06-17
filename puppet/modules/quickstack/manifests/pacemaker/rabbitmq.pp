@@ -42,7 +42,7 @@ class quickstack::pacemaker::rabbitmq (
       admin_enable             => false,
       package_provider         => "yum",
       package_source           => undef,
-      manage_repos             => false,
+      repos_ensure             => false,
       environment_variables   => {
         'RABBITMQ_NODENAME'        => "rabbit@$this_node",
         'RABBITMQ_SERVER_ERL_ARGS' => "${erl_args}",
