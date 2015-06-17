@@ -76,7 +76,7 @@ class quickstack::pacemaker::rabbitmq (
 
     if (str2bool_i(map_params('include_mysql'))) {
       # avoid race condition with galera setup
-      Anchor['galera-online'] -> Exec['pcs-rabbitmq-server-set-up']
+      Anchor['galera-online'] -> Class['::rabbitmq::install']
     }
 
     Class['::quickstack::firewall::amqp'] ->
@@ -100,14 +100,22 @@ class quickstack::pacemaker::rabbitmq (
       content => $cookie,
       replace => true,
     } ->
-    Exec['pcs-rabbitmq-server-set-up']
+    Exec['pcs-rabbitmq-server-configured-on-this-node']
 
     Class['::rabbitmq'] ->
-    exec {"pcs-rabbitmq-server-set-up":
-      command => "/usr/sbin/pcs property set rabbitmq=running --force",
-    } ->
     quickstack::pacemaker::manual_service { "rabbitmq-server":
       stop => !$_enabled,
+    } ->
+    exec {"pcs-rabbitmq-server-configured-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property rabbitmq-conf"
+    } ->
+    # we want all the nodes configured (with cookie!) before allowing the
+    # rabbitmq-cluster pacemaker resource to get started
+    exec {"all-rabbitmq-nodes-are-configured":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include rabbitmq-conf",
     } ->
     quickstack::pacemaker::resource::generic { 'rabbitmq-server':
       resource_type   => "rabbitmq-cluster",
@@ -122,13 +130,13 @@ class quickstack::pacemaker::rabbitmq (
       command => '/usr/sbin/rabbitmqctl cluster_status'
     } ->
     exec {"pcs-rabbitmq-server-set-up-on-this-node":
-      command => "/tmp/ha-all-in-one-util.bash update_my_node_property rabbitmq"
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property rabbitmq-run"
     } ->
     exec {"all-rabbitmq-nodes-are-up":
       timeout   => 3600,
       tries     => 360,
       try_sleep => 10,
-      command   => "/tmp/ha-all-in-one-util.bash all_members_include rabbitmq",
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include rabbitmq-run",
     } ->
     Anchor['pacemaker ordering constraints begin']
   }
