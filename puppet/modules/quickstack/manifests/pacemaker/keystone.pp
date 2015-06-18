@@ -245,7 +245,7 @@ class quickstack::pacemaker::keystone (
       keystone_private_vip => map_params("keystone_private_vip"),
     } ->
     exec {"pcs-keystone-server-set-up":
-      command => "/usr/sbin/pcs property set keystone=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property keystone running",
     } ->
     exec {"pcs-keystone-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property keystone"

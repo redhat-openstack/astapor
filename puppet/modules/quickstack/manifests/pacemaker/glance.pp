@@ -147,7 +147,7 @@ class quickstack::pacemaker::glance (
     }
     ->
     exec {"pcs-glance-server-set-up":
-      command => "/usr/sbin/pcs property set glance=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property glance running",
     } ->
     exec {"pcs-glance-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property glance"

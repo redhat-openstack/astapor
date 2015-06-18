@@ -105,7 +105,7 @@ class quickstack::pacemaker::horizon (
     Service['httpd']
     ->
     exec {"pcs-horizon-server-set-up":
-      command => "/usr/sbin/pcs property set horizon=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property horizon running",
     }
     ->
     exec {"pcs-horizon-server-set-up-on-this-node":

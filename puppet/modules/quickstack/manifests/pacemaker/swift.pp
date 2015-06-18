@@ -84,7 +84,7 @@ class quickstack::pacemaker::swift (
       command => "/usr/sbin/pcs property set swift=running --force",
     } ->
     exec {"pcs-swift-server-set-up-on-this-node":
-      command => "/tmp/ha-all-in-one-util.bash update_my_node_property swift"
+      command => "/tmp/ha-all-in-one-util.bash set_property swift running",
     } ->
     exec {"all-swift-nodes-are-up":
       timeout   => 3600,

@@ -141,7 +141,7 @@ class quickstack::pacemaker::ceilometer (
     }
     ->
     exec {"pcs-ceilometer-server-set-up":
-      command => "/usr/sbin/pcs property set ceilometer=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property ceilometer running",
     }
     ->
     exec {"pcs-ceilometer-server-set-up-on-this-node":

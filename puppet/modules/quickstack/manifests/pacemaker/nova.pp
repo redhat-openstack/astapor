@@ -107,7 +107,7 @@ class quickstack::pacemaker::nova (
     }
     ->
     exec {"pcs-nova-server-set-up":
-      command => "/usr/sbin/pcs property set nova=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property nova running",
     } ->
     exec {"pcs-nova-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property nova"

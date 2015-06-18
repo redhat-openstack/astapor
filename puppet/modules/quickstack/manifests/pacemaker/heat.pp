@@ -125,7 +125,7 @@ class quickstack::pacemaker::heat(
     }
     ->
     exec {"pcs-heat-server-set-up":
-      command => "/usr/sbin/pcs property set heat=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property heat running",
     }
     ->
     exec {"pcs-heat-server-set-up-on-this-node":
