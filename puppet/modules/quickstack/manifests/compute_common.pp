@@ -69,6 +69,13 @@ class quickstack::compute_common (
 
   class {'quickstack::openstack_common': }
 
+  if str2bool_i($kvm_capable) {
+    $libvirt_type = 'kvm'
+  } else {
+    include quickstack::compute::qemu
+    $libvirt_type = 'qemu'
+  }
+
   if str2bool_i("$cinder_backend_gluster") {
     if defined('gluster::client') {
       class { 'gluster::client': }
@@ -131,14 +138,20 @@ class quickstack::compute_common (
 
   if str2bool_i("$cinder_backend_rbd") {
     nova_config {
-      'DEFAULT/libvirt_images_rbd_pool':      value => $libvirt_images_rbd_pool;
-      'DEFAULT/libvirt_images_rbd_ceph_conf': value => $libvirt_images_rbd_ceph_conf;
-      'DEFAULT/libvirt_inject_password':      value => $libvirt_inject_password;
-      'DEFAULT/libvirt_inject_key':           value => $libvirt_inject_key;
-      'DEFAULT/libvirt_inject_partition':     value => '-2';
-      'DEFAULT/libvirt_images_type':          value => $libvirt_images_type;
-      'DEFAULT/rbd_user':                     value => $rbd_user;
-      'DEFAULT/rbd_secret_uuid':              value => $rbd_secret_uuid;
+      'libvirt/images_rbd_pool':      value => $libvirt_images_rbd_pool;
+      'libvirt/images_rbd_ceph_conf': value => $libvirt_images_rbd_ceph_conf;
+      'libvirt/images_type':          value => $libvirt_images_type;
+      'libvirt/rbd_user':             value => $rbd_user;
+      'libvirt/rbd_secret_uuid':      value => $rbd_secret_uuid;
+      'libvirt/live_migration_flag':  value => '"VIR_MIGRATE_UNDEFINE_SOURCE,VIR_MIGRATE_PEER2PEER,VIR_MIGRATE_LIVE,VIR_MIGRATE_PERSIST_DEST"';
+    }
+    class { '::nova::compute::libvirt':
+      libvirt_virt_type        => $libvirt_type,
+      vncserver_listen         => '0.0.0.0',
+      libvirt_inject_key       => $libvirt_inject_key,
+      libvirt_inject_partition => -2,
+      libvirt_inject_password  => $libvirt_inject_password,
+      libvirt_disk_cachemodes  => ['"network=writeback"'],
     }
 
     Package['nova-common'] ->
@@ -161,8 +174,10 @@ class quickstack::compute_common (
       command => "/usr/bin/virsh secret-set-value --secret ${rbd_secret_uuid} --base64 ${ceph_volumes_key}",
     }
   } else {
-    nova_config {
-      'DEFAULT/libvirt_inject_partition':     value => '-1';
+    class { '::nova::compute::libvirt':
+      libvirt_virt_type        => $libvirt_type,
+      vncserver_listen         => '0.0.0.0',
+      libvirt_inject_partition => -1,
     }
   }
 
@@ -203,18 +218,6 @@ class quickstack::compute_common (
     rabbit_use_ssl      => $ssl,
     rabbit_hosts        => $rabbit_hosts,
     verbose             => $verbose,
-  }
-
-  if str2bool_i($kvm_capable) {
-    $libvirt_type = 'kvm'
-  } else {
-    include quickstack::compute::qemu
-    $libvirt_type = 'qemu'
-  }
-
-  class { '::nova::compute::libvirt':
-    libvirt_virt_type => $libvirt_type,
-    vncserver_listen  => '0.0.0.0',
   }
 
   $compute_ip = find_ip("$private_network",
