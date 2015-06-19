@@ -1,4 +1,6 @@
 class quickstack::cinder_volume(
+  $backend_dell_sc        = false,
+  $backend_dell_sc_name   = ['dell_sc'],
   $backend_eqlx           = false,
   $backend_eqlx_name      = ['eqlx'],
   $backend_glusterfs      = false,
@@ -21,6 +23,16 @@ class quickstack::cinder_volume(
 
   $nfs_shares             = [],
   $nfs_mount_options      = undef,
+
+  $dell_sc_san_ip           = [''],
+  $dell_sc_san_login         = ['Admin'],
+  $dell_sc_san_password     = [''],
+  $dell_sc_iscsi_ip_address = ['192.168.0.20'],
+  $dell_sc_iscsi_port       = ['3260'],
+  $dell_sc_ssn              = ['64702'],
+  $dell_sc_api_port         = ['3033'],
+  $dell_sc_server_folder    = ['server'],
+  $dell_sc_volume_folder    = ['volume'],
 
   $san_ip                 = [''],
   $san_login              = ['grpadmin'],
@@ -109,6 +121,18 @@ class quickstack::cinder_volume(
         nfs_servers       => $nfs_shares,
         nfs_mount_options => $nfs_mount_options,
         nfs_shares_config => '/etc/cinder/shares-nfs.conf',
+      }
+    } elsif str2bool_i($backend_dell_sc) {
+      class { '::cinder::volume::dellsc_iscsi':
+        san_ip                => $dell_sc_san_ip[0],
+        san_login             => $dell_sc_san_login[0],
+        san_password          => $dell_sc_san_password[0],
+        iscsi_ip_address      => $dell_sc_iscsi_ip_address[0],
+        iscsi_port            => $dell_sc_iscsi_port[0],
+        dell_sc_ssn           => $dell_sc_ssn[0],
+        dell_sc_api_port      => $dell_sc_api_port[0],
+        dell_sc_server_folder => $dell_sc_server_folder[0],
+        dell_sc_volume_folder => $dell_sc_volume_folder[0],
       }
     } elsif str2bool_i("$backend_eqlx") {
       class { '::cinder::volume::eqlx':
@@ -223,6 +247,28 @@ class quickstack::cinder_volume(
       }
     }
 
+    if str2bool_i($backend_dell_sc) {
+
+      $count = size($backend_dell_sc_name)
+      $last = $count -1
+      $dell_sc_backends = produce_array_with_prefix('dell_sc',1,$count)  #Initialize with section headers
+
+      quickstack::dellsc::volume { $last:
+        index                          => $last,
+        backend_section_name_array     => $dell_sc_backends,
+        backend_dell_sc_name_array     => $backend_dell_sc_name,
+        dell_sc_san_ip_array           => $dell_sc_san_ip,
+        dell_sc_san_login_array        => $dell_sc_san_login,
+        dell_sc_san_password_array     => $dell_sc_san_password,
+        dell_sc_iscsi_ip_address_array => $dell_sc_iscsi_ip_address,
+        dell_sc_iscsi_port_array    => $dell_sc_iscsi_port,
+        dell_sc_ssn_array           => $dell_sc_ssn,
+        dell_sc_api_port_array      => $dell_sc_api_port,
+        dell_sc_server_folder_array => $dell_sc_server_folder,
+        dell_sc_volume_folder_array => $dell_sc_volume_folder,
+      }
+    }
+
     if str2bool_i("$backend_eqlx") {
 
       $count = size($backend_eqlx_name)
@@ -303,6 +349,7 @@ class quickstack::cinder_volume(
     $enabled_backends = join_arrays_if_exist(
       'glusterfs_backends',
       'nfs_backends',
+      'dell_sc_backends',
       'eqlx_backends',
       'backend_netapp_name',
       'rbd_backends',

@@ -1,4 +1,6 @@
 class quickstack::cinder_volume_types(
+  $backend_dell_sc        = false,
+  $backend_dell_sc_name   = ['dell_sc'],
   $backend_eqlx           = false,
   $backend_eqlx_name      = ['eqlx'],
   $backend_glusterfs      = false,
@@ -33,6 +35,17 @@ class quickstack::cinder_volume_types(
     os_auth_url     => $os_auth_url,
   }
 
+  if str2bool_i($backend_dell_sc) {
+    $dell_sc_last_index = size($backend_dell_sc) - 1
+
+    Exec['wait-for-cinder-api-being-reachable'] ->
+    quickstack::cinder::multi_instance_type { "dell-sc-${dell_sc_last_index}":
+      index           => $dell_sc_last_index,
+      resource_prefix => 'dell_sc',
+      backend_names   => $backend_dell_sc_name,
+    }
+  }
+  
   if str2bool_i("$backend_eqlx") {
     $eqlx_last_index = size($backend_eqlx_name) - 1
 
