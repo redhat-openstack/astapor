@@ -241,22 +241,22 @@ class quickstack::neutron::all (
     }
 
     if str2bool_i("$l3_ha") {
-      $_ovs_l2_population = 'False'
+      $_ovs_l2_population = false
     } else {
-      $_ovs_l2_population = 'True'
+      $_ovs_l2_population = true
     }
-    neutron_plugin_ovs {'AGENT/l2_population': value => "$_ovs_l2_population"; }
+    neutron_plugin_ovs {'agent/veth_mtu': value => "$veth_mtu"; }
 
-    class { '::neutron::agents::ovs':
+    class { '::neutron::agents::ml2::ovs':
       bridge_mappings  => $ovs_bridge_mappings,
       bridge_uplinks   => $ovs_bridge_uplinks,
       enabled          => str2bool_i("$enabled"),
       enable_tunneling => $_enable_tunneling,
+      l2_population    => $_ovs_l2_population,
       local_ip         => $local_ip,
       manage_service   => str2bool_i("$manage_service"),
       tunnel_types     => $ovs_tunnel_types,
       vxlan_udp_port   => $ovs_vxlan_udp_port,
-      veth_mtu         => $veth_mtu,
     }
   }
 

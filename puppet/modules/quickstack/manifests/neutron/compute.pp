@@ -38,10 +38,12 @@ class quickstack::neutron::compute (
   $nova_user_password           = $quickstack::params::nova_user_password,
   $ovs_bridge_mappings          = $quickstack::params::ovs_bridge_mappings,
   $ovs_bridge_uplinks           = $quickstack::params::ovs_bridge_uplinks,
-  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  $ovs_l2_population            = 'False',
   $ovs_tunnel_iface             = 'eth1',
   $ovs_tunnel_network           = '',
-  $ovs_l2_population            = 'False',
+  $ovs_tunnel_types             = $quickstack::params::ovs_tunnel_types,
+  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  $ovs_vxlan_udp_port           = $quickstack::params::ovs_vxlan_udp_port,
   $amqp_provider                = $quickstack::params::amqp_provider,
   $amqp_host                    = $quickstack::params::amqp_host,
   $amqp_port                    = '5672',
@@ -52,8 +54,6 @@ class quickstack::neutron::compute (
   $rabbitmq_use_addrs_not_vip   = true,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges             = '1:1000',
-  $ovs_vxlan_udp_port           = $quickstack::params::ovs_vxlan_udp_port,
-  $ovs_tunnel_types             = $quickstack::params::ovs_tunnel_types,
   $verbose                      = $quickstack::params::verbose,
   $ssl                          = $quickstack::params::ssl,
   $security_group_api           = 'neutron',
@@ -72,6 +72,7 @@ class quickstack::neutron::compute (
   $veth_mtu                     = undef,
   $vnc_keymap                   = 'en-us',
   $vncproxy_host                = undef,
+  $vxlan_group                  = '224.0.0.1',
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -135,24 +136,33 @@ class quickstack::neutron::compute (
   }
 
   if downcase("$agent_type") == 'ovs' {
-    class { '::neutron::plugins::ovs':
-      tenant_network_type => $tenant_network_type,
-      network_vlan_ranges => $ovs_vlan_ranges,
-      tunnel_id_ranges    => $tunnel_id_ranges,
-      vxlan_udp_port      => $ovs_vxlan_udp_port,
+    # We don't want all the validation of type_drivers since some of that is
+    # inaccurate, just use plugins::ml2 to make sure the package is installed.
+    class { '::neutron::plugins::ml2':
+      type_drivers => [], #not relevant on compute
+    }
+    # Just setting the values in plugin file, as the neutron::plugins::ml2 class
+    # does extra things right now that are unneeded on compute nodes (like mech
+    # drivers, vni_ranges, etc).
+    $_ovs_vlan_ranges = join(any2array($ovs_vlan_ranges), ',')
+    neutron_plugin_ml2 {
+      'ml2_type_vlan/network_vlan_ranges': value => $_ovs_vlan_ranges;
+      'ml2_type_vxlan/vxlan_group'       : value => $vxlan_group;
     }
 
-    neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
+    # We seem to have lost this in the switch away from agents::ovs in
+    # puppet-neutron, so adding here.
+    neutron_plugin_ovs { 'agent/veth_mtu': value    => "$veth_mtu"; }
 
     $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
-    class { '::neutron::agents::ovs':
-      bridge_uplinks      => $ovs_bridge_uplinks,
-      bridge_mappings     => $ovs_bridge_mappings,
-      local_ip            => $local_ip,
-      enable_tunneling    => str2bool_i("$enable_tunneling"),
-      tunnel_types        => $ovs_tunnel_types,
-      vxlan_udp_port      => $ovs_vxlan_udp_port,
-      veth_mtu            => $veth_mtu,
+    class { '::neutron::agents::ml2::ovs':
+      bridge_uplinks   => $ovs_bridge_uplinks,
+      bridge_mappings  => $ovs_bridge_mappings,
+      l2_population    => str2bool_i("$ovs_l2_population"),
+      local_ip         => $local_ip,
+      enable_tunneling => str2bool_i("$enable_tunneling"),
+      tunnel_types     => $ovs_tunnel_types,
+      vxlan_udp_port   => $ovs_vxlan_udp_port,
     }
   }
 
