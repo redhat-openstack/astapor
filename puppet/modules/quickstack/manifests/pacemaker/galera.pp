@@ -20,16 +20,6 @@ class quickstack::pacemaker::galera (
   if (str2bool_i(map_params('include_mysql'))) {
     $galera_vip = map_params("db_vip")
 
-    # TODO: extract this into a helper function
-    if ($::pcs_setup_galera ==  undef or
-        !str2bool_i("$::pcs_setup_galera")) {
-      $_enabled = true
-      $_ensure = 'running'
-    } else {
-      $_enabled = false
-      $_ensure = undef
-    }
-
     # defined for galera.cnf template
     $wsrep_provider         = '/usr/lib64/galera/libgalera_smm.so'
     $wsrep_bind_address     = map_params("pcmk_bind_addr")
@@ -73,7 +63,7 @@ class quickstack::pacemaker::galera (
         command   => "/usr/sbin/pcs resource show haproxy-clone",
       } ->
       exec{'disable haproxy during init mysql setup':
-        # it's ok to run this on all nodes, additional calls are no-ops        
+        # it's ok to run this on all nodes, additional calls are no-ops
         command => '/usr/sbin/pcs resource disable haproxy'
       } ->
       class { 'mysql::server':
@@ -142,11 +132,11 @@ class quickstack::pacemaker::galera (
       ->
       Exec['pcs-mysqlinit-server-setup']
       Mysql_grant <| |> -> Exec["pcs-mysqlinit-server-setup"]
-      
+
       Exec["all-mysqlinit-nodes-are-up"] ->
       Exec['galera-online-cmd'] ->
       exec{'enable haproxy after galera-online':
-        # it's ok to run this on all nodes, additional calls are no-ops        
+        # it's ok to run this on all nodes, additional calls are no-ops
         command => '/usr/sbin/pcs resource enable haproxy'
       } ->
       Anchor['galera-online']
@@ -170,9 +160,6 @@ class quickstack::pacemaker::galera (
     }
 
     exec {"pcs-mysqlinit-server-setup":
-      command => "/usr/sbin/pcs property set mysqlinit=running --force",
-    } ->
-    exec {"pcs-mysqlinit-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property mysqlinit"
     } ->
     exec {"all-mysqlinit-nodes-are-up":

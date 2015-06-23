@@ -200,7 +200,7 @@ class quickstack::pacemaker::cinder(
     Service[openstack-cinder-api] ->
     Service[openstack-cinder-scheduler] ->
     exec {"pcs-cinder-server-set-up":
-      command => "/usr/sbin/pcs property set cinder=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property cinder running",
     } ->
     exec {"pcs-cinder-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property cinder"

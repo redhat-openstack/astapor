@@ -24,6 +24,23 @@ property_exists() {
 get_property_value() {
   echo $(get_property $1) | /bin/grep $1 | perl -p -e 's/^.*\: //'
 }
+property_value_is() {
+  property=$1
+  element=$2
+  property_exists $1 || return 1
+  propval=$(get_property_value $1)
+  [ "x$propval" = "x$element" ]
+}
+set_property_verified() {
+  property=$1
+  value=$2
+  property_value_is $property $value
+  while [ $? -ne 0 ]; do
+    /usr/sbin/pcs property set $property=$value --force
+    sleep 1
+    property_value_is $property $value
+  done
+}
 
 property_includes() {
   propval=$(get_property_value $1)
@@ -122,6 +139,10 @@ case "$1" in
      ;;
   "all_members_include")
      all_members_include $2
+     ;;
+  # any pcs property (so not a "node property" sub command)
+  "set_property")
+     set_property_verified $2 $3
      ;;
   "info")
      info

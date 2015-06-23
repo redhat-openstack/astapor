@@ -220,7 +220,7 @@ class quickstack::pacemaker::neutron (
     anchor {"neutron configuration anchor end": }
     ->
     exec {"pcs-neutron-server-set-up":
-      command => "/usr/sbin/pcs property set neutron=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property neutron running",
     } ->
     exec {"pcs-neutron-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property neutron"
