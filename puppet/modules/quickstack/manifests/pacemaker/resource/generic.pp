@@ -7,9 +7,10 @@ define quickstack::pacemaker::resource::generic(
   $clone_opts           = undef,
   $group_opts           = undef,
   $resource_type        = "systemd",
-  $post_success_sleep   = 5,
-  $tries                = 4,
-  $try_sleep            = 30,
+  $tries                = 30,
+  $try_sleep            = 6,
+  $verify_on_create     = true,
+  $post_success_sleep   = undef,
 ) {
   include quickstack::pacemaker::params
 
@@ -30,9 +31,10 @@ define quickstack::pacemaker::resource::generic(
       op_params          => $operation_opts,
       clone_params       => $clone_opts,
       group_params       => $group_opts,
-      post_success_sleep => $post_success_sleep,
       tries              => $tries,
       try_sleep          => $try_sleep,
+      verify_on_create   => $verify_on_create,
+      post_success_sleep => $post_success_sleep,
     }
     -> anchor { "qprs end ${title}": }
   }
