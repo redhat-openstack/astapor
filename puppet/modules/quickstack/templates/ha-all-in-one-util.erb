@@ -8,11 +8,11 @@ get_resource_ip_output() {
   # trailing space is on purpose below to avoid matching Failed actions
   echo $(/usr/sbin/pcs status | /bin/grep -P "ip-\S*$1\s")
 }
-which_cluster_ip() {
+which_cluster_node() {
   line=$(get_resource_ip_output $1)
   echo $line | sed -n -e 's/^.*Started //p'
 }
-my_cluster_ip() {
+my_cluster_node() {
   /usr/sbin/crm_node -n
 }
 get_property() {
@@ -71,7 +71,7 @@ all_members_include() {
 # to include the argument in a list if it is not there already
 update_my_node_property() {
   element=$1
-  mynode=$(my_cluster_ip)
+  mynode=$(my_cluster_node)
   if ! $(property_exists $mynode); then
     /usr/sbin/pcs property set $mynode=$element --force || return 1
     return 0
@@ -85,7 +85,7 @@ update_my_node_property() {
 
 update_my_node_property_verified() {
   element=$1
-  mynode=$(my_cluster_ip)
+  mynode=$(my_cluster_node)
   property_includes $mynode $element
   while [ $? -ne 0 ]; do
     update_my_node_property $element $mynode
@@ -96,22 +96,31 @@ update_my_node_property_verified() {
 
 # obsolete, but here as an illustration of how i_am_vip works
 i_am_keystone_vip () {
-  clu_ip=$(which_cluster_ip $keystone_private_vip)
+  clu_ip=$(which_cluster_node $keystone_private_vip)
   # if vip isn't Started, return false
   if [ "x${clu_ip}" = "x" ]; then return 1; fi
-  my_clu_ip=$(my_cluster_ip)
+  my_clu_ip=$(my_cluster_node)
   test "$clu_ip" == "$my_clu_ip"
 }
 
 i_am_vip () {
   the_vip=$1
-  clu_ip=$(which_cluster_ip $the_vip)
+  clu_ip=$(which_cluster_node $the_vip)
   # if vip isn't Started, return false
   if [ "x${clu_ip}" = "x" ]; then return 1; fi
-  my_clu_ip=$(my_cluster_ip)
+  my_clu_ip=$(my_cluster_node)
   test "$clu_ip" == "$my_clu_ip"
 }
 
+vips_on_same_node() {
+  vip1=$1
+  vip2=$2
+  node1=$(which_cluster_node $vip1)
+  node2=$(which_cluster_node $vip2)
+  if [ "x${node1}" = "x" ]; then return 1; fi
+  if [ "x${node2}" = "x" ]; then return 1; fi
+  test "$node1" == "$node2"
+}
 
 info() {
   $(i_am_keystone_vip) ; echo i_am_keystone_vip is $?
@@ -144,6 +153,10 @@ case "$1" in
   "set_property")
      set_property_verified $2 $3
      ;;
+  "vips_on_same_node")
+     vips_on_same_node $2 $3
+     ;;
+
   "info")
      info
      ;;
