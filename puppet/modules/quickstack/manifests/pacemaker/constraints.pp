@@ -219,6 +219,14 @@ class quickstack::pacemaker::constraints() {
     include quickstack::pacemaker::ceilometer
     if ($::quickstack::pacemaker::ceilometer::coordination_backend == 'redis') {
       $_ceilo_central_clone = 'ceilometer-central-clone'
+      $_redis_vip = map_params('redis_vip')
+      Quickstack::Pacemaker::Resource::Ip['ip-redis-pub'] ->
+      Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
+      quickstack::pacemaker::constraint::typical{ 'redis-vip-then-ceilo-central':
+        first_resource  => "ip-redis-pub-${_redis_vip}",
+        second_resource => $_ceilo_central_clone,
+        colocation      => false,
+      }
     } else {
       $_ceilo_central_clone = 'ceilometer-central'
     }
