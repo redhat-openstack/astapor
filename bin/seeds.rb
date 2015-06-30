@@ -114,6 +114,150 @@ clearpart --all --initlabel
 autopart
 '
 
+redhat_register_text  = <<-'EORRT'
+<%#
+kind: snippet
+name: redhat_register
+%>
+# Red Hat Registration Snippet
+#
+# Set these parameters if you're using rhnreg_ks:
+#
+#   spacewalk_type = 'site'     (local Spacewalk/Satellite server)
+#                  = 'hosted'   (RHN hosted)
+#   spacewalk_host = <hostname> (hostname of Spacewalk server, optional for
+#                                RHN hosted)
+#
+# Set these parameters if you're using subscription-manager:
+#
+#   subscription_manager = 'true' (you're going to use subscription-manager)
+#
+#   subscription_manager_username = <username> (if using hosted RHN)
+#
+#   subscription_manager_password = <password> (if using hosted RHN)
+#
+#   subscription_manager_host = <hostname> (hostname of SAM/Katello
+#                                           installation, if using SAM)
+#
+#   subscription_manager_org = <org name> (organization name, if using
+#                                          SAM/Katello)
+#
+#   subscription_manager_repos = <repos> (comma separated list of repos (like
+#                                         rhel-6-server-optional-rpms) to
+#                                         enable after registration)
+#
+#   subscription_manager_pool = <pool> (specific pool to be used for
+#                                       registration)
+#
+#   http-proxy = <host> (proxy hostname to be used for registration)
+#
+#   http-proxy-port = <port> (proxy port to be used for registration)
+#
+#   http-proxy-user = <user> (proxy user to be used for registration)
+#
+#   http-proxy-password = <password> (proxy password to be
+#                                           used for registration)
+#
+# Set this parameter regardless of which registration method you're using:
+#
+#   activation_key = <key>      (activation key string, not needed if using
+#                                subscription-manager with hosted RHN)
+#
+
+<% unless @host.params['subscription_manager'] %>
+  <% type = @host.params['spacewalk_type'] || 'hosted' %>
+
+  <% if @host.params['activation_key'] %>
+    # Discovered Activation Key <%= @host.params['activation_key'] %>
+    rhn_activation_key="<%= @host.params['activation_key'] -%>"
+
+    <% if type == "site" -%>
+    satellite_hostname="<%= @host.params['spacewalk_host'] -%>"
+    rhn_cert_file="RHN-ORG-TRUSTED-SSL-CERT"
+    <% else -%>
+    satellite_hostname="<%= @host.params['spacewalk_host'] || 'xmlrpc.rhn.redhat.com' -%>"
+    rhn_cert_file="RHNS-CA-CERT"
+    <% end -%>
+
+    echo "Registering to RHN Satellite at [$satellite_hostname]"
+    echo "Using Registration Key [$rhn_activation_key]"
+
+    <% if type == 'site' -%>
+    # Obtain our RHN Satellite Certificate
+    echo "Obtaining RHN SSL certificate"
+    wget http://$satellite_hostname/pub/$rhn_cert_file -O /usr/share/rhn/$rhn_cert_file
+    <% end -%>
+
+    # Update our up2date configuration file
+    echo "Updating SSL CA Certificate to /usr/share/rhn/$rhn_cert_file"
+    sed -i -e "s|^sslCACert=.*$|sslCACert=/usr/share/rhn/$rhn_cert_file|" /etc/sysconfig/rhn/up2date
+
+    # Update our Satellite Hostname
+    echo "Updating Satellite Hostname to [$satellite_hostname]"
+    sed -i -e "s|^serverURL=.*$|serverURL=https://$satellite_hostname/XMLRPC|" /etc/sysconfig/rhn/up2date
+    sed -i -e "s|^noSSLServerURL=.*$|noSSLServerURL=https://$satellite_hostname/XMLRPC|" /etc/sysconfig/rhn/up2date
+
+    # Restart messagebus/HAL to try and prevent hardware detection errors in rhnreg_ks
+    echo "Restarting services..."
+    service messagebus restart
+    service hald restart
+
+    # Now, perform our registration
+    #  (might get hardware errors here, due to dbus/messagebus lameness. These are safe to ignore.)
+    echo -n "Performing RHN Registration... "
+    rhnreg_ks --activationkey=$rhn_activation_key
+    echo "done."
+
+    # Check we registered
+    echo -n "Checking System Registration... "
+    if ! rhn_check; then
+        echo "FAILED"
+        echo " >> RHN Registration FAILED. Please Investigate. <<"
+    else
+        echo "registration successful."
+    fi
+  <% else %>
+    # Not registering - host.params['activation_key'] not found.
+  <% end %>
+<% else %>
+  echo "Starting the subscription-manager registration process"
+  <% if @host.params['http-proxy'] %>
+    subscription-manager config --server.proxy_hostname="<%= @host.params['http-proxy'] %>"
+    <% if @host.params['http-proxy-user'] %>
+      subscription-manager config --server.proxy_user="<%= @host.params['http-proxy-user'] %>"
+    <% end %>
+    <% if @host.params['http-proxy-password'] %>
+      subscription-manager config --server.proxy_password='<%= @host.params['http-proxy-password'] %>'
+    <% end %>
+    <% if @host.params['http-proxy-port'] %>
+      subscription-manager config --server.proxy_port="<%= @host.params['http-proxy-port'] %>"
+    <% end %>
+  <% end %>
+  <% if @host.params['subscription_manager_username'] && @host.params['subscription_manager_password'] %>
+    <% if @host.params['subscription_manager_pool'] %>
+      subscription-manager register --username='<%= @host.params['subscription_manager_username'] %>' --password='<%= @host.params['subscription_manager_password'] %>'
+      subscription-manager attach --pool="<%= @host.params['subscription_manager_pool'] %>"
+    <% else %>
+      subscription-manager register --username="<%= @host.params['subscription_manager_username'] %>" --password="<%= @host.params['subscription_manager_password'] %>" --auto-attach
+    <% end %>
+    # workaround for RHEL 6.4 bug https://bugzilla.redhat.com/show_bug.cgi?id=1008016
+    subscription-manager repos --list > /dev/null
+    subscription-manager repos --disable=*
+    <%= "subscription-manager repos #{@host.params['subscription_manager_repos'].split(/[\s,]/).reject { |r| r.empty? }.map { |r| '--enable=' + r }.join(' ')}" if @host.params['subscription_manager_repos'] %>
+  <% elsif @host.params['activation_key'] %>
+    rpm -Uvh http://<%= @host.params['subscription_manager_host'] %>/pub/katello-ca-consumer-latest.noarch.rpm
+    subscription-manager register --org="<%= @host.params['subscription_manager_org'] %>" --activationkey="<%= @host.params['activation_key'] %>"
+    # workaround for RHEL 6.4 bug https://bugzilla.redhat.com/show_bug.cgi?id=1008016
+    subscription-manager repos --list > /dev/null
+    subscription-manager repos --disable=*
+    <%= "subscription-manager repos #{@host.params['subscription_manager_repos'].split(',').map { |r| '--enable=' + r.strip }.join(' ')}" if @host.params['subscription_manager_repos'] %>
+  <% else %>
+    # Not registering host.params['activation_key'] not found.
+  <% end %>
+<% end %>
+# End Red Hat Registration Snippet
+EORRT
+
 # Disable CA management as the proxy has issues using sudo with SCL
 Setting[:manage_puppetca] = false
 
@@ -242,6 +386,15 @@ if ENV["FOREMAN_PROVISIONING"] == "true" then
   secondary_int=sec_int_hash[0].split('_').last
   secondary_prefix=sec_int_hash[1].split('.')[0..2].join('.')
 end
+
+rr = ConfigTemplate.find_or_initialize_by_name "redhat_register"
+data = {
+  :template         => redhat_register_text,
+  :operatingsystems => ( rr.operatingsystems << os ).uniq,
+  :snippet          => true,
+}
+rr.update_attributes(data)
+rr.save!
 
 params = {
   "verbose"                       => "true",
