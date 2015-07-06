@@ -120,11 +120,17 @@ class quickstack::pacemaker::nova (
     }
     ->
     quickstack::pacemaker::resource::generic {
+      [ 'nova-api',
+        'nova-conductor' ]:
+      resource_name_prefix => 'openstack-',
+      clone_opts           => "interleave=true",
+      operation_opts       => 'start timeout=60',
+    }
+    ->
+    quickstack::pacemaker::resource::generic {
       [ 'nova-consoleauth',
         'nova-novncproxy',
-        'nova-api',
-        'nova-scheduler',
-        'nova-conductor' ]:
+        'nova-scheduler' ]:
       resource_name_prefix => 'openstack-',
       clone_opts           => "interleave=true",
     }
