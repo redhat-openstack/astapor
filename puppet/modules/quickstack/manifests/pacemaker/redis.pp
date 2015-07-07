@@ -70,7 +70,7 @@ class quickstack::pacemaker::redis(
     timeout   => 3600,
     tries     => 360,
     try_sleep => 10,
-    command => "bash -c 'pcs constraint show | grep -qs \"ip-redis-pub-${_redis_vip} with redis-master\"'",
+    command => "bash -c 'pcs constraint show | grep -qs \"redis-master then start ip-redis-pub-${_redis_vip}\"'",
     path => ['/usr/sbin', '/usr/bin'],
   }
 
@@ -81,19 +81,4 @@ class quickstack::pacemaker::redis(
     backend_server_names => map_params("lb_backend_server_names"),
     backend_server_addrs => map_params("lb_backend_server_addrs"),
   }
-
-  if has_interface_with("ipaddress", map_params("cluster_control_ip")){
-    # using an exec here because of the "with master" clause which
-    # current colocation classes do not support.
-    Quickstack::Pacemaker::Constraint::Base['redis-master-then-vip-redis']
-    ->
-    exec{ 'redis-master-and-vip-colo':
-      command => "pcs constraint colocation add ip-redis-pub-${_redis_vip} with master redis-master",
-      unless => "bash -c 'pcs constraint show | grep -qs \"ip-redis-pub-${_redis_vip} with redis-master\"'",
-      path => ['/usr/sbin', '/usr/bin'],
-    }
-    ->
-    Exec['redis-master-is-up']
-  }
-
 }
