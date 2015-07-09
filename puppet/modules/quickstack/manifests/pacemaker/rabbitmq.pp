@@ -5,6 +5,7 @@ class quickstack::pacemaker::rabbitmq (
   # need to override connect_options and set listen_options
   # for TCP_USER_TIMEOUT
   $erl_args              = "\"+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true},{raw,6,18,<<5000:64/native>>}] -kernel inet_default_listen_options [{raw,6,18,<<5000:64/native>>}]\"",
+  $file_descriptors      = '4096',
 ) {
 
   include quickstack::pacemaker::common
@@ -46,6 +47,12 @@ class quickstack::pacemaker::rabbitmq (
       environment_variables   => {
         'RABBITMQ_NODENAME'        => "rabbit@$this_node",
         'RABBITMQ_SERVER_ERL_ARGS' => "${erl_args}",
+	#  hack alert: the below line in puppet results in something
+        #  like in /etc/rabbitmq/rabbitmq-env.conf (we only care about
+        #  the ulimit line):
+        #  IGNORE_ME=
+        #  ulimit -S -n 4096
+        'IGNORE_ME'                => "\nulimit -S -n ${file_descriptors}",
       },
       service_manage           => $_enabled,
       # set the parameter tcp_keepalive to false -- but don't be misled!
