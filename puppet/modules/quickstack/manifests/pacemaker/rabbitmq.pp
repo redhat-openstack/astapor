@@ -4,7 +4,6 @@ class quickstack::pacemaker::rabbitmq (
   $cookie                = 'EWKOWWGETETZSHWEYXCV',
   # need to override connect_options and set listen_options
   # for TCP_USER_TIMEOUT
-  $erl_args              = "\"+K true +A30 +P 1048576 -kernel inet_default_connect_options [{nodelay,true},{raw,6,18,<<5000:64/native>>}] -kernel inet_default_listen_options [{raw,6,18,<<5000:64/native>>}]\"",
   $file_descriptors      = '4096',
 ) {
 
@@ -46,7 +45,6 @@ class quickstack::pacemaker::rabbitmq (
       repos_ensure             => false,
       environment_variables   => {
         'RABBITMQ_NODENAME'        => "rabbit@$this_node",
-        'RABBITMQ_SERVER_ERL_ARGS' => "${erl_args}",
 	#  hack alert: the below line in puppet results in something
         #  like in /etc/rabbitmq/rabbitmq-env.conf (we only care about
         #  the ulimit line):
