@@ -6,7 +6,7 @@ class quickstack::load_balancer::common {
       'user'       => 'haproxy',
       'group'      => 'haproxy',
       'daemon'     => '',
-      'maxconn'    => '10000',
+      'maxconn'    => '40000',
     },
     defaults_options => {
       'mode'         => 'tcp',
