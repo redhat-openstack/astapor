@@ -1,6 +1,6 @@
 class quickstack::pacemaker::galera (
   $limit_no_file            ="16384",
-  $max_connections         = "1024",
+  $max_connections         = "4096",
   $mysql_root_password     = '',
   $open_files_limit        = '-1',
   $galera_monitor_username = 'monitor_user',
