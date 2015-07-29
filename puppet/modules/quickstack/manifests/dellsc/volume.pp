@@ -1,4 +1,4 @@
-define quickstack::dell_sc_iscsi::volume (
+define quickstack::dellsc::volume (
   $index,
   $backend_section_name_array,
   $backend_dell_sc_name_array,
@@ -41,7 +41,7 @@ define quickstack::dell_sc_iscsi::volume (
 
     #recurse
     $next = $index -1
-    quickstack::dellsc::dellsc_iscsi {$next:
+    quickstack::dellsc::volume {$next:
       index                          => $next,
       backend_section_name_array     => $backend_section_name_array,
       backend_dell_sc_name_array     => $backend_dell_sc_name_array,
