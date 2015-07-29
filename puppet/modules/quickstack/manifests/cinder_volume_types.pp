@@ -36,7 +36,7 @@ class quickstack::cinder_volume_types(
   }
 
   if str2bool_i($backend_dell_sc) {
-    $dell_sc_last_index = size($backend_dell_sc) - 1
+    $dell_sc_last_index = size($backend_dell_sc_name) - 1
 
     Exec['wait-for-cinder-api-being-reachable'] ->
     quickstack::cinder::multi_instance_type { "dell-sc-${dell_sc_last_index}":
