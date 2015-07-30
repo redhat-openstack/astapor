@@ -35,6 +35,7 @@ class quickstack::pacemaker::galera (
       })
     }
     $wsrep_debug = 0
+    $_maxconn = $max_connections - 100
 
     Exec['all-memcached-nodes-are-up'] -> Class['quickstack::firewall::galera']
 
@@ -42,6 +43,7 @@ class quickstack::pacemaker::galera (
       frontend_pub_host    => map_params("db_vip"),
       backend_server_names => map_params("pcmk_server_names"),
       backend_server_addrs => map_params("pcmk_server_addrs"),
+      maxconn              => $_maxconn,
     }
 
     Class['::quickstack::pacemaker::common']
