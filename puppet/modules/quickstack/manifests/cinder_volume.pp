@@ -253,7 +253,7 @@ class quickstack::cinder_volume(
       $last = $count -1
       $dell_sc_backends = produce_array_with_prefix('dell_sc',1,$count)  #Initialize with section headers
 
-      quickstack::dellsc::volume { $last:
+      quickstack::dell::sc_iscsi::volume { $last:
         index                          => $last,
         backend_section_name_array     => $dell_sc_backends,
         backend_dell_sc_name_array     => $backend_dell_sc_name,
