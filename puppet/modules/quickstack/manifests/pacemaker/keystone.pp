@@ -128,7 +128,8 @@ class quickstack::pacemaker::keystone (
       Anchor['galera-online'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_heat'))) {
-      if (is_configured('heat')) {
+      $_is_control = has_interface_with("ipaddress", map_params("cluster_control_ip"))
+      if (is_configured('heat') and $_is_control) {
         $_extra_admin_roles = ['heat_stack_owner']
       } else {
         $_extra_admin_roles = []
