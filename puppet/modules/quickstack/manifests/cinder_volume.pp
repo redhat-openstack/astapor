@@ -295,12 +295,14 @@ class quickstack::cinder_volume(
     if str2bool_i("$backend_netapp") {
 
       $count = size($backend_netapp_name)
-      $last = $count - 1
+      $last = $count -1
+      $netapp_backends = produce_array_with_prefix("netapp",1,$count)
+
 
       # FIXME: with newer parser we should use `each` (with index) instead
       quickstack::netapp::volume { $last:
         index => $last,
-        backend_netapp_name_array      => $backend_netapp_name,
+        backend_netapp_name_array      => $netapp_backends,
         netapp_hostname_array          => $netapp_hostname,
         netapp_login_array             => $netapp_login,
         netapp_password_array          => $netapp_password,
@@ -351,7 +353,7 @@ class quickstack::cinder_volume(
       'nfs_backends',
       'dell_sc_backends',
       'eqlx_backends',
-      'backend_netapp_name',
+      'netapp_backends',
       'rbd_backends',
       'iscsi_backends')
     if $enabled_backends == [] {
