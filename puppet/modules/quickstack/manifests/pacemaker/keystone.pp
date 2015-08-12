@@ -15,7 +15,7 @@ class quickstack::pacemaker::keystone (
   $public_protocol                          = "http",
   $region                                   = "RegionOne",
   $token_driver                             = "keystone.token.persistence.backends.sql.Token",
-  $token_provider                           = "keystone.token.providers.pki.Provider",
+  $token_provider                           = "keystone.token.providers.uuid.Provider",
   $use_syslog                               = "false",
   $log_facility                             = 'LOG_USER',
   $verbose                                  = 'false',
@@ -130,7 +130,7 @@ class quickstack::pacemaker::keystone (
     }
     if (str2bool_i(map_params('include_heat'))) {
       $_is_control = has_interface_with("ipaddress", map_params("cluster_control_ip"))
-      if (is_configured('heat') and $_is_control) {
+      if (is_configured('heat') and is_configured('keystone') and $_is_control) {
         $_extra_admin_roles = ['heat_stack_owner']
       } else {
         $_extra_admin_roles = []
