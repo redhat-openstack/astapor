@@ -1,0 +1,9 @@
+{
+  "name": "redhat-quickstack",
+  "version": "4.0.6",
+  "author": "redhat",
+  "summary": "Configurations to set up foreman quickly, install openstack puppet modules and rapidly provision openstack compute & controller nodes with puppet.",
+  "license": "none",
+  "source": "https://github.com/redhat-openstack/astapor",
+  "dependencies": []
+}
