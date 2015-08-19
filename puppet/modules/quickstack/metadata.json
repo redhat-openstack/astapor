@@ -1,9 +1,50 @@
 {
   "name": "redhat-quickstack",
-  "version": "4.0.6",
+  "version": "4.0.0",
   "author": "redhat",
   "summary": "Configurations to set up foreman quickly, install openstack puppet modules and rapidly provision openstack compute & controller nodes with puppet.",
   "license": "none",
   "source": "https://github.com/redhat-openstack/astapor",
-  "dependencies": []
+  "operatingsystem_support": [
+        {
+          "operatingsystem":"RedHat",
+          "operatingsystemrelease": [
+            "6.0",
+            "7.0"
+          ]
+        }
+      ],
+  "dependencies": [
+        { "name": "puppetlabs/apache", "version_requirement": ">= 1.5.0" },
+        { "name": "stackforge/ceilometer", "version_requirement": ">= 5.1.0" },
+        { "name": "stackforge/ceph", "version_requirement": ">= 1.0.0" },
+        { "name": "rcritten/certmonger", "version_requirement": ">= 1.0.3" },
+        { "name": "stackforge/cinder", "version_requirement": ">= 5.1.0" },
+        { "name": "puppetlabs/concat", "version_requirement": ">= 1.2.0" },
+        { "name": "puppetlabs/corosync", "version_requirement": ">= 0.7.0" },
+        { "name": "puppetlabs/firewall", "version_requirement": ">= 1.6.0" },
+        { "name": "puppet/galera", "version_requirement": ">= 0.0.2" },
+        { "name": "stackforge/glance", "version_requirement": ">= 5.1.0" },
+        { "name": "purpleidea/gluster", "version_requirement": ">= 0.1.0" },
+        { "name": "puppetlabs/haproxy", "version_requirement": ">= 1.2.0" },
+        { "name": "stackforge/heat", "version_requirement": ">= 5.1.0" },
+        { "name": "stackforge/horizon", "version_requirement": ">= 5.1.0" },
+        { "name": "stackforge/keystone", "version_requirement": ">= 5.1.0" },
+        { "name": "saz/memcached", "version_requirement": ">= 2.8.1" },
+        { "name": "puppetlabs/mongodb", "version_requirement": ">= 0.11.0" },
+        { "name": "puppetlabs/mysql", "version_requirement": ">= 3.4.0" },
+        { "name": "stackforge/n1kv_vsm", "version_requirement": ">= 0.0.2" },
+        { "name": "stackforge/neutron", "version_requirement": ">= 5.1.0" },
+        { "name": "stackforge/nova", "version_requirement": ">= 5.1.0" },
+        { "name": "puppetlabs/ntp", "version_requirement": ">= 4.0.0" },
+        { "name": "radez/pacemaker", "version_requirement": ">= 0.2.0" },
+        { "name": "puppet/puppet", "version_requirement": ">= 0.0.2" },
+        { "name": "dprince/qpid", "version_requirement": ">= 1.0.2" },
+        { "name": "puppetlabs/rabbitmq", "version_requirement": ">= 5.2.3" },
+        { "name": "arioch/redis", "version_requirement": ">= 1.1.0" },
+        { "name": "puppetlabs/rsync", "version_requirement": ">= 0.4.0" },
+        { "name": "saz/ssh", "version_requirement": ">= 2.8.1" },
+        { "name": "puppetlabs/sysctl", "version_requirement": ">= 0.0.1" },
+        { "name": "puppetlabs/xinetd", "version_requirement": ">= 1.5.0" }
+      ]
 }
