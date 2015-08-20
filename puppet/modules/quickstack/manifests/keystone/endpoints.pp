@@ -280,12 +280,22 @@ class quickstack::keystone::endpoints (
 
     # Configure Nova endpoint in Keystone
     if $nova {
+      $_public_base_url = "${public_protocol}://${nova_public_real}"
+      $_admin_base_url = "${public_protocol}://${nova_admin_real}"
+      $_internal_base_url = "${public_protocol}://${nova_internal_real}"
+      $_v2_chunk = ":8774/v2/%(tenant_id)s"
+      $_v3_chunk = ":8774/v3"
       class { 'nova::keystone::auth':
         password         => $nova_user_password,
-        public_address   => $nova_public_real,
-        public_protocol  => $public_protocol,
-        admin_address    => $nova_admin_real,
-        internal_address => $nova_internal_real,
+        public_url       => "${_public_base_url}${_v2_chunk}",
+        public_url_v3    => "${_public_base_url}${_v3_chunk}",
+        ec2_public_url   => "${_public_base_url}:8773/services/Cloud",
+        admin_url        => "${_admin_base_url}${_v2_chunk}",
+        admin_url_v3     => "${_admin_base_url}${_v3_chunk}",
+        ec2_admin_url    => "${_admin_base_url}:8773/services/Admin",
+        internal_url     => "${_internal_base_url}${_v2_chunk}",
+        internal_url_v3  => "${_internal_base_url}${_v3_chunk}",
+        ec2_internal_url => "${_internal_base_url}:8773/services/Cloud",
         region           => $region,
       }
       contain nova::keystone::auth
