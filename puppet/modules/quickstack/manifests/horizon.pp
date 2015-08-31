@@ -60,7 +60,7 @@ class quickstack::horizon(
 
   $neutron_options   = {'enable_lb' => true,
                         'enable_firewall' => true,
-                        'enable_quotas' => false,
+                        'enable_quotas' => true,
                         'enable_security_group' => false,
                         'enable_vpn' => true,
                         'profile_support' => $_profile_support }
