@@ -271,13 +271,13 @@ class quickstack::cinder_volume(
 
     if str2bool_i("$backend_eqlx") {
 
-      $count = size($backend_eqlx_name)
-      $last = $count -1
-      $eqlx_backends = produce_array_with_prefix("eqlx",1,$count)  #Initialize with section headers
+      $count2 = size($backend_eqlx_name)
+      $last2 = $count2 -1
+      $eqlx_backends = produce_array_with_prefix("eqlx",1,$count2)  #Initialize with section headers
 
       # FIXME: with newer parser we should use `each` (with index) instead
-      quickstack::eqlx::volume { $last:
-        index => $last,
+      quickstack::eqlx::volume { $last2:
+        index => $last2,
         backend_section_name_array => $eqlx_backends,
         backend_eqlx_name_array => $backend_eqlx_name,
         san_ip_array => $san_ip,
@@ -294,14 +294,14 @@ class quickstack::cinder_volume(
 
     if str2bool_i("$backend_netapp") {
 
-      $count = size($backend_netapp_name)
-      $last = $count -1
-      $netapp_backends = produce_array_with_prefix("netapp",1,$count)
+      $count3 = size($backend_netapp_name)
+      $last3 = $count3 -1
+      $netapp_backends = produce_array_with_prefix("netapp",1,$count3)
 
 
       # FIXME: with newer parser we should use `each` (with index) instead
-      quickstack::netapp::volume { $last:
-        index => $last,
+      quickstack::netapp::volume { $last3:
+        index => $last3,
         backend_netapp_name_array      => $netapp_backends,
         netapp_hostname_array          => $netapp_hostname,
         netapp_login_array             => $netapp_login,
