@@ -55,6 +55,17 @@ class quickstack::pacemaker::constraints() {
       private_vip => map_params("heat_private_vip"),
       admin_vip   => map_params("heat_admin_vip"),
     }
+    if (str2bool_i(map_params('include_keystone'))) {
+      quickstack::pacemaker::constraint::typical{ 'keystone-then-heat-constr' :
+        first_resource  => "keystone-clone",
+        second_resource => "heat-api-clone",
+        colocation      => false,
+      }
+    } else {
+      quickstack::pacemaker::constraint::base_services{"base-then-heat-constr" :
+        target_resource => "heat-api-clone",
+      }
+    }
     if str2bool_i($heat_cfn_enabled) {
       quickstack::pacemaker::constraint::haproxy_vips {"$heat_cfn_group":
         public_vip  => map_params("heat_cfn_public_vip"),
@@ -239,6 +250,18 @@ class quickstack::pacemaker::constraints() {
       Quickstack::Pacemaker::Resource::Generic['ceilometer-central'] ->
       quickstack::pacemaker::constraint::base_services{"base-then-ceilo-constr" :
         target_resource => $_ceilo_central_clone,
+      }
+    }
+    if (str2bool_i(map_params('include_heat'))) {
+      Quickstack::Pacemaker::Resource::Generic['ceilometer-notification'] ->
+      quickstack::pacemaker::constraint::typical{
+        'ceilometer-notification-heat-api-constr' :
+        first_resource  => "ceilometer-notification-clone",
+        second_resource => "heat-api-clone",
+        colocation      => false,
+        require         =>
+          [ Quickstack::Pacemaker::Resource::Generic['ceilometer-notification'],
+            Quickstack::Pacemaker::Resource::Generic['heat-api']],
       }
     }
     if (str2bool_i(map_params('include_nosql'))) {
