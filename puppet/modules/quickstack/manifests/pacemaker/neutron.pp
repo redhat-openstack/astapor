@@ -250,22 +250,16 @@ class quickstack::pacemaker::neutron (
       operation_opts   => "start timeout=90",
       # monitor_params => { 'start-delay'     => '10s' },
     }
-    ->
-    quickstack::pacemaker::resource::generic {'neutron-scale':
-      resource_name => 'neutron:NeutronScale',
-      clone_opts    => "globally-unique=true clone-max=${_clone_max} interleave=true",
-      resource_type => 'ocf',
-    }
 
     if ($core_plugin == 'plumgrid') {
-      notify { 'PLUMgrid neutron-scale resource':
+      notify { 'PLUMgrid core plugin':
         require => Quickstack::Pacemaker::Resource::Generic['neutron-server'],
       }
       ->
       Anchor['pacemaker ordering constraints begin']
 
     } else {
-      notify { 'neutron-scale resource':
+      notify { 'not PLUMgrid core plugin':
         require => Quickstack::Pacemaker::Resource::Generic['neutron-server'],
       }
       ->
@@ -302,18 +296,18 @@ class quickstack::pacemaker::neutron (
       }
       ->
       quickstack::pacemaker::constraint::base {
-        'neutron-scale-to-ovs-cleanup-constr' :
+        'neutron-server-openvswitch-agent-constr' :
         constraint_type => "order",
-        first_resource  => "neutron-scale-clone",
-        second_resource => "neutron-ovs-cleanup-clone",
+        first_resource  => "neutron-server-clone",
+        second_resource => "neutron-openvswitch-agent-clone",
         first_action    => "start",
         second_action   => "start",
       }
       ->
       quickstack::pacemaker::constraint::colocation {
-        'neutron-scale-ovs-colo' :
-        source => "neutron-ovs-cleanup-clone",
-        target => "neutron-scale-clone",
+        'neutron-server-openvswitch-agent-colo' :
+        source => "neutron-openvswitch-agent-clone",
+        target => "neutron-server-clone",
         score  => "INFINITY",
       }
       ->
