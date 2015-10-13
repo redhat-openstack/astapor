@@ -52,6 +52,19 @@ class quickstack::pacemaker::ceilometer (
       Anchor['redis-begin']
       Exec['redis-master-is-up'] ->
       Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+
+      quickstack::pacemaker::constraint::base {
+        'redis-then-ceilometer-central-constraint':
+        constraint_type   => "order",
+        constraint_params => "require-all=false",
+        first_resource    => "redis-master",
+        second_resource   => $_ceilo_central_resource,
+        first_action      => "promote",
+        second_action     => "start",
+        require           => [
+          Quickstack::Pacemaker::Resource::Generic['redis'],
+          Quickstack::Pacemaker::Resource::Generic['ceilometer-central']],
+      }
     } else {
       $_coordination_url = undef
       $_ceilo_central_clone = undef

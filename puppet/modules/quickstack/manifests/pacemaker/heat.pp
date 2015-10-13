@@ -146,6 +146,7 @@ class quickstack::pacemaker::heat(
     ->
     quickstack::pacemaker::resource::generic {'heat-engine':
       resource_name   => "openstack-heat-engine",
+      clone_opts      => "interleave=true",
     }
 
     if str2bool_i($heat_cfn_enabled) {
@@ -208,13 +209,13 @@ class quickstack::pacemaker::heat(
         quickstack::pacemaker::constraint::base { 'heat-cloudwatch-engine-constr' :
           constraint_type => "order",
           first_resource  => "heat-api-cloudwatch-clone",
-          second_resource => "heat-engine",
+          second_resource => "heat-engine-clone",
           first_action    => "start",
           second_action   => "start",
         }
         ->
         quickstack::pacemaker::constraint::colocation { 'heat-cloudwatch-engine-colo' :
-          source => "heat-engine",
+          source => "heat-engine-clone",
           target => "heat-api-cloudwatch-clone",
           score => "INFINITY",
         }
