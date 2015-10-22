@@ -117,6 +117,7 @@
 
 class quickstack::nova (
   $admin_password,
+  $amqp_heartbeat_timeout_threshold,
   $amqp_hostname                = 'localhost',
   $amqp_port                    = '5672',
   $amqp_username                = '',
@@ -156,22 +157,23 @@ class quickstack::nova (
     $glance_api_uri =  "http://${glance_host}:${glance_port}/v1"
 
     class { '::nova':
-      database_connection => $nova_sql_connection,
-      image_service       => $image_service,
-      glance_api_servers  => $glance_api_uri,
-      memcached_servers   => $memcached_servers,
-      rpc_backend         => $rpc_backend,
-      verbose             => $verbose,
-      qpid_port           => $amqp_port,
-      qpid_hostname       => $amqp_hostname,
-      qpid_heartbeat      => $qpid_heartbeat,
-      qpid_username       => $amqp_username,
-      qpid_password       => $amqp_password,
-      rabbit_port         => $amqp_port,
-      rabbit_host         => $amqp_hostname,
-      rabbit_userid       => $amqp_username,
-      rabbit_password     => $amqp_password,
-      rabbit_hosts        => $rabbit_hosts,
+      database_connection                => $nova_sql_connection,
+      image_service                      => $image_service,
+      glance_api_servers                 => $glance_api_uri,
+      memcached_servers                  => $memcached_servers,
+      rpc_backend                        => $rpc_backend,
+      verbose                            => $verbose,
+      qpid_port                          => $amqp_port,
+      qpid_hostname                      => $amqp_hostname,
+      qpid_heartbeat                     => $qpid_heartbeat,
+      qpid_username                      => $amqp_username,
+      qpid_password                      => $amqp_password,
+      rabbit_heartbeat_timeout_threshold => $amqp_heartbeat_timeout_threshold,
+      rabbit_port                        => $amqp_port,
+      rabbit_host                        => $amqp_hostname,
+      rabbit_userid                      => $amqp_username,
+      rabbit_password                    => $amqp_password,
+      rabbit_hosts                       => $rabbit_hosts,
     }
 
     nova_config { 'DEFAULT/default_floating_pool':
@@ -223,7 +225,7 @@ class quickstack::nova (
     class {'::nova::scheduler::filter':
       scheduler_host_subset_size => $scheduler_host_subset_size,
       ram_allocation_ratio       =>  $ram_allocation_ratio,
-      cpu_allocation_ratio       =>  $cpu_allocation_ratio,  
+      cpu_allocation_ratio       =>  $cpu_allocation_ratio,
     }
     class {'::nova::cert':
       enabled => str2bool_i("$enabled"),

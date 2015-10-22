@@ -11,6 +11,7 @@
 #   Defaults to the value of nova_host if unset.
 
 class quickstack::compute_common (
+  $amqp_heartbeat_timeout_threshold,
   $amqp_host                    = $quickstack::params::amqp_host,
   $amqp_password                = $quickstack::params::amqp_password,
   $amqp_port                    = '5672',
@@ -203,23 +204,24 @@ class quickstack::compute_common (
   }
 
   class { '::nova':
-    database_connection => $nova_sql_connection,
-    debug               => $debug,
-    image_service       => 'nova.image.glance.GlanceImageService',
-    glance_api_servers  => "http://${glance_host}:9292/v1",
-    rpc_backend         => amqp_backend('nova', $amqp_provider),
-    qpid_hostname       => $amqp_host,
-    qpid_protocol       => $qpid_protocol,
-    qpid_port           => $real_amqp_port,
-    qpid_username       => $amqp_username,
-    qpid_password       => $amqp_password,
-    rabbit_host         => $amqp_host,
-    rabbit_port         => $real_amqp_port,
-    rabbit_userid       => $amqp_username,
-    rabbit_password     => $amqp_password,
-    rabbit_use_ssl      => $ssl,
-    rabbit_hosts        => $rabbit_hosts,
-    verbose             => $verbose,
+    database_connection                => $nova_sql_connection,
+    debug                              => $debug,
+    image_service                      => 'nova.image.glance.GlanceImageService',
+    glance_api_servers                 => "http://${glance_host}:9292/v1",
+    rpc_backend                        => amqp_backend('nova', $amqp_provider),
+    qpid_hostname                      => $amqp_host,
+    qpid_protocol                      => $qpid_protocol,
+    qpid_port                          => $real_amqp_port,
+    qpid_username                      => $amqp_username,
+    qpid_password                      => $amqp_password,
+    rabbit_heartbeat_timeout_threshold => $amqp_heartbeat_timeout_threshold,
+    rabbit_host                        => $amqp_host,
+    rabbit_port                        => $real_amqp_port,
+    rabbit_userid                      => $amqp_username,
+    rabbit_password                    => $amqp_password,
+    rabbit_use_ssl                     => $ssl,
+    rabbit_hosts                       => $rabbit_hosts,
+    verbose                            => $verbose,
   }
 
   $compute_ip = find_ip("$private_network",
@@ -234,19 +236,20 @@ class quickstack::compute_common (
   }
 
   if str2bool_i("$ceilometer") {
-    class { 'ceilometer':
-      metering_secret => $ceilometer_metering_secret,
-      qpid_protocol   => $qpid_protocol,
-      qpid_username   => $amqp_username,
-      qpid_password   => $amqp_password,
-      rabbit_host     => $amqp_host,
-      rabbit_hosts    => $rabbit_hosts,
-      rabbit_port     => $real_amqp_port,
-      rabbit_userid   => $amqp_username,
-      rabbit_password => $amqp_password,
-      rabbit_use_ssl  => $ssl,
-      rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
-      verbose         => $verbose,
+    class { '::ceilometer':
+      metering_secret                    => $ceilometer_metering_secret,
+      qpid_protocol                      => $qpid_protocol,
+      qpid_username                      => $amqp_username,
+      qpid_password                      => $amqp_password,
+      rabbit_heartbeat_timeout_threshold => $amqp_heartbeat_timeout_threshold,
+      rabbit_host                        => $amqp_host,
+      rabbit_hosts                       => $rabbit_hosts,
+      rabbit_port                        => $real_amqp_port,
+      rabbit_userid                      => $amqp_username,
+      rabbit_password                    => $amqp_password,
+      rabbit_use_ssl                     => $ssl,
+      rpc_backend                        => amqp_backend('ceilometer', $amqp_provider),
+      verbose                            => $verbose,
     }
 
     class { 'ceilometer::agent::auth':
