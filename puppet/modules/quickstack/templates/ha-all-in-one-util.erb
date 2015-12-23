@@ -59,7 +59,7 @@ all_members_include() {
         scope.lookupvar("::operatingsystemrelease").match(/^6\.5.*/) %>
   members=$(/usr/sbin/crm_node -l)
   <% else %>
-  members=$(/usr/sbin/crm_node -l | perl -p -e 's/^.*\s+(\S+)$/$1/g')
+  members=$(/usr/sbin/crm_node -l | awk '{print $2}')
   <% end %>
   if [ "x${members}" = "x" ]; then return 1; fi
   for member in $members; do
