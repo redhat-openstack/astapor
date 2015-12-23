@@ -23,7 +23,7 @@ define quickstack::pacemaker::resource::generic(
     }
 
     if $operation_opts != undef {
-      $_operation_opts = "op ${operation_opts}"
+      $_operation_opts = "${operation_opts}"
     } else {
       $_operation_opts = ""
     }
