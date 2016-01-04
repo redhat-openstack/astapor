@@ -263,7 +263,8 @@ class Hostgroups
         data = { 'id' => param['id'],
           'smart_class_parameter' => {
             'default_value'  => default_value,
-            'parameter_type' => parameter_type
+            'parameter_type' => parameter_type,
+            'override'       => true,
           }
         }
         @foreman.smart_params.update(data)
