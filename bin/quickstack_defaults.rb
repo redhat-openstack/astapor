@@ -260,10 +260,15 @@ class Hostgroups
           default_value  = [].to_json
         end
 
+        if parameter_type == 'hash' && default_value.empty?
+          default_value  = {}.to_json
+        end
+
         data = { 'id' => param['id'],
           'smart_class_parameter' => {
             'default_value'  => default_value,
-            'parameter_type' => parameter_type
+            'parameter_type' => parameter_type,
+            'override'       => true,
           }
         }
         @foreman.smart_params.update(data)
