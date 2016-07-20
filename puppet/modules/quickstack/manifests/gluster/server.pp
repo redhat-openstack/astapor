@@ -29,6 +29,7 @@ class quickstack::gluster::server (
   $volume3_path  = $quickstack::params::gluster_volume3_path,
   $volume3_uid   = $quickstack::params::gluster_volume3_uid,
 ) {
+  include gluster::params
 
   $vip  = ''
   $vrrp =  false
