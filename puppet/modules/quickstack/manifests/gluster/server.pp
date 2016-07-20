@@ -52,121 +52,40 @@ class quickstack::gluster::server (
     uuid => "${uuid3}"
   }
 
-  gluster::brick {"${fqdn1}:${volume1_path}":
-    dev         => "${device1}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn1}:${volume1_path}":
+    dev => "${device1}",
   }
 
-  gluster::brick {"${fqdn1}:${volume2_path}":
-    dev         => "${device2}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn1}:${volume2_path}":
+    dev => "${device2}",
   }
 
-  gluster::brick {"${fqdn1}:${volume3_path}":
-    dev         => "${device3}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn1}:${volume3_path}":
+    dev => "${device3}",
   }
 
-  gluster::brick {"${fqdn2}:${volume1_path}":
-    dev         => "${device1}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn2}:${volume1_path}":
+    dev => "${device1}",
   }
 
-  gluster::brick {"${fqdn2}:${volume2_path}":
-    dev         => "${device2}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn2}:${volume2_path}":
+    dev => "${device2}",
   }
 
-  gluster::brick {"${fqdn2}:${volume3_path}":
-    dev         => "${device3}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn2}:${volume3_path}":
+    dev => "${device3}",
   }
 
-  gluster::brick {"${fqdn3}:${volume1_path}":
-    dev         => "${device1}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn3}:${volume1_path}":
+    dev => "${device1}",
   }
 
-  gluster::brick {"${fqdn3}:${volume2_path}":
-    dev         => "${device2}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn3}:${volume2_path}":
+    dev => "${device2}",
   }
 
-  gluster::brick {"${fqdn3}:${volume3_path}":
-    dev         => "${device3}",
-    raid_su     => '256',
-    raid_sw     => '10',
-    partition   => true,
-    lvm         => true,
-    fstype      => 'xfs',
-    xfs_inode64 => true,
-    #xfs_nobarrier => true,
-    force       => true,
-    areyousure  => true,
+  gluster::gluster_brick {"${fqdn3}:${volume3_path}":
+    dev => "${device3}",
   }
 
   $brick_list = [
@@ -183,10 +102,11 @@ class quickstack::gluster::server (
 
   gluster::volume { ["${volume1_name}", "${volume2_name}", "${volume3_name}"]:
     replica => "${replica_count}",
-    bricks => $brick_list,
-    vip => "${vip}",
-    ping => false,  # disable fping
-    start => true,
+    bricks  => $brick_list,
+    vip     => "${vip}",
+    ping    => false,  # disable fping
+    start   => true,
+    again   => false,
   }
 
   gluster::volume::property {"${volume1_name}#storage.owner-uid":
