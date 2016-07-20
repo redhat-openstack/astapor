@@ -81,10 +81,10 @@ class quickstack::pacemaker::swift (
       command => "/usr/bin/openstack-config --set /etc/swift/object-expirer.conf object-expirer concurrency 100",
     } ->
     exec {"pcs-swift-server-set-up":
-      command => "/usr/sbin/pcs property set swift=running --force",
+      command => "/tmp/ha-all-in-one-util.bash set_property swift running",
     } ->
     exec {"pcs-swift-server-set-up-on-this-node":
-      command => "/tmp/ha-all-in-one-util.bash set_property swift running",
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property swift" 
     } ->
     exec {"all-swift-nodes-are-up":
       timeout   => 3600,
