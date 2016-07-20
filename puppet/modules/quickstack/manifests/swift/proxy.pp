@@ -38,7 +38,7 @@ class quickstack::swift::proxy (
     # this declaration is needed so that the pipeline loop in
     # puppet-swift/manaifests/proxy.pp doesn't break.  note that
     # it ends up including the real logging class, proxy_logging
-    class { '::swift::proxy::proxy-logging': }
+    class { '::swift::proxy::proxy_logging': }
 
     # configure all of the middlewares
     class { [
